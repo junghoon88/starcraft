@@ -1,0 +1,188 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="mainGame">
+      <UniqueIdentifier>{f64753bf-5ff2-43bd-9a2d-d1a9330be2ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header">
+      <UniqueIdentifier>{0e5eef77-a78b-4c6f-80c1-8cfa2321868f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="framework">
+      <UniqueIdentifier>{b6c5733b-b097-4081-8985-2fe3d39566de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="framework\animation">
+      <UniqueIdentifier>{8abb4b56-d243-4ef6-ac1c-a4942cdb58f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="framework\camera">
+      <UniqueIdentifier>{0db8bc6f-a912-4fc7-8a0c-c5fcf23fb82e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="framework\UTIL">
+      <UniqueIdentifier>{ac7385d2-9d86-4a30-89cb-5490c9cd3e16}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="framework\Manager">
+      <UniqueIdentifier>{36ba96d6-d009-407b-92bf-cbe0eb1a6984}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="framework\Sprite">
+      <UniqueIdentifier>{7f9fc6e6-897c-48fa-b80d-81a6767d02bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="framework\Rect">
+      <UniqueIdentifier>{cca6865b-9b73-4dc3-8ae0-91ca6520a374}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="framework\timer">
+      <UniqueIdentifier>{2a88910e-99d3-471c-8755-a560835f270c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="framework\PrintText">
+      <UniqueIdentifier>{c8476652-8ba7-478e-9c5f-6233ecd0b258}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="framework\database">
+      <UniqueIdentifier>{d57f84d3-a606-482e-aaa4-cf32231f4815}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="framework\animation.cpp">
+      <Filter>framework\animation</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\camera.cpp">
+      <Filter>framework\camera</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\imageManager.cpp">
+      <Filter>framework\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\keyAniManager.cpp">
+      <Filter>framework\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\keyManager.cpp">
+      <Filter>framework\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\rectManager.cpp">
+      <Filter>framework\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\soundManager.cpp">
+      <Filter>framework\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\textManager.cpp">
+      <Filter>framework\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\timeManager.cpp">
+      <Filter>framework\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\mainGame.cpp">
+      <Filter>mainGame</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\database.cpp">
+      <Filter>framework\database</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\DxWindow.cpp">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\PrintText.cpp">
+      <Filter>framework\PrintText</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\Rect.cpp">
+      <Filter>framework\Rect</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\Sprite.cpp">
+      <Filter>framework\Sprite</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\Texture.cpp">
+      <Filter>framework\Sprite</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\timer.cpp">
+      <Filter>framework\timer</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\collision.cpp">
+      <Filter>framework\UTIL</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\utils.cpp">
+      <Filter>framework\UTIL</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\sceneManager.cpp">
+      <Filter>framework\Manager</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="framework\animation.h">
+      <Filter>framework\animation</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\camera.h">
+      <Filter>framework\camera</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\imageManager.h">
+      <Filter>framework\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\keyAniManager.h">
+      <Filter>framework\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\keyManager.h">
+      <Filter>framework\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\rectManager.h">
+      <Filter>framework\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\soundManager.h">
+      <Filter>framework\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\textManager.h">
+      <Filter>framework\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\timeManager.h">
+      <Filter>framework\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\mainGame.h">
+      <Filter>mainGame</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\commonMacroFunction.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\globalMacroVariables.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\randomFunction.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\stdafx.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\database.h">
+      <Filter>framework\database</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\DxWindow.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\PrintText.h">
+      <Filter>framework\PrintText</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\Rect.h">
+      <Filter>framework\Rect</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\Sprite.h">
+      <Filter>framework\Sprite</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\Texture.h">
+      <Filter>framework\Sprite</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\timer.h">
+      <Filter>framework\timer</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\collision.h">
+      <Filter>framework\UTIL</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\singletonBase.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\utils.h">
+      <Filter>framework\UTIL</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\sceneManager.h">
+      <Filter>framework\Manager</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="mainGame">
+      <UniqueIdentifier>{a077d8d1-66fe-4e56-9de2-837633154462}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="header">
+      <UniqueIdentifier>{90c486fc-c3f7-44c4-8a53-3dea85ca33af}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
