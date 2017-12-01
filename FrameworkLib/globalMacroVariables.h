@@ -36,12 +36,21 @@ enum DIRECTION
 	DIRECTION_RD = DIR_R | DIR_D,
 };
 
-enum PlayerNum
+enum PLAYER
 {
 	PLAYER_NONE = -1,
 	PLAYER1,
 	//PLAYER2,
 
 	PLAYER_NUM
+};
+
+enum RACES
+{
+	TERRAN,
+	PROTOSS,
+	ZERG,
+
+	RACES_NUM
 };
 

@@ -12,6 +12,7 @@ Sprite::Sprite(LPDIRECT3DDEVICE9 device, D3DXVECTOR2 coord, D3DXVECTOR2 size, D3
 
 	_scaleOffset = { 0.0f, 0.0f };
 
+
 	//4D Matrix ..?
 	D3DXMatrixIdentity(&_world);
 }
@@ -36,7 +37,12 @@ void Sprite::init(Texture* texture, bool bCameraOffset)
 	_size.x = (_size.x < 1) ? _texture->getFrameWidth()  : _size.x;
 	_size.y = (_size.y < 1) ? _texture->getFrameHeight() : _size.y;
 
+	_curFrameX = 0;
+	_curFrameY = 0;
+
 	_bCameraOffset = bCameraOffset;
+	_cameraX = 0;
+	_cameraY = 0;
 
 	AdjustTransform();
 }
@@ -104,8 +110,8 @@ bool Sprite::AdjustTransform()
 	D3DXVECTOR2 coord = _coord;
 	if (_bCameraOffset)
 	{
-		coord.x -= _mainCamera.x;
-		coord.y -= _mainCamera.y;
+		coord.x -= _cameraX;
+		coord.y -= _cameraY;
 	}
 
 	if (_scale.x < 0)
@@ -119,10 +125,10 @@ bool Sprite::AdjustTransform()
 
 	RECT temp;
 	RECT rcSprite = RectMake(_coord.x, _coord.y, fabs(_size.x), fabs(_size.y));
-	RECT rcCamera = RectMake(_mainCamera.x, _mainCamera.y, WINSIZEX, WINSIZEY);
+	//RECT rcCamera = RectMake(_mainCamera.x, _mainCamera.y, WINSIZEX, WINSIZEY);
 
-	if (!IntersectRect(&temp, &rcSprite, &rcCamera))
-		return false;
+	//if (!IntersectRect(&temp, &rcSprite, &rcCamera))
+	//	return false;
 
 
 	//4D Matrix ..?

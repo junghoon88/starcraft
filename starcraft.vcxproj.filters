@@ -7,174 +7,77 @@
     <Filter Include="Header">
       <UniqueIdentifier>{0e5eef77-a78b-4c6f-80c1-8cfa2321868f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="framework">
-      <UniqueIdentifier>{b6c5733b-b097-4081-8985-2fe3d39566de}</UniqueIdentifier>
+    <Filter Include="mainGame\sceneGame">
+      <UniqueIdentifier>{469c0a74-79c8-42ab-80ff-f40b3300f40e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="framework\animation">
-      <UniqueIdentifier>{8abb4b56-d243-4ef6-ac1c-a4942cdb58f3}</UniqueIdentifier>
+    <Filter Include="mainGame\Unit">
+      <UniqueIdentifier>{87f53df7-09c6-4b04-bf57-f44dbfed44cf}</UniqueIdentifier>
     </Filter>
-    <Filter Include="framework\camera">
-      <UniqueIdentifier>{0db8bc6f-a912-4fc7-8a0c-c5fcf23fb82e}</UniqueIdentifier>
+    <Filter Include="mainGame\Building">
+      <UniqueIdentifier>{7b8a57c9-3f59-4c37-8925-394af320baa7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="framework\UTIL">
-      <UniqueIdentifier>{ac7385d2-9d86-4a30-89cb-5490c9cd3e16}</UniqueIdentifier>
+    <Filter Include="mainGame\RACES">
+      <UniqueIdentifier>{efd3194d-9f35-449d-9b7b-110d58292aad}</UniqueIdentifier>
     </Filter>
-    <Filter Include="framework\Manager">
-      <UniqueIdentifier>{36ba96d6-d009-407b-92bf-cbe0eb1a6984}</UniqueIdentifier>
+    <Filter Include="mainGame\RACES\Zerg">
+      <UniqueIdentifier>{62224911-1a4f-4f3a-9798-260d41944a1f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="framework\Sprite">
-      <UniqueIdentifier>{7f9fc6e6-897c-48fa-b80d-81a6767d02bb}</UniqueIdentifier>
+    <Filter Include="mainGame\RACES\Zerg\Units">
+      <UniqueIdentifier>{dcb40a26-767f-42fa-b9a9-86f71dcbb0ae}</UniqueIdentifier>
     </Filter>
-    <Filter Include="framework\Rect">
-      <UniqueIdentifier>{cca6865b-9b73-4dc3-8ae0-91ca6520a374}</UniqueIdentifier>
+    <Filter Include="mainGame\RACES\Zerg\Building">
+      <UniqueIdentifier>{f610cbbe-ef9f-4330-bc59-8a24cc9f5e08}</UniqueIdentifier>
     </Filter>
-    <Filter Include="framework\timer">
-      <UniqueIdentifier>{2a88910e-99d3-471c-8755-a560835f270c}</UniqueIdentifier>
+    <Filter Include="mainGame\RACES\Terran">
+      <UniqueIdentifier>{b6d308ac-21f9-43ee-b270-e34edafb0bb1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="framework\PrintText">
-      <UniqueIdentifier>{c8476652-8ba7-478e-9c5f-6233ecd0b258}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="framework\database">
-      <UniqueIdentifier>{d57f84d3-a606-482e-aaa4-cf32231f4815}</UniqueIdentifier>
+    <Filter Include="mainGame\RACES\Protoss">
+      <UniqueIdentifier>{60e4678d-a482-42fe-8020-8bde1cc9edd3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="framework\animation.cpp">
-      <Filter>framework\animation</Filter>
+    <ClCompile Include="sceneGame.cpp">
+      <Filter>mainGame\sceneGame</Filter>
     </ClCompile>
-    <ClCompile Include="framework\camera.cpp">
-      <Filter>framework\camera</Filter>
+    <ClCompile Include="Unit.cpp">
+      <Filter>mainGame\Unit</Filter>
     </ClCompile>
-    <ClCompile Include="framework\keyAniManager.cpp">
-      <Filter>framework\Manager</Filter>
-    </ClCompile>
-    <ClCompile Include="framework\keyManager.cpp">
-      <Filter>framework\Manager</Filter>
-    </ClCompile>
-    <ClCompile Include="framework\rectManager.cpp">
-      <Filter>framework\Manager</Filter>
-    </ClCompile>
-    <ClCompile Include="framework\soundManager.cpp">
-      <Filter>framework\Manager</Filter>
-    </ClCompile>
-    <ClCompile Include="framework\textManager.cpp">
-      <Filter>framework\Manager</Filter>
-    </ClCompile>
-    <ClCompile Include="framework\timeManager.cpp">
-      <Filter>framework\Manager</Filter>
-    </ClCompile>
-    <ClCompile Include="framework\mainGame.cpp">
+    <ClCompile Include="mainGame.cpp">
       <Filter>mainGame</Filter>
     </ClCompile>
-    <ClCompile Include="framework\database.cpp">
-      <Filter>framework\database</Filter>
+    <ClCompile Include="DxWindow.cpp" />
+    <ClCompile Include="Building.cpp">
+      <Filter>mainGame\Building</Filter>
     </ClCompile>
-    <ClCompile Include="framework\DxWindow.cpp">
-      <Filter>framework</Filter>
+    <ClCompile Include="Player.cpp">
+      <Filter>mainGame</Filter>
     </ClCompile>
-    <ClCompile Include="framework\PrintText.cpp">
-      <Filter>framework\PrintText</Filter>
-    </ClCompile>
-    <ClCompile Include="framework\Rect.cpp">
-      <Filter>framework\Rect</Filter>
-    </ClCompile>
-    <ClCompile Include="framework\Sprite.cpp">
-      <Filter>framework\Sprite</Filter>
-    </ClCompile>
-    <ClCompile Include="framework\Texture.cpp">
-      <Filter>framework\Sprite</Filter>
-    </ClCompile>
-    <ClCompile Include="framework\timer.cpp">
-      <Filter>framework\timer</Filter>
-    </ClCompile>
-    <ClCompile Include="framework\collision.cpp">
-      <Filter>framework\UTIL</Filter>
-    </ClCompile>
-    <ClCompile Include="framework\utils.cpp">
-      <Filter>framework\UTIL</Filter>
-    </ClCompile>
-    <ClCompile Include="framework\sceneManager.cpp">
-      <Filter>framework\Manager</Filter>
-    </ClCompile>
-    <ClCompile Include="framework\textureManager.cpp">
-      <Filter>framework\Manager</Filter>
+    <ClCompile Include="gameMap.cpp">
+      <Filter>mainGame</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="framework\animation.h">
-      <Filter>framework\animation</Filter>
+    <ClInclude Include="sceneGame.h">
+      <Filter>mainGame\sceneGame</Filter>
     </ClInclude>
-    <ClInclude Include="framework\camera.h">
-      <Filter>framework\camera</Filter>
+    <ClInclude Include="Unit.h">
+      <Filter>mainGame\Unit</Filter>
     </ClInclude>
-    <ClInclude Include="framework\keyAniManager.h">
-      <Filter>framework\Manager</Filter>
-    </ClInclude>
-    <ClInclude Include="framework\keyManager.h">
-      <Filter>framework\Manager</Filter>
-    </ClInclude>
-    <ClInclude Include="framework\rectManager.h">
-      <Filter>framework\Manager</Filter>
-    </ClInclude>
-    <ClInclude Include="framework\soundManager.h">
-      <Filter>framework\Manager</Filter>
-    </ClInclude>
-    <ClInclude Include="framework\textManager.h">
-      <Filter>framework\Manager</Filter>
-    </ClInclude>
-    <ClInclude Include="framework\timeManager.h">
-      <Filter>framework\Manager</Filter>
-    </ClInclude>
-    <ClInclude Include="framework\mainGame.h">
+    <ClInclude Include="mainGame.h">
       <Filter>mainGame</Filter>
     </ClInclude>
-    <ClInclude Include="framework\commonMacroFunction.h">
+    <ClInclude Include="stdafx.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="framework\globalMacroVariables.h">
-      <Filter>Header</Filter>
+    <ClInclude Include="DxWindow.h" />
+    <ClInclude Include="Building.h">
+      <Filter>mainGame\Building</Filter>
     </ClInclude>
-    <ClInclude Include="framework\randomFunction.h">
-      <Filter>Header</Filter>
+    <ClInclude Include="Player.h">
+      <Filter>mainGame</Filter>
     </ClInclude>
-    <ClInclude Include="framework\stdafx.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="framework\database.h">
-      <Filter>framework\database</Filter>
-    </ClInclude>
-    <ClInclude Include="framework\DxWindow.h">
-      <Filter>framework</Filter>
-    </ClInclude>
-    <ClInclude Include="framework\PrintText.h">
-      <Filter>framework\PrintText</Filter>
-    </ClInclude>
-    <ClInclude Include="framework\Rect.h">
-      <Filter>framework\Rect</Filter>
-    </ClInclude>
-    <ClInclude Include="framework\Sprite.h">
-      <Filter>framework\Sprite</Filter>
-    </ClInclude>
-    <ClInclude Include="framework\Texture.h">
-      <Filter>framework\Sprite</Filter>
-    </ClInclude>
-    <ClInclude Include="framework\timer.h">
-      <Filter>framework\timer</Filter>
-    </ClInclude>
-    <ClInclude Include="framework\collision.h">
-      <Filter>framework\UTIL</Filter>
-    </ClInclude>
-    <ClInclude Include="framework\singletonBase.h">
-      <Filter>framework</Filter>
-    </ClInclude>
-    <ClInclude Include="framework\utils.h">
-      <Filter>framework\UTIL</Filter>
-    </ClInclude>
-    <ClInclude Include="framework\sceneManager.h">
-      <Filter>framework\Manager</Filter>
-    </ClInclude>
-    <ClInclude Include="framework\textureManager.h">
-      <Filter>framework\Manager</Filter>
+    <ClInclude Include="gameMap.h">
+      <Filter>mainGame</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

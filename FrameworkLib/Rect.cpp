@@ -41,8 +41,8 @@ void Rect::render(bool cameraOffset)
 	{
 		if (cameraOffset)
 		{
-			_lineVectorOffset[i].x = _lineVector[i].x - _mainCamera.x;
-			_lineVectorOffset[i].y = _lineVector[i].y - _mainCamera.y;
+			_lineVectorOffset[i].x = _lineVector[i].x;// - _mainCamera.x;
+			_lineVectorOffset[i].y = _lineVector[i].y;// - _mainCamera.y;
 			_lineVectorOffset[i].z = _lineVector[i].z;
 		}
 		else

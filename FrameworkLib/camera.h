@@ -5,8 +5,8 @@
 class camera : public singletonBase<camera>
 {
 private:
-	//int _cameraX;		//카메라 현재 위치
-	//int _cameraY;		//
+	int _cameraX;		//카메라 현재 위치
+	int _cameraY;		//
 						
 	int _targetX;		//카메라가 가야할 위치
 	int _targetY;		//

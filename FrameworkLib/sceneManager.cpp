@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "sceneManager.h"
-#include "DxWindow.h"
+#include "../DxWindow.h"
 
 DWORD CALLBACK loadingThread(LPVOID prc)
 {

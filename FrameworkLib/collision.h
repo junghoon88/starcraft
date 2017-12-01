@@ -1,4 +1,5 @@
 #pragma once
+#include "stdafx.h"
 
 namespace IOTA_UTIL
 {
@@ -111,10 +112,10 @@ namespace IOTA_UTIL
 			bottom = (float)(rc.bottom);
 		}
 
-		RECT toRect(void)
-		{
-			return RectMake((int)left, (int)top, (int)(right - left), (int)(bottom - top));
-		}
+		//RECT toRect(void)
+		//{
+		//	return RectMake((int)left, (int)top, (int)(right - left), (int)(bottom - top));
+		//}
 
 		void setCenter(float _cx, float _cy, float _width, float _height)
 		{

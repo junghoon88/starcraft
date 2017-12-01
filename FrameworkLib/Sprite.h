@@ -18,9 +18,16 @@ private:
 
 	D3DXMATRIX _world;
 
+	//image
+	int _curFrameX;
+	int _curFrameY;
 
+	//camera
 	bool _bCameraOffset;
+	int _cameraX;
+	int _cameraY;
 
+private:
 	bool AdjustTransform();
 
 public:
@@ -41,6 +48,7 @@ public:
 	void move(float moveX, float moveY);
 
 
+public:
 	//getter, setter
 	inline D3DXVECTOR2 getCoord(void) { return _coord; }
 	inline D3DXVECTOR2 getSize(void) { return _size; }
@@ -64,24 +72,14 @@ public:
 	void setRotate(float angleDeg);
 	void setScaleOffset(float scaleOffsetX, float scaleOffsetY);
 
-	int getCurFrameX(void);
-	int getCurFrameY(void);
-	void setCurFrameX(int frameX);
-	void setCurFrameY(int frameY);
-	int getMaxFrameX(void);
-	int getMaxFrameY(void);
+	inline int getCurFrameX(void) { return _curFrameX; }
+	inline int getCurFrameY(void) { return _curFrameY; }
+	inline void setCurFrameX(int frameX) { _curFrameX = frameX; }
+	inline void setCurFrameY(int frameY) { _curFrameY = frameY; }
 
+	inline void setCameraPos(int x, int y) { _cameraX = x, _cameraY = y; }
 
 
 	inline Texture* getTexture(void) { return _texture; }
-
-
-	//int Sprite::getCurFrameX(void) { if (_texture) return _texture->getCurFrameX(); }
-	//int Sprite::getCurFrameY(void) { if (_texture) return _texture->getCurFrameY(); }
-	//void Sprite::setCurFrameX(int frameX) { if (_texture) _texture->setCurFrameX(frameX); }
-	//void Sprite::setCurFrameY(int frameY) { if (_texture) _texture->setCurFrameY(frameY); }
-	//int Sprite::getMaxFrameX(void) { if (_texture) return _texture->getMaxFrameX(); }
-	//int Sprite::getMaxFrameY(void) { if (_texture) return _texture->getMaxFrameY(); }
-
 };
 

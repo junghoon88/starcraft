@@ -1,3 +1,4 @@
+#pragma once
 #include "singletonBase.h"
 #include <time.h>
 

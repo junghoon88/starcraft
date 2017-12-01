@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "mainGame.h"
-#include "PrintText.h"
 
 
 mainGame::mainGame(HINSTANCE hInstance, LPCWSTR className, LPCSTR lpCmdLine, int nCmdShow)

@@ -16,7 +16,7 @@ protected:
 
 	HWND handle;
 
-	POINT winSize = { WINSIZEX, WINSIZEY };
+	POINT winSize;// = { WINSIZEX, WINSIZEY };
 	DWORD winStyle = WS_OVERLAPPEDWINDOW | WS_VISIBLE;
 
 	BOOL isWindow = TRUE;
@@ -52,10 +52,15 @@ public:
 	LRESULT MessageLoop(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 	virtual void init(void);
-	virtual void release(void) = 0;
-	virtual void update(void) = 0;
-	virtual void render(void) = 0;
+	virtual void release(void);
+	virtual void update(void);
+	virtual void render(void);
 
+
+public:
 	static int getStage(void) { return _stage; }
 	static void setStage(int stage) { _stage = stage; }
+
+	inline void setWinSize(int x, int y) { winSize.x = x; winSize.y = y; }
+
 };

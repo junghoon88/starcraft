@@ -5,7 +5,6 @@
 HINSTANCE _hInstance;		//어플 고유번호
 HWND _hWnd;
 POINT _ptMouse;
-POINT _mainCamera = { 0, 0 };
 
 //Window
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -19,6 +18,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdPa
 	_hInstance = hInstance; //image 에서 쓰려고 추가함
 
 	mainGame main(hInstance, L"DxClass", lpszCmdParam, nCmdShow);
+	main.setWinSize(WINSIZEX, WINSIZEY);
 	main.Create(L"starcraft");
 	main.CreateDevice();
 	main.init();
@@ -92,6 +92,9 @@ DxWindow::~DxWindow()
 
 //virtual
 void DxWindow::init() {}
+void DxWindow::release(void) {}
+void DxWindow::update(void) {}
+void DxWindow::render(void) {}
 
 void DxWindow::Create(LPCWSTR title)
 {
@@ -181,7 +184,7 @@ void DxWindow::SetupMatrices()
 
 	/// 뷰행렬을 설정
 	D3DXVECTOR3 vEyePt(0.0f, 0.0f, -5.0f);
-	D3DXVECTOR3 vLookatPt((float)_mainCamera.x, (float)_mainCamera.y, 0.0f);
+	D3DXVECTOR3 vLookatPt(0.0f, 0.0f, 0.0f);
 	D3DXVECTOR3 vUpVec(0.0f, 1.0f, 0.0f);
 	D3DXMATRIXA16 matView;
 	D3DXMatrixLookAtLH(&matView, &vEyePt, &vLookatPt, &vUpVec);
