@@ -19,7 +19,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdPa
 	_hInstance = hInstance; //image 에서 쓰려고 추가함
 
 	mainGame main(hInstance, L"DxClass", lpszCmdParam, nCmdShow);
-	main.Create(L"DirectX");
+	main.Create(L"starcraft");
 	main.CreateDevice();
 	main.init();
 
