@@ -4,21 +4,18 @@
 #include "Texture.h"
 #include <map>
 
-class imageManager : public singletonBase<imageManager>
+class textureManager : public singletonBase<textureManager>
 {
 private:
-	typedef map<wstring, Sprite*> mapSpriteList;
-	typedef map<wstring, Sprite*>::iterator mapSpriteIter;
 	typedef map<wstring, Texture*> mapTextureList;
 	typedef map<wstring, Texture*>::iterator mapTextureIter;
 
 private:
 	mapTextureList	_mTextureList;	//고유 이미지
-	mapSpriteList	_mSpriteList;	//같은 이미지를 여러개 표현
 
 public:
-	imageManager();
-	~imageManager();
+	textureManager();
+	~textureManager();
 
 	void init();
 	void release();
@@ -27,11 +24,9 @@ public:
 	Texture* addTexture(LPDIRECT3DDEVICE9 device, wstring strKey, const TCHAR* fileName, int frameX, int frameY);
 	Texture* findTexture(wstring strKey);
 
-	Sprite* addSprite(LPDIRECT3DDEVICE9 device, wstring strKey, wstring strTextureKey, bool bCameraOffset = true);
-	Sprite* findSprite(wstring strKey);
-
 	void deleteAll(void);
 
+#if 0
 	void setCoord(wstring strKey, float destX, float destY);
 	void setScale(wstring strKey, float scaleX, float scaleY);
 	void setCenterPer(wstring strKey, float centerPerX, float centerPerY); //size 기준 배율로
@@ -68,5 +63,7 @@ public:
 
 	//getter
 	wstring FindKeyByImage(Sprite* img);
+#endif
+
 };
 

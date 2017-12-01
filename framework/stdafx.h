@@ -37,7 +37,7 @@ using namespace std;
 #include "keyManager.h"
 #include "utils.h"
 #include "collision.h"
-#include "imageManager.h"
+#include "textureManager.h"
 #include "timeManager.h"
 #include "sceneManager.h"
 #include "database.h"
@@ -64,7 +64,7 @@ using namespace IOTA_UTIL;
 
 #define RND randomFunction::getSingleton()
 #define KEYMANAGER keyManager::getSingleton()
-#define IMAGEMANAGER imageManager::getSingleton()
+#define TEXTUREMANAGER textureManager::getSingleton()
 //#define TXTDATA txtData::getSingleton()
 #define TIMEMANAGER timeManager::getSingleton() 
 #define SOUNDMANAGER soundManager::getSingleton()

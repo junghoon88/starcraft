@@ -269,7 +269,7 @@ void DxWindow::initialize(void)
 
 	//singleton init
 	KEYMANAGER->init();
-	IMAGEMANAGER->init();
+	TEXTUREMANAGER->init();
 	//TXTDATA->init();
 	TIMEMANAGER->init();
 	SOUNDMANAGER->init();
@@ -289,7 +289,7 @@ void DxWindow::releaseSingleton(void)
 	if (_managerInit)
 	{
 		KEYMANAGER->release();					KEYMANAGER->releaseSingleton();
-		IMAGEMANAGER->release();				IMAGEMANAGER->releaseSingleton();
+		TEXTUREMANAGER->release();				TEXTUREMANAGER->releaseSingleton();
 		//TXTDATA->releaseSingleton();
 		TIMEMANAGER->release();					TIMEMANAGER->releaseSingleton();
 		SOUNDMANAGER->release();				SOUNDMANAGER->releaseSingleton();

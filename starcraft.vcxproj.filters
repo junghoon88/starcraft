@@ -45,9 +45,6 @@
     <ClCompile Include="framework\camera.cpp">
       <Filter>framework\camera</Filter>
     </ClCompile>
-    <ClCompile Include="framework\imageManager.cpp">
-      <Filter>framework\Manager</Filter>
-    </ClCompile>
     <ClCompile Include="framework\keyAniManager.cpp">
       <Filter>framework\Manager</Filter>
     </ClCompile>
@@ -99,6 +96,9 @@
     <ClCompile Include="framework\sceneManager.cpp">
       <Filter>framework\Manager</Filter>
     </ClCompile>
+    <ClCompile Include="framework\textureManager.cpp">
+      <Filter>framework\Manager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework\animation.h">
@@ -106,9 +106,6 @@
     </ClInclude>
     <ClInclude Include="framework\camera.h">
       <Filter>framework\camera</Filter>
-    </ClInclude>
-    <ClInclude Include="framework\imageManager.h">
-      <Filter>framework\Manager</Filter>
     </ClInclude>
     <ClInclude Include="framework\keyAniManager.h">
       <Filter>framework\Manager</Filter>
@@ -174,6 +171,9 @@
       <Filter>framework\UTIL</Filter>
     </ClInclude>
     <ClInclude Include="framework\sceneManager.h">
+      <Filter>framework\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\textureManager.h">
       <Filter>framework\Manager</Filter>
     </ClInclude>
   </ItemGroup>

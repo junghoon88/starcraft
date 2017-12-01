@@ -22,7 +22,7 @@
     <ProjectGuid>{49A2D0D2-6A5C-41E6-A9F0-EAC533B5C310}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>starcraft</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -71,8 +71,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Program Files %28x86%29\Microsoft starcraft SDK %28June 2010%29\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files %28x86%29\Microsoft starcraft SDK %28June 2010%29\Lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -151,7 +151,7 @@
     <ClCompile Include="framework\collision.cpp" />
     <ClCompile Include="framework\database.cpp" />
     <ClCompile Include="framework\DxWindow.cpp" />
-    <ClCompile Include="framework\imageManager.cpp" />
+    <ClCompile Include="framework\textureManager.cpp" />
     <ClCompile Include="framework\keyAniManager.cpp" />
     <ClCompile Include="framework\keyManager.cpp" />
     <ClCompile Include="framework\mainGame.cpp" />
@@ -187,7 +187,7 @@
     <ClInclude Include="framework\database.h" />
     <ClInclude Include="framework\DxWindow.h" />
     <ClInclude Include="framework\globalMacroVariables.h" />
-    <ClInclude Include="framework\imageManager.h" />
+    <ClInclude Include="framework\textureManager.h" />
     <ClInclude Include="framework\keyAniManager.h" />
     <ClInclude Include="framework\keyManager.h" />
     <ClInclude Include="framework\mainGame.h" />

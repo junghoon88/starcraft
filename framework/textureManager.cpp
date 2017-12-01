@@ -1,27 +1,27 @@
 #include "stdafx.h"
-#include "imageManager.h"
+#include "textureManager.h"
 
 
 
-imageManager::imageManager()
+textureManager::textureManager()
 {
 }
 
 
-imageManager::~imageManager()
+textureManager::~textureManager()
 {
 }
 
-void imageManager::init()
+void textureManager::init()
 {
 
 }
-void imageManager::release()
+void textureManager::release()
 {
 	deleteAll();
 }
 
-Texture* imageManager::addTexture(LPDIRECT3DDEVICE9 device, wstring strKey, const TCHAR* fileName)
+Texture* textureManager::addTexture(LPDIRECT3DDEVICE9 device, wstring strKey, const TCHAR* fileName)
 {
 	Texture* texture = findTexture(strKey);
 
@@ -35,7 +35,7 @@ Texture* imageManager::addTexture(LPDIRECT3DDEVICE9 device, wstring strKey, cons
 	return texture;
 }
 
-Texture* imageManager::addTexture(LPDIRECT3DDEVICE9 device, wstring strKey, const TCHAR* fileName, int frameX, int frameY)
+Texture* textureManager::addTexture(LPDIRECT3DDEVICE9 device, wstring strKey, const TCHAR* fileName, int frameX, int frameY)
 {
 	Texture* texture = findTexture(strKey);
 
@@ -49,7 +49,7 @@ Texture* imageManager::addTexture(LPDIRECT3DDEVICE9 device, wstring strKey, cons
 	return texture;
 }
 
-Texture* imageManager::findTexture(wstring strKey)
+Texture* textureManager::findTexture(wstring strKey)
 {
 	mapTextureIter key = _mTextureList.find(strKey);
 
@@ -61,48 +61,8 @@ Texture* imageManager::findTexture(wstring strKey)
 	return NULL;
 }
 
-Sprite* imageManager::addSprite(LPDIRECT3DDEVICE9 device, wstring strKey, wstring strTextureKey, bool bCameraOffset)
+void textureManager::deleteAll(void)
 {
-	Sprite* sprite = findSprite(strKey);
-	Texture* texture = findTexture(strTextureKey);
-
-	if (sprite) return sprite;
-
-	sprite = new Sprite(device);
-	sprite->init(texture, bCameraOffset);
-
-	_mSpriteList.insert(make_pair(strKey, sprite));
-
-	return sprite;
-}
-
-Sprite* imageManager::findSprite(wstring strKey)
-{
-	mapSpriteIter key = _mSpriteList.find(strKey);
-
-	if (key != _mSpriteList.end())
-	{
-		return key->second;
-	}
-
-	return NULL;
-}
-
-void imageManager::deleteAll(void)
-{
-	mapSpriteIter sIter = _mSpriteList.begin();
-	while(sIter != _mSpriteList.end())
-	{
-		if ((*sIter).second)
-		{
-			(*sIter).second->release();
-			SAFE_DELETE((*sIter).second);
-			_mSpriteList.erase(sIter);
-		}
-		else ++sIter;
-	}
-
-
 	mapTextureIter tIter = _mTextureList.begin();
 	while (tIter != _mTextureList.end())
 	{
@@ -119,21 +79,21 @@ void imageManager::deleteAll(void)
 
 
 #if 0
-void imageManager::setCoord(wstring strKey, float destX, float destY)
+void textureManager::setCoord(wstring strKey, float destX, float destY)
 {
 	Sprite* sprite = findImage(strKey);
 
 	if (sprite) sprite->setCoord({ destX, destY });
 }
 
-void imageManager::setScale(wstring strKey, float scaleX, float scaleY)
+void textureManager::setScale(wstring strKey, float scaleX, float scaleY)
 {
 	Sprite* sprite = findImage(strKey);
 
 	if (sprite) sprite->setScale({ scaleX, scaleY});
 }
 
-void imageManager::setCenterPer(wstring strKey, float centerPerX, float centerPerY)
+void textureManager::setCenterPer(wstring strKey, float centerPerX, float centerPerY)
 {
 	Sprite* sprite = findImage(strKey);
 
@@ -141,28 +101,28 @@ void imageManager::setCenterPer(wstring strKey, float centerPerX, float centerPe
 }
 
 
-void imageManager::setCenterPos(wstring strKey, float centerPosX, float centerPosY)
+void textureManager::setCenterPos(wstring strKey, float centerPosX, float centerPosY)
 {
 	Sprite* sprite = findImage(strKey);
 
 	if (sprite) sprite->setCenterPos({ centerPosX, centerPosY });
 }
 
-void imageManager::setRotate(wstring strKey, float angleDeg)				  
+void textureManager::setRotate(wstring strKey, float angleDeg)				  
 {
 	Sprite* sprite = findImage(strKey);
 
 	if (sprite) sprite->setRotate(angleDeg);
 }
 
-void imageManager::move(wstring strKey, float moveX, float moveY)
+void textureManager::move(wstring strKey, float moveX, float moveY)
 {
 	Sprite* sprite = findImage(strKey);
 
 	if (sprite) sprite->move(moveX, moveY);
 }
 
-void imageManager::setScaleOffset(wstring strKey, float scaleOffsetX, float scaleOffsetY)
+void textureManager::setScaleOffset(wstring strKey, float scaleOffsetX, float scaleOffsetY)
 {
 	Sprite* sprite = findImage(strKey);
 
@@ -173,21 +133,21 @@ void imageManager::setScaleOffset(wstring strKey, float scaleOffsetX, float scal
 
 
 
-void imageManager::render(wstring strKey)
+void textureManager::render(wstring strKey)
 {
 	Sprite* sprite = findImage(strKey);
 
 	if (sprite) sprite->render();
 }
 
-void imageManager::frameRender(wstring strKey, int frameX, int frameY)
+void textureManager::frameRender(wstring strKey, int frameX, int frameY)
 {
 	Sprite* sprite = findImage(strKey);
 
 	if (sprite) sprite->frameRender(frameX, frameY);
 }
 
-void imageManager::aniRender(wstring strKey, animation* ani)
+void textureManager::aniRender(wstring strKey, animation* ani)
 {
 	Sprite * sprite = findImage(strKey);
 
@@ -195,7 +155,7 @@ void imageManager::aniRender(wstring strKey, animation* ani)
 }
 
 
-int imageManager::getCurFrameX(wstring strKey)
+int textureManager::getCurFrameX(wstring strKey)
 {
 	Sprite * sprite = findImage(strKey);
 
@@ -203,7 +163,7 @@ int imageManager::getCurFrameX(wstring strKey)
 
 	return 0;
 }
-int imageManager::getCurFrameY(wstring strKey)
+int textureManager::getCurFrameY(wstring strKey)
 {
 	Sprite * sprite = findImage(strKey);
 
@@ -212,28 +172,28 @@ int imageManager::getCurFrameY(wstring strKey)
 	return 0;
 }
 
-void imageManager::setCurFrameX(wstring strKey, int frameX)
+void textureManager::setCurFrameX(wstring strKey, int frameX)
 {
 	Sprite * sprite = findImage(strKey);
 
 	if (sprite) sprite->setCurFrameX(frameX);
 }
 
-void imageManager::setCurFrameY(wstring strKey, int frameY)
+void textureManager::setCurFrameY(wstring strKey, int frameY)
 {
 	Sprite * sprite = findImage(strKey);
 
 	if (sprite) sprite->setCurFrameY(frameY);
 }
 
-void imageManager::setCurFrame(wstring strKey, int frameX, int frameY)
+void textureManager::setCurFrame(wstring strKey, int frameX, int frameY)
 {
 	Sprite * sprite = findImage(strKey);
 
 	if (sprite) sprite->setCurFrameX(frameX);
 	if (sprite) sprite->setCurFrameY(frameY);
 }
-int imageManager::getMaxFrameX(wstring strKey)
+int textureManager::getMaxFrameX(wstring strKey)
 {
 	Sprite * sprite = findImage(strKey);
 
@@ -242,7 +202,7 @@ int imageManager::getMaxFrameX(wstring strKey)
 	return 0;
 }
 
-int imageManager::getMaxFrameY(wstring strKey)
+int textureManager::getMaxFrameY(wstring strKey)
 {
 	Sprite * sprite = findImage(strKey);
 
@@ -251,7 +211,7 @@ int imageManager::getMaxFrameY(wstring strKey)
 	return 0;
 }
 
-wstring imageManager::FindKeyByImage(Sprite* img)
+wstring textureManager::FindKeyByImage(Sprite* img)
 {
 	mapImageIter iter = _mSpriteList.begin();
 

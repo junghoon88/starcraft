@@ -50,8 +50,7 @@ void keyAniManager::render()
 //디폴트 키 애니메이션
 void keyAniManager::addDefaultFrameAnimation(wstring animationKeyName, const TCHAR* imageKeyName, int fps, bool reverse, bool loop)							  
 {
-	Sprite* sprite = IMAGEMANAGER->findSprite(imageKeyName);
-	Texture* texture = sprite->getTexture();
+	Texture* texture = TEXTUREMANAGER->findTexture(imageKeyName);
 	animation* ani = new animation;
 
 	ani->init(texture->getWidth(), texture->getHeight(), texture->getFrameWidth(), texture->getFrameHeight());
@@ -65,8 +64,7 @@ void keyAniManager::addDefaultFrameAnimation(wstring animationKeyName, const TCH
 
 void keyAniManager::addDefaultFrameAnimation(wstring animationKeyName, const TCHAR* imageKeyName, int fps, bool reverse, bool loop, void* cbFunction)			  
 {
-	Sprite* sprite = IMAGEMANAGER->findSprite(imageKeyName);
-	Texture* texture = sprite->getTexture();
+	Texture* texture = TEXTUREMANAGER->findTexture(imageKeyName);
 	animation* ani = new animation;
 
 	ani->init(texture->getWidth(), texture->getHeight(), texture->getFrameWidth(), texture->getFrameHeight());
@@ -81,8 +79,7 @@ void keyAniManager::addDefaultFrameAnimation(wstring animationKeyName, const TCH
 
 void keyAniManager::addDefaultFrameAnimation(wstring animationKeyName, const TCHAR* imageKeyName, int fps, bool reverse, bool loop, void* cbFunction, void* obj)
 {
-	Sprite* sprite = IMAGEMANAGER->findSprite(imageKeyName);
-	Texture* texture = sprite->getTexture();
+	Texture* texture = TEXTUREMANAGER->findTexture(imageKeyName);
 	animation* ani = new animation;
 
 	ani->init(texture->getWidth(), texture->getHeight(), texture->getFrameWidth(), texture->getFrameHeight());
@@ -99,8 +96,7 @@ void keyAniManager::addDefaultFrameAnimation(wstring animationKeyName, const TCH
 //배열 키 애니메이션
 void keyAniManager::addArrayFrameAnimation(wstring animationKeyName, const TCHAR* imageKeyName, int* arr, int arrLen, int fps, bool loop)								
 {
-	Sprite* sprite = IMAGEMANAGER->findSprite(imageKeyName);
-	Texture* texture = sprite->getTexture();
+	Texture* texture = TEXTUREMANAGER->findTexture(imageKeyName);
 	animation* ani = new animation;
 
 	ani->init(texture->getWidth(), texture->getHeight(), texture->getFrameWidth(), texture->getFrameHeight());
@@ -115,8 +111,7 @@ void keyAniManager::addArrayFrameAnimation(wstring animationKeyName, const TCHAR
 
 void keyAniManager::addArrayFrameAnimation(wstring animationKeyName, const TCHAR* imageKeyName, int* arr, int arrLen, int fps, bool loop, void* cbFunction)			
 {
-	Sprite* sprite = IMAGEMANAGER->findSprite(imageKeyName);
-	Texture* texture = sprite->getTexture();
+	Texture* texture = TEXTUREMANAGER->findTexture(imageKeyName);
 	animation* ani = new animation;
 
 	ani->init(texture->getWidth(), texture->getHeight(), texture->getFrameWidth(), texture->getFrameHeight());
@@ -130,8 +125,7 @@ void keyAniManager::addArrayFrameAnimation(wstring animationKeyName, const TCHAR
 
 void keyAniManager::addArrayFrameAnimation(wstring animationKeyName, const TCHAR* imageKeyName, int* arr, int arrLen, int fps, bool loop, void* cbFunction, void* obj)
 {
-	Sprite* sprite = IMAGEMANAGER->findSprite(imageKeyName);
-	Texture* texture = sprite->getTexture();
+	Texture* texture = TEXTUREMANAGER->findTexture(imageKeyName);
 	animation* ani = new animation;
 
 	ani->init(texture->getWidth(), texture->getHeight(), texture->getFrameWidth(), texture->getFrameHeight());
@@ -147,8 +141,7 @@ void keyAniManager::addArrayFrameAnimation(wstring animationKeyName, const TCHAR
 //구간 키 애니메이션
 void keyAniManager::addCoordinateFrameAnimation(wstring animationKeyName, TCHAR* imageKeyName, int start, int end, int fps, bool reverse, bool loop)							   
 {
-	Sprite* sprite = IMAGEMANAGER->findSprite(imageKeyName);
-	Texture* texture = sprite->getTexture();
+	Texture* texture = TEXTUREMANAGER->findTexture(imageKeyName);
 	animation* ani = new animation;
 
 	ani->init(texture->getWidth(), texture->getHeight(), texture->getFrameWidth(), texture->getFrameHeight());
@@ -162,8 +155,7 @@ void keyAniManager::addCoordinateFrameAnimation(wstring animationKeyName, TCHAR*
 
 void keyAniManager::addCoordinateFrameAnimation(wstring animationKeyName, TCHAR* imageKeyName, int start, int end, int fps, bool reverse, bool loop, void* cbFunction)		   
 {
-	Sprite* sprite = IMAGEMANAGER->findSprite(imageKeyName);
-	Texture* texture = sprite->getTexture();
+	Texture* texture = TEXTUREMANAGER->findTexture(imageKeyName);
 	animation* ani = new animation;
 
 	ani->init(texture->getWidth(), texture->getHeight(), texture->getFrameWidth(), texture->getFrameHeight());
@@ -177,8 +169,7 @@ void keyAniManager::addCoordinateFrameAnimation(wstring animationKeyName, TCHAR*
 
 void keyAniManager::addCoordinateFrameAnimation(wstring animationKeyName, TCHAR* imageKeyName, int start, int end, int fps, bool reverse, bool loop, void* cbFunction, void* obj)
 {
-	Sprite* sprite = IMAGEMANAGER->findSprite(imageKeyName);
-	Texture* texture = sprite->getTexture();
+	Texture* texture = TEXTUREMANAGER->findTexture(imageKeyName);
 	animation* ani = new animation;
 
 	ani->init(texture->getWidth(), texture->getHeight(), texture->getFrameWidth(), texture->getFrameHeight());
