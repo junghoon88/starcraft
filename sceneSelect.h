@@ -24,5 +24,14 @@ public:
 	void release(void);
 	void update(void);
 	void render(void);
+
+
+	//button callbackFunction
+public:
+	//level1
+	static void cbFuncGameStart(void* obj);
+	static void cbFuncMaptool(void* obj);
+	static void cbFuncGameExit(void* obj);
+
 };
 

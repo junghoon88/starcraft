@@ -39,8 +39,12 @@ public:
 
 	bool isCurScene(wstring sceneName);
 
+	HRESULT changeScene(void);
 	HRESULT changeScene(wstring sceneName);
 	HRESULT changeScene(wstring sceneName, wstring loadingSceneName);
+
+	bool willChangeScene(void);
+
 
 	friend DWORD CALLBACK loadingThread(LPVOID prc);
 

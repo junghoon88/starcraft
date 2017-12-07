@@ -1,9 +1,14 @@
 #include "stdafx.h"
 #include "gameNode.h"
+#include "image.h"
 
+//빈 비트맵 파일 백버퍼 생성
+static image* _backBuffer = IMAGEMANAGER->addImage(L"backBuffer", WINSIZEX, WINSIZEY);
 
 gameNode::gameNode()
 {
+	_changeScene = false;
+	_tcscpy(_strNextSceneName, L"");
 }
 
 
@@ -84,6 +89,10 @@ void gameNode::getChar(WPARAM wParam)
 
 }
 
+void gameNode::checkScene(void)
+{
+}
+
 
 LRESULT gameNode::MainProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 {
@@ -131,3 +140,7 @@ LRESULT gameNode::MainProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lPara
 
 	return (DefWindowProc(hWnd, iMessage, wParam, lParam));
 }
+
+
+image* gameNode::getBackBuffer(void) { return _backBuffer; }
+HDC gameNode::getMemDC(void) { return _backBuffer->getMemDC(); }

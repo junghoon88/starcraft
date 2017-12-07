@@ -156,6 +156,27 @@ HRESULT sceneManager::changeScene(wstring sceneName, wstring loadingSceneName)
 	return E_FAIL;
 }
 
+bool sceneManager::willChangeScene(void)
+{
+	if(_currentScene == NULL)
+		return false;
+
+	if (_currentScene->getChangeScene())
+	{
+		return true;
+	}
+
+	return false;
+}
+
+HRESULT sceneManager::changeScene(void)
+{
+	TCHAR strSceneName[128];
+	_tcscpy(strSceneName, _currentScene->getChanageSceneInfo());
+	_currentScene->setChangeScene(false, L"");
+	return changeScene(strSceneName);
+}
+
 
 void sceneManager::playBGM(void)
 {

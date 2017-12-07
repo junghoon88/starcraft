@@ -95,6 +95,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmd
 			TIMEMANAGER->update(_mg.getFPS());
 			_mg.update();
 			_mg.render();
+			_mg.checkScene();
 		}
 	}
 

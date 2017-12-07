@@ -20,9 +20,13 @@ public:
 	HRESULT init(void);
 	void release(void);
 	void update(void);
+	void render(HDC hdc);
+
 
 	void moveCamera(DIRECTION dir);
 	void earthquake(float power);
+
+	RECT getRectCamera(void);
 
 	//getter, setter
 	inline int getCameraX(void) { return _cameraX; }
@@ -41,6 +45,7 @@ public:
 	inline int getMinY(void) { return _minY; }
 	inline int getMaxX(void) { return _maxX; }
 	inline int getMaxY(void) { return _maxY; }
+
 
 
 

@@ -11,6 +11,8 @@ private:
 	void initImage(void);
 	void initSound(void);
 
+	void initImageTiles(void);
+
 public:
 	HRESULT init(void);
 	void release(void);

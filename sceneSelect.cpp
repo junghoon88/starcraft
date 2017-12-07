@@ -18,11 +18,11 @@ sceneSelect::~sceneSelect()
 HRESULT sceneSelect::init(void)
 {
 	_btn[BTNMENU_GAMESTART] = new button;
-	_btn[BTNMENU_GAMESTART]->init(L"버튼1", L"게임시작", 100, 100, { 0,0 }, { 0,1 }, NULL);
+	_btn[BTNMENU_GAMESTART]->init(L"버튼1", L"게임시작", 100, 100, { 0,0 }, { 0,1 }, cbFuncGameStart, this);
 	_btn[BTNMENU_MAPTOOL] = new button;
-	_btn[BTNMENU_MAPTOOL]->init(L"버튼1", L"맵에디터",	100, 200, { 0,0 }, { 0,1 }, NULL);
+	_btn[BTNMENU_MAPTOOL]->init(L"버튼1", L"맵에디터",	100, 200, { 0,0 }, { 0,1 }, cbFuncMaptool, this);
 	_btn[BTNMENU_EXIT] = new button;
-	_btn[BTNMENU_EXIT]->init(L"버튼1", L"나가기",		100, 300, { 0,0 }, { 0,1 }, NULL);
+	_btn[BTNMENU_EXIT]->init(L"버튼1", L"나가기",		100, 300, { 0,0 }, { 0,1 }, cbFuncGameExit, this);
 
 	return S_OK;
 }
@@ -52,3 +52,19 @@ void sceneSelect::render(void)
 	}
 }
 
+//callback functions
+void sceneSelect::cbFuncGameStart(void* obj)
+{
+	sceneSelect* ss = (sceneSelect*)obj;
+}
+void sceneSelect::cbFuncMaptool(void* obj)
+{
+	sceneSelect* ss = (sceneSelect*)obj;
+	ss->setChangeScene(true, L"맵툴씬");
+	//SCENEMANAGER->changeScene();
+}
+void sceneSelect::cbFuncGameExit(void* obj)
+{
+	sceneSelect* ss = (sceneSelect*)obj;
+	PostQuitMessage(0);
+}

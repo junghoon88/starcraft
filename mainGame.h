@@ -23,6 +23,9 @@ public:
 	virtual void update(void);				//연산관련(타이머)
 	virtual void render(void);				//그려주는 함수
 	virtual void getChar(WPARAM wParam);	//키보드 입력
+	
+	void checkScene(void);
+
 
 	void setWindowResize(POINT size);
 

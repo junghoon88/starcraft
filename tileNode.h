@@ -67,9 +67,8 @@ struct tagTile
 	TCHAR obj[128];
 	RECT rc;
 
-	int sampleTerrainIdx;		//샘플 터레인 인덱스
-	int sampleObjectSelectIdx;	//오브젝트 case 인덱스
-	bool isClick;				//오브젝트 선택했니?
+	INT terrainNum;		//샘플 터레인 인덱스
+	BOOL isClick;		//오브젝트 선택
 };
 
 struct tagSampleTile

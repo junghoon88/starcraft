@@ -1,11 +1,12 @@
 #pragma once
+#include "gameNode.h"
 #include "animation.h"
 
 //==================================
 // ## 2017.08.22 ## image Class ##
 //==================================
 
-class image
+class image : public gameNode
 {
 public:
 	enum IMAGE_LOAD_KIND

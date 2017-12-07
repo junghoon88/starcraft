@@ -2,8 +2,8 @@
 
 #define CAMERA_SPEED		10
 
-#define MAP_WIDTH			(WINSIZEX*10)
-#define MAP_HEIGHT			(WINSIZEY*10)
+#define MAP_WIDTH			(TILESIZE*TILEX)
+#define MAP_HEIGHT			(TILESIZE*TILEY)
 
 #define DIR_L			0x01
 #define DIR_R			0x02

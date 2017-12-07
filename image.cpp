@@ -385,6 +385,15 @@ void image::render(HDC hdc, int destX, int destY)
 	if (!_imageInfo)
 		return;
 
+	////카메라 영역 밖이면 랜더링하지 않는다.
+	//RECT rcImg = RectMake(destX, destY, _imageInfo->frameWidth, _imageInfo->frameHeight);
+	//RECT rcCamera = MAINCAMERA->getRectCamera();
+	//RECT rcTemp;
+	//if (IntersectRect(&rcTemp, &rcImg, &rcCamera) == FALSE)
+	//{
+	//	return;
+	//}
+
 	if (_trans)
 	{
 		//특정색상을 DC영역에서 제외해주는 함수
@@ -573,6 +582,7 @@ void image::alphaRender(HDC hdc, BYTE alpha)
 		return;
 	}
 
+
 	//0 ~ 255
 	_blendFunc.SourceConstantAlpha = alpha;
 
@@ -722,6 +732,7 @@ void image::alphaFrameRender(HDC hdc, int destX, int destY, int currentFrameX, i
 		frameRender(hdc, destX, destY, currentFrameX, currentFrameY);
 		return;
 	}
+
 
 	_blendFunc.SourceConstantAlpha = alpha;
 

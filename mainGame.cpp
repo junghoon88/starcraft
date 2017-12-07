@@ -35,9 +35,9 @@ void mainGame::initScene(void)
 {
 	gameNode* node = NULL;
 	
-	SCENEMANAGER->addScene(L"ÃÊ±âÈ­¾À", new sceneInit);  //°ÔÀÓ ¸®¼Ò½º ÃÊ±âÈ­
-	SCENEMANAGER->addScene(L"¼±ÅÃ¾À", new sceneSelect);
-	SCENEMANAGER->addScene(L"¸ÊÅø¾À", new sceneMaptool);				//¸ÊÅø
+	node = SCENEMANAGER->addScene(L"ÃÊ±âÈ­¾À", new sceneInit);  //°ÔÀÓ ¸®¼Ò½º ÃÊ±âÈ­
+	node = SCENEMANAGER->addScene(L"¼±ÅÃ¾À", new sceneSelect);
+	node = SCENEMANAGER->addScene(L"¸ÊÅø¾À", new sceneMaptool);				//¸ÊÅø
 
 
 	SCENEMANAGER->changeScene(L"ÃÊ±âÈ­¾À");
@@ -84,6 +84,7 @@ void mainGame::render(void)
 	RENDERMANAGER->render();
 
 	TIMEMANAGER->render(getMemDC());
+	MAINCAMERA->render(getMemDC());
 	
 	//========================================================================
 	//¹é¹öÆÛ¿¡ ÀÖ´Â°É HDC·Î ±×·ÁÁÖ´Â ¿ªÇÒ
@@ -92,6 +93,14 @@ void mainGame::render(void)
 
 void mainGame::getChar(WPARAM wParam)
 {
+}
+
+void mainGame::checkScene(void)
+{
+	if (SCENEMANAGER->willChangeScene() == TRUE)
+	{
+		SCENEMANAGER->changeScene();
+	}
 }
 
 void mainGame::setWindowResize(POINT size)

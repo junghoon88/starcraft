@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "camera.h"
+#include "tileNode.h"
 
 camera::camera()
 {
@@ -68,6 +69,15 @@ void camera::update(void)
 
 }
 
+void camera::render(HDC hdc)
+{
+	TCHAR str[256];
+	SetBkMode(hdc, TRANSPARENT);
+
+	wsprintf(str, L"camera : <%d, %d>", _cameraX, _cameraY);
+	TextOut(hdc, 0, 60, str, _tcslen(str));
+}
+
 
 void camera::moveCamera(DIRECTION dir)
 {
@@ -99,4 +109,9 @@ void camera::earthquake(float power)
 {
 	_cameraX += RND->getFromFloatTo(-power, power);
 	_cameraY += RND->getFromFloatTo(-power, power);
+}
+
+RECT camera::getRectCamera(void)
+{
+	return RectMake(_cameraX, _cameraY, WINSIZEX, WINSIZEY);
 }
