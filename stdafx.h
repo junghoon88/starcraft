@@ -1,99 +1,88 @@
 #pragma once
 
-// 공용 헤더
+#include "targetver.h"
+
+#define WIN32_LEAN_AND_MEAN             // 거의 사용되지 않는 내용은 Windows 헤더에서 제외합니다.
 // Windows 헤더 파일:
 #include <windows.h>
-//#include <iostream>
-//#include <stdlib.h>
-//#include <malloc.h>
-//#include <memory.h>
+#include <iostream>
+#include <stdlib.h>
+#include <malloc.h>
+#include <memory.h>
 #include <tchar.h>
-//#include <commdlg.h>	//OPENFILENAME
+#include <commdlg.h>	//OPENFILENAME
 
-#include <assert.h>
-#include <stdio.h>
-
-#include <vector>
-#include <string>
-#include <map>
-
-#include <d3d9.h>
-#include <d3dx9.h>
-#include <time.h>
-
-
-#pragma comment(lib, "d3d9.lib")
-#pragma comment(lib, "d3dx9.lib")
-#pragma comment(lib, "winmm.lib")
-
-#pragma warning( disable : 4996 )
-
-using namespace std;
-
-
-// 프로젝트 헤더
 #include "commonMacroFunction.h"
 #include "randomFunction.h"
 #include "keyManager.h"
 #include "utils.h"
-#include "collision.h"
-#include "textureManager.h"
+#include "imageManager.h"
 #include "timeManager.h"
-#include "sceneManager.h"
-#include "database.h"
-#include "camera.h"
-#include "textManager.h"
-#include "keyAniManager.h"
-#include "rectManager.h"
 #include "soundManager.h"
+#include "effectManager.h"
+#include "iniDataManager.h"
+#include "sceneManager.h"
+#include "keyAniManager.h"
+#include "database.h"
+#include "RenderManager.h"
+#include "txtData.h"
+#include "collision.h"
+#include "camera.h"
+//#include "editboxManager.h"
 
+//전역 매크로변수
 #include "globalMacroVariables.h"
 
+
+using namespace std;
 using namespace IOTA_UTIL;
 
+//===============================================
+// ## 윈도우 설정 디파인 ## 2017.07. 28 ##
+//===============================================
 
-//#include "Keyboard.h"
-//#include "PrintText.h"
+#define WINNAME (LPTSTR)(TEXT("starcraft"))
+#define WINSTARTX 0
+#define WINSTARTY 0
 
-#define DEVICE getDevice()
-#define STAGE getStage()
+#define WINSIZEX 960	//
+#define WINSIZEY 960	//
 
 
-//==================================
-// ## 매크로 함수 ##
-//==================================
+#define WINSTYLE WS_CAPTION | WS_SYSMENU
 
-#define WINSIZEX 960
-#define WINSIZEY 540
-
-//#define PI 3.14159265f
+#define SIDEWINSIZE 144
 
 #define RND randomFunction::getSingleton()
 #define KEYMANAGER keyManager::getSingleton()
-#define TEXTUREMANAGER textureManager::getSingleton()
-//#define TXTDATA txtData::getSingleton()
+#define IMAGEMANAGER imageManager::getSingleton()
+#define TXTDATA txtData::getSingleton()
 #define TIMEMANAGER timeManager::getSingleton() 
 #define SOUNDMANAGER soundManager::getSingleton()
-//#define EFFECTMANAGER effectManager::getSingleton()
+#define EFFECTMANAGER effectManager::getSingleton()
 #define SCENEMANAGER sceneManager::getSingleton()
 #define KEYANIMANAGER keyAniManager::getSingleton()
-//#define INIDATA iniDataManager::getSingleton()
+#define INIDATA iniDataManager::getSingleton()
 #define DATABASE database::getSingleton()
 #define MAINCAMERA camera::getSingleton()
-//#define RENDERMANAGER RenderManager::getSingleton()
-#define TEXTMANAGER textManager::getSingleton()
-#define RECTMANAGER rectManager::getSingleton()
+#define RENDERMANAGER RenderManager::getSingleton()
+//#define EDITBOXMANAGER editboxManager::getSingleton()
 
-#define SAFE_RELEASE(p) { if ( (p) ) { (p)->Release(); (p) = NULL; } }
-#define SAFE_RELEASE2(p) { if ( (p) ) { (p)->release(); (p) = NULL; } }
-#define SAFE_DELETE(a) if( (a) != NULL ) delete (a); (a) = NULL;
-#define SAFE_DELETE_ARRAY(a) if( (a) != NULL ) delete [] (a); (a) = NULL;
+//==================================
+// ## 매크로 함수 ## 17.08.07 ##
+//==================================
 
+#define SAFE_DELETE(p)  {if(p) {delete(p); (p)=NULL;}}
+#define SAFE_DELETE_ARRAY(p) {if(p) { delete[](p); (p) = NULL;}}
+#define SAFE_RELEASE(p) {if(p) {(p)->release(); (p)=NULL;}}
 
 //===================================
 // ## 전역 변수 ## 17.08.07 ##
 //===================================
 
-extern POINT _ptMouse;
-extern HWND _hWnd;
 extern HINSTANCE _hInstance;
+extern HWND _hWnd;
+extern POINT _ptMouse;
+
+extern HFONT _gFont[FONTVERSION_MAX];
+extern HBRUSH _gBrush[BRUSHVERSION_MAX];
