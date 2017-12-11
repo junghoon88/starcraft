@@ -779,3 +779,40 @@ void image::aniAlphaRender(HDC hdc, int destX, int destY, animation* ani, BYTE a
 {
 	alphaRender(hdc, destX, destY, ani->getFramePos().x, ani->getFramePos().y, ani->getFrameWidth(), ani->getFrameHeight(), alpha);
 }
+
+void image::frameRenderCT(HDC hdc, int cenX, int cenY, int currentFrameX, int currentFrameY)
+{
+	if (!_imageInfo)
+		return;
+
+	int destX = cenX - (_imageInfo->frameWidth  * 0.5f);
+	int destY = cenY - (_imageInfo->frameHeight * 0.5f);
+
+	_imageInfo->currentFrameX = currentFrameX;
+	_imageInfo->currentFrameY = currentFrameY;
+
+	if (_trans)
+	{
+		GdiTransparentBlt(hdc,
+			destX,
+			destY,
+			_imageInfo->frameWidth,
+			_imageInfo->frameHeight,
+			_imageInfo->hMemDC,
+			_imageInfo->currentFrameX * _imageInfo->frameWidth,
+			_imageInfo->currentFrameY * _imageInfo->frameHeight,
+			_imageInfo->frameWidth,
+			_imageInfo->frameHeight,
+			_transColor);
+	}
+	else
+	{
+		BitBlt(hdc, destX, destY,
+			_imageInfo->frameWidth,
+			_imageInfo->frameHeight,
+			_imageInfo->hMemDC,
+			_imageInfo->currentFrameX * _imageInfo->frameWidth,
+			_imageInfo->currentFrameY * _imageInfo->frameHeight,
+			SRCCOPY);
+	}
+}

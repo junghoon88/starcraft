@@ -1,17 +1,39 @@
 #pragma once
 #include "stdafx.h"
 
-
-//한 타일의 규격
-#define TILESIZE	32
-
 //타일 갯수
 #define TILEX		128
 #define TILEY		128
 
-//게임맵, 맵에디터에서 보여줄 타일 개수
-#define TILEVIEWX	30
-#define TILEVIEWY	30
+//맵툴-----------------------------------------------------------------
+//한 타일의 규격
+#define MAPTOOL_TILESIZE	32
+
+//게임맵, 맵툴에서 보여줄 타일 개수
+#define MAPTOOL_TILEVIEWX	40
+#define MAPTOOL_TILEVIEWY	30
+
+//맵툴 ISOTILE
+#define ISOTILE_WIDTH		(MAPTOOL_TILESIZE*4)
+#define ISOTILE_HEIGHT		(MAPTOOL_TILESIZE*2)
+
+#define ISOTILE_HALF_WIDTH	(MAPTOOL_TILESIZE*2)
+#define ISOTILE_HALF_HEIGHT	(MAPTOOL_TILESIZE)
+
+#define ISOTILEX			(MAPTOOL_TILEVIEWX/2)
+#define ISOTILEY			(MAPTOOL_TILEVIEWY)
+//~맵툴-----------------------------------------------------------------
+
+//게임맵----------------------------------------------------------------
+#define GAMEMAP_TILESIZE 64
+
+#define GAMEMAP_TILEVIEWX		20
+#define GAMEMAP_TILEVIEWY		11 //30
+
+
+
+//~게임맵---------------------------------------------------------------
+
 
 //비트필드 타일 속성
 #define ATTR_INCASTLE	0x00000001	//
@@ -63,11 +85,12 @@ enum OBJECTSELECT
 //타일 구조체
 struct tagTile
 {
-	TERRAIN terrain;
-	TCHAR obj[128];
-	RECT rc;
+	TERRAIN terrain;	//터레인
+	INT terrainNum;		//터레인 인덱스
 
-	INT terrainNum;		//샘플 터레인 인덱스
+	DWORD obj;			//
+	RECT rc;			//
+
 	BOOL isClick;		//오브젝트 선택
 };
 
@@ -89,4 +112,12 @@ struct tagCurrentTile
 {
 	int x;
 	int y;
+};
+
+struct tagisoTile
+{
+	POINT pt;
+	RECT rc;
+
+	bool clicked;
 };

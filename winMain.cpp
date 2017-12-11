@@ -8,6 +8,7 @@ HWND _hWnd;					//조작질
 POINT _ptMouse;
 HFONT _gFont[FONTVERSION_MAX];
 HBRUSH _gBrush[BRUSHVERSION_MAX];
+HPEN _gPen[PENVERSION_MAX];
 
 
 LPTSTR _lpszClass = WINNAME;
@@ -69,6 +70,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmd
 	//Font, Brush 생성
 	_gTools.setFontAll();
 	_gTools.setBrushAll();
+	_gTools.setPenAll();
 
 	//GetMessage : 메시지 정보가 들어오면 그때 반응
 	//PeekMessage : 메시지 정보가 들어오든 말든 무조건 반응(상시 루프돌고있음)
@@ -93,9 +95,17 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmd
 		else
 		{
 			TIMEMANAGER->update(_mg.getFPS());
+
+			DWORD tick1 = GetTickCount();
+
 			_mg.update();
 			_mg.render();
 			_mg.checkScene();
+
+			DWORD tick2 = GetTickCount();
+			DWORD tick = tick2 - tick1;
+
+			printf("");
 		}
 	}
 
@@ -110,6 +120,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmd
 	//Font, Brush 제거
 	_gTools.deleteFontAll();
 	_gTools.deleteBrushAll();
+	_gTools.deletePenAll();
 
 	return message.wParam;
 }

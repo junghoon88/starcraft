@@ -6,7 +6,6 @@
 class elements
 {
 public:
-	int currentHP;
 
 
 	elements(){};
@@ -26,7 +25,7 @@ private:
 	arrElement _mTotalElement;
 
 
-	int _slectScenario;
+	int _mapNum;
 
 	bool _battleVictory;
 
@@ -48,8 +47,8 @@ public:
 	~database();
 
 public:
-	inline int getSlectScenario(void) { return _slectScenario; }
-	inline void setSlectScenario(int num) { _slectScenario = num; }
+	inline int getMapNum(void) { return _mapNum; }
+	inline void setMapNum(int num) { _mapNum = num; }
 
 	inline bool getBattleVictory(void) { return _battleVictory; }
 	inline void setBattleVictory(bool victory) { _battleVictory = victory; }

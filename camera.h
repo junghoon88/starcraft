@@ -16,6 +16,8 @@ private:
 	int _maxX;
 	int _maxY;
 
+	RECT _rcCamera;
+
 public:
 	HRESULT init(void);
 	void release(void);
@@ -26,7 +28,6 @@ public:
 	void moveCamera(DIRECTION dir);
 	void earthquake(float power);
 
-	RECT getRectCamera(void);
 
 	//getter, setter
 	inline int getCameraX(void) { return _cameraX; }
@@ -45,6 +46,8 @@ public:
 	inline int getMinY(void) { return _minY; }
 	inline int getMaxX(void) { return _maxX; }
 	inline int getMaxY(void) { return _maxY; }
+
+	inline RECT getRectCamera(void) { return _rcCamera; }
 
 
 

@@ -56,6 +56,7 @@ void sceneSelect::render(void)
 void sceneSelect::cbFuncGameStart(void* obj)
 {
 	sceneSelect* ss = (sceneSelect*)obj;
+	ss->setChangeScene(true, L"ÀüÅõ¾À");
 }
 void sceneSelect::cbFuncMaptool(void* obj)
 {

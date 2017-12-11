@@ -1,10 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="소스 파일">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
     <Filter Include="헤더 파일">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
@@ -84,6 +80,31 @@
     </Filter>
     <Filter Include="MainGame\Common">
       <UniqueIdentifier>{3961fab7-407a-4c78-b791-13dfbd083907}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MainGame\RACES\Zerg">
+      <UniqueIdentifier>{dcb336e7-0a27-4834-a48f-59a19817fcbf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MainGame\RACES\Terran">
+      <UniqueIdentifier>{eb8434f9-61bf-4ecb-9404-1566418eda79}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MainGame\RACES\Protoss">
+      <UniqueIdentifier>{63b081da-6e66-45eb-a10b-1cdc8f94210d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MainGame\RACES\Zerg\Building">
+      <UniqueIdentifier>{ad7297c4-71df-45f5-9dbd-090fe36163ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MainGame\RACES\Zerg\Unit%28Ground%29">
+      <UniqueIdentifier>{1b3e96fc-0610-498b-af28-6b08d4f8a42b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MainGame\RACES\Zerg\Unit%28Air%29">
+      <UniqueIdentifier>{6b6b8cb0-9740-4b3a-8e16-b834d9bb1ad8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="MainGame\sceneBattle\gameMap">
+      <UniqueIdentifier>{23c60061-27c7-4f7e-9dc4-4adda9c652c1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -207,9 +228,6 @@
     <ClInclude Include="editboxManager.h">
       <Filter>2DFramework\editbox</Filter>
     </ClInclude>
-    <ClInclude Include="gameMap.h">
-      <Filter>MainGame</Filter>
-    </ClInclude>
     <ClInclude Include="globalTools.h">
       <Filter>2DFramework</Filter>
     </ClInclude>
@@ -218,6 +236,132 @@
     </ClInclude>
     <ClInclude Include="Unit.h">
       <Filter>MainGame\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="zuBroodling.h">
+      <Filter>MainGame\RACES\Zerg\Unit%28Ground%29</Filter>
+    </ClInclude>
+    <ClInclude Include="zuDefiler.h">
+      <Filter>MainGame\RACES\Zerg\Unit%28Ground%29</Filter>
+    </ClInclude>
+    <ClInclude Include="zuHydralisk.h">
+      <Filter>MainGame\RACES\Zerg\Unit%28Ground%29</Filter>
+    </ClInclude>
+    <ClInclude Include="zuInfestedTerran.h">
+      <Filter>MainGame\RACES\Zerg\Unit%28Ground%29</Filter>
+    </ClInclude>
+    <ClInclude Include="zuLarva.h">
+      <Filter>MainGame\RACES\Zerg\Unit%28Ground%29</Filter>
+    </ClInclude>
+    <ClInclude Include="zuLerkerEgg.h">
+      <Filter>MainGame\RACES\Zerg\Unit%28Ground%29</Filter>
+    </ClInclude>
+    <ClInclude Include="zuLurker.h">
+      <Filter>MainGame\RACES\Zerg\Unit%28Ground%29</Filter>
+    </ClInclude>
+    <ClInclude Include="zuUltralisk.h">
+      <Filter>MainGame\RACES\Zerg\Unit%28Ground%29</Filter>
+    </ClInclude>
+    <ClInclude Include="zuZergEgg.h">
+      <Filter>MainGame\RACES\Zerg\Unit%28Ground%29</Filter>
+    </ClInclude>
+    <ClInclude Include="zuZergling.h">
+      <Filter>MainGame\RACES\Zerg\Unit%28Ground%29</Filter>
+    </ClInclude>
+    <ClInclude Include="zuCocoon.h">
+      <Filter>MainGame\RACES\Zerg\Unit%28Air%29</Filter>
+    </ClInclude>
+    <ClInclude Include="zuDevourer.h">
+      <Filter>MainGame\RACES\Zerg\Unit%28Air%29</Filter>
+    </ClInclude>
+    <ClInclude Include="zuGuadian.h">
+      <Filter>MainGame\RACES\Zerg\Unit%28Air%29</Filter>
+    </ClInclude>
+    <ClInclude Include="zuMutalisk.h">
+      <Filter>MainGame\RACES\Zerg\Unit%28Air%29</Filter>
+    </ClInclude>
+    <ClInclude Include="zuOverload.h">
+      <Filter>MainGame\RACES\Zerg\Unit%28Air%29</Filter>
+    </ClInclude>
+    <ClInclude Include="zuQueen.h">
+      <Filter>MainGame\RACES\Zerg\Unit%28Air%29</Filter>
+    </ClInclude>
+    <ClInclude Include="zuScourge.h">
+      <Filter>MainGame\RACES\Zerg\Unit%28Air%29</Filter>
+    </ClInclude>
+    <ClInclude Include="zbCreepColony.h">
+      <Filter>MainGame\RACES\Zerg\Building</Filter>
+    </ClInclude>
+    <ClInclude Include="zbDefilerMound.h">
+      <Filter>MainGame\RACES\Zerg\Building</Filter>
+    </ClInclude>
+    <ClInclude Include="zbEvolutionChamber.h">
+      <Filter>MainGame\RACES\Zerg\Building</Filter>
+    </ClInclude>
+    <ClInclude Include="zbExtractor.h">
+      <Filter>MainGame\RACES\Zerg\Building</Filter>
+    </ClInclude>
+    <ClInclude Include="zbGreaterSpire.h">
+      <Filter>MainGame\RACES\Zerg\Building</Filter>
+    </ClInclude>
+    <ClInclude Include="zbHatchery.h">
+      <Filter>MainGame\RACES\Zerg\Building</Filter>
+    </ClInclude>
+    <ClInclude Include="zbHive.h">
+      <Filter>MainGame\RACES\Zerg\Building</Filter>
+    </ClInclude>
+    <ClInclude Include="zbHydraliskDen.h">
+      <Filter>MainGame\RACES\Zerg\Building</Filter>
+    </ClInclude>
+    <ClInclude Include="zbLair.h">
+      <Filter>MainGame\RACES\Zerg\Building</Filter>
+    </ClInclude>
+    <ClInclude Include="zbNydusCanal.h">
+      <Filter>MainGame\RACES\Zerg\Building</Filter>
+    </ClInclude>
+    <ClInclude Include="zbQueensNest.h">
+      <Filter>MainGame\RACES\Zerg\Building</Filter>
+    </ClInclude>
+    <ClInclude Include="zbSpawningPool.h">
+      <Filter>MainGame\RACES\Zerg\Building</Filter>
+    </ClInclude>
+    <ClInclude Include="zbSpire.h">
+      <Filter>MainGame\RACES\Zerg\Building</Filter>
+    </ClInclude>
+    <ClInclude Include="zbSporeColony.h">
+      <Filter>MainGame\RACES\Zerg\Building</Filter>
+    </ClInclude>
+    <ClInclude Include="zbSunkenColony.h">
+      <Filter>MainGame\RACES\Zerg\Building</Filter>
+    </ClInclude>
+    <ClInclude Include="zbUltraliskCavern.h">
+      <Filter>MainGame\RACES\Zerg\Building</Filter>
+    </ClInclude>
+    <ClInclude Include="player.h">
+      <Filter>MainGame\sceneBattle</Filter>
+    </ClInclude>
+    <ClInclude Include="sceneBattle.h">
+      <Filter>MainGame\sceneBattle</Filter>
+    </ClInclude>
+    <ClInclude Include="zergHeader.h">
+      <Filter>MainGame\RACES\Zerg</Filter>
+    </ClInclude>
+    <ClInclude Include="zergProduction.h">
+      <Filter>MainGame\RACES\Zerg</Filter>
+    </ClInclude>
+    <ClInclude Include="zergUpgrade.h">
+      <Filter>MainGame\RACES\Zerg</Filter>
+    </ClInclude>
+    <ClInclude Include="gameInterface.h">
+      <Filter>MainGame\sceneBattle</Filter>
+    </ClInclude>
+    <ClInclude Include="zuDrone.h">
+      <Filter>MainGame\RACES\Zerg</Filter>
+    </ClInclude>
+    <ClInclude Include="gameMap.h">
+      <Filter>MainGame\sceneBattle\gameMap</Filter>
+    </ClInclude>
+    <ClInclude Include="fog.h">
+      <Filter>MainGame\sceneBattle\gameMap</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -320,9 +464,6 @@
     <ClCompile Include="editboxManager.cpp">
       <Filter>2DFramework\editbox</Filter>
     </ClCompile>
-    <ClCompile Include="gameMap.cpp">
-      <Filter>MainGame</Filter>
-    </ClCompile>
     <ClCompile Include="globalTools.cpp">
       <Filter>2DFramework</Filter>
     </ClCompile>
@@ -331,6 +472,129 @@
     </ClCompile>
     <ClCompile Include="Unit.cpp">
       <Filter>MainGame\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="zuBroodling.cpp">
+      <Filter>MainGame\RACES\Zerg\Unit%28Ground%29</Filter>
+    </ClCompile>
+    <ClCompile Include="zuDefiler.cpp">
+      <Filter>MainGame\RACES\Zerg\Unit%28Ground%29</Filter>
+    </ClCompile>
+    <ClCompile Include="zuHydralisk.cpp">
+      <Filter>MainGame\RACES\Zerg\Unit%28Ground%29</Filter>
+    </ClCompile>
+    <ClCompile Include="zuInfestedTerran.cpp">
+      <Filter>MainGame\RACES\Zerg\Unit%28Ground%29</Filter>
+    </ClCompile>
+    <ClCompile Include="zuLarva.cpp">
+      <Filter>MainGame\RACES\Zerg\Unit%28Ground%29</Filter>
+    </ClCompile>
+    <ClCompile Include="zuLerkerEgg.cpp">
+      <Filter>MainGame\RACES\Zerg\Unit%28Ground%29</Filter>
+    </ClCompile>
+    <ClCompile Include="zuLurker.cpp">
+      <Filter>MainGame\RACES\Zerg\Unit%28Ground%29</Filter>
+    </ClCompile>
+    <ClCompile Include="zuUltralisk.cpp">
+      <Filter>MainGame\RACES\Zerg\Unit%28Ground%29</Filter>
+    </ClCompile>
+    <ClCompile Include="zuZergEgg.cpp">
+      <Filter>MainGame\RACES\Zerg\Unit%28Ground%29</Filter>
+    </ClCompile>
+    <ClCompile Include="zuZergling.cpp">
+      <Filter>MainGame\RACES\Zerg\Unit%28Ground%29</Filter>
+    </ClCompile>
+    <ClCompile Include="zuCocoon.cpp">
+      <Filter>MainGame\RACES\Zerg\Unit%28Air%29</Filter>
+    </ClCompile>
+    <ClCompile Include="zuDevourer.cpp">
+      <Filter>MainGame\RACES\Zerg\Unit%28Air%29</Filter>
+    </ClCompile>
+    <ClCompile Include="zuGuadian.cpp">
+      <Filter>MainGame\RACES\Zerg\Unit%28Air%29</Filter>
+    </ClCompile>
+    <ClCompile Include="zuMutalisk.cpp">
+      <Filter>MainGame\RACES\Zerg\Unit%28Air%29</Filter>
+    </ClCompile>
+    <ClCompile Include="zuOverload.cpp">
+      <Filter>MainGame\RACES\Zerg\Unit%28Air%29</Filter>
+    </ClCompile>
+    <ClCompile Include="zuQueen.cpp">
+      <Filter>MainGame\RACES\Zerg\Unit%28Air%29</Filter>
+    </ClCompile>
+    <ClCompile Include="zuScourge.cpp">
+      <Filter>MainGame\RACES\Zerg\Unit%28Air%29</Filter>
+    </ClCompile>
+    <ClCompile Include="zbCreepColony.cpp">
+      <Filter>MainGame\RACES\Zerg\Building</Filter>
+    </ClCompile>
+    <ClCompile Include="zbDefilerMound.cpp">
+      <Filter>MainGame\RACES\Zerg\Building</Filter>
+    </ClCompile>
+    <ClCompile Include="zbEvolutionChamber.cpp">
+      <Filter>MainGame\RACES\Zerg\Building</Filter>
+    </ClCompile>
+    <ClCompile Include="zbExtractor.cpp">
+      <Filter>MainGame\RACES\Zerg\Building</Filter>
+    </ClCompile>
+    <ClCompile Include="zbGreaterSpire.cpp">
+      <Filter>MainGame\RACES\Zerg\Building</Filter>
+    </ClCompile>
+    <ClCompile Include="zbHatchery.cpp">
+      <Filter>MainGame\RACES\Zerg\Building</Filter>
+    </ClCompile>
+    <ClCompile Include="zbHive.cpp">
+      <Filter>MainGame\RACES\Zerg\Building</Filter>
+    </ClCompile>
+    <ClCompile Include="zbHydraliskDen.cpp">
+      <Filter>MainGame\RACES\Zerg\Building</Filter>
+    </ClCompile>
+    <ClCompile Include="zbLair.cpp">
+      <Filter>MainGame\RACES\Zerg\Building</Filter>
+    </ClCompile>
+    <ClCompile Include="zbNydusCanal.cpp">
+      <Filter>MainGame\RACES\Zerg\Building</Filter>
+    </ClCompile>
+    <ClCompile Include="zbQueensNest.cpp">
+      <Filter>MainGame\RACES\Zerg\Building</Filter>
+    </ClCompile>
+    <ClCompile Include="zbSpawningPool.cpp">
+      <Filter>MainGame\RACES\Zerg\Building</Filter>
+    </ClCompile>
+    <ClCompile Include="zbSpire.cpp">
+      <Filter>MainGame\RACES\Zerg\Building</Filter>
+    </ClCompile>
+    <ClCompile Include="zbSporeColony.cpp">
+      <Filter>MainGame\RACES\Zerg\Building</Filter>
+    </ClCompile>
+    <ClCompile Include="zbSunkenColony.cpp">
+      <Filter>MainGame\RACES\Zerg\Building</Filter>
+    </ClCompile>
+    <ClCompile Include="zbUltraliskCavern.cpp">
+      <Filter>MainGame\RACES\Zerg\Building</Filter>
+    </ClCompile>
+    <ClCompile Include="player.cpp">
+      <Filter>MainGame\sceneBattle</Filter>
+    </ClCompile>
+    <ClCompile Include="sceneBattle.cpp">
+      <Filter>MainGame\sceneBattle</Filter>
+    </ClCompile>
+    <ClCompile Include="zergProduction.cpp">
+      <Filter>MainGame\RACES\Zerg</Filter>
+    </ClCompile>
+    <ClCompile Include="zergUpgrade.cpp">
+      <Filter>MainGame\RACES\Zerg</Filter>
+    </ClCompile>
+    <ClCompile Include="gameInterface.cpp">
+      <Filter>MainGame\sceneBattle</Filter>
+    </ClCompile>
+    <ClCompile Include="zuDrone.cpp">
+      <Filter>MainGame\RACES\Zerg</Filter>
+    </ClCompile>
+    <ClCompile Include="gameMap.cpp">
+      <Filter>MainGame\sceneBattle\gameMap</Filter>
+    </ClCompile>
+    <ClCompile Include="fog.cpp">
+      <Filter>MainGame\sceneBattle\gameMap</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

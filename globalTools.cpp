@@ -69,3 +69,29 @@ void globalTools::deleteBrushAll(void)
 		DeleteObject(_gBrush[i]);
 	}
 }
+
+void globalTools::setPenAll(void)
+{
+	for (int i = 0; i < PENVERSION_MAX; i++)
+	{
+		switch (i)
+		{
+			case PENVERSION_BLACK:
+				_gPen[i] = CreatePen(PS_SOLID, 1, RGB(0, 0, 0));
+				break;
+			case PENVERSION_BLUE:
+				_gPen[i] = CreatePen(PS_SOLID, 3, RGB(0, 0, 255));
+				break;
+		}
+	}
+}
+
+void globalTools::deletePenAll(void)
+{
+	for (int i = 0; i < PENVERSION_MAX; i++)
+	{
+		DeleteObject(_gPen[i]);
+	}
+}
+
+

@@ -1,5 +1,6 @@
 #pragma once
 #include "gameNode.h"
+#include "Unit.h"
 
 class mainGame : public gameNode
 {
@@ -7,6 +8,10 @@ private:
 	bool		_stop;
 	POINT		_winsize;
 	float		_FPS;
+
+	Unit*		_unit;
+
+
 
 private:
 	void initScene(void);
@@ -23,7 +28,6 @@ public:
 	virtual void update(void);				//연산관련(타이머)
 	virtual void render(void);				//그려주는 함수
 	virtual void getChar(WPARAM wParam);	//키보드 입력
-	
 	void checkScene(void);
 
 

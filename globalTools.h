@@ -11,6 +11,8 @@ public:
 	void deleteFontAll(void);
 	void setBrushAll(void);
 	void deleteBrushAll(void);
+	void setPenAll(void);
+	void deletePenAll(void);
 
 };
 

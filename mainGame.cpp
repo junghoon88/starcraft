@@ -4,6 +4,7 @@
 #include "sceneInit.h"
 #include "sceneSelect.h"
 #include "sceneMaptool.h"
+#include "sceneBattle.h"
 
 
 
@@ -12,12 +13,15 @@ mainGame::mainGame()
 	_stop = false;
 	_winsize = { WINSIZEX, WINSIZEY };
 	_FPS = 60.0f;
+
+	//UnitÅ¬·¡½º ³»¿¡ Àü¿ªº¯¼ö¸¦ ÃÊ±âÈ­ÇÏ±â À§ÇØ
+	_unit = new Unit(true);
 }
 
 
 mainGame::~mainGame()
 {
-
+	SAFE_DELETE(_unit);
 }
 
 
@@ -38,6 +42,7 @@ void mainGame::initScene(void)
 	node = SCENEMANAGER->addScene(L"ÃÊ±âÈ­¾À", new sceneInit);  //°ÔÀÓ ¸®¼Ò½º ÃÊ±âÈ­
 	node = SCENEMANAGER->addScene(L"¼±ÅÃ¾À", new sceneSelect);
 	node = SCENEMANAGER->addScene(L"¸ÊÅø¾À", new sceneMaptool);				//¸ÊÅø
+	node = SCENEMANAGER->addScene(L"ÀüÅõ¾À", new sceneBattle);				//¸ÊÅø
 
 
 	SCENEMANAGER->changeScene(L"ÃÊ±âÈ­¾À");
@@ -67,6 +72,8 @@ void mainGame::update(void)
 	{
 		//SCENEMANAGER->changeScene(L"¼±ÅÃ¾À");
 	}
+
+	MAINCAMERA->update();
 
 	SCENEMANAGER->update();
 }

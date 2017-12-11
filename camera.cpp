@@ -67,6 +67,7 @@ void camera::update(void)
 	//if (_cameraY < MAP_SKY)								_cameraY = MAP_SKY;
 	//if (_cameraY > MAP_SKY + MAP_HEIGHT - WINSIZEY)		_cameraY = MAP_SKY + MAP_HEIGHT - WINSIZEY;
 
+	_rcCamera = RectMake(_cameraX, _cameraY, WINSIZEX, WINSIZEY);
 }
 
 void camera::render(HDC hdc)
@@ -111,7 +112,3 @@ void camera::earthquake(float power)
 	_cameraY += RND->getFromFloatTo(-power, power);
 }
 
-RECT camera::getRectCamera(void)
-{
-	return RectMake(_cameraX, _cameraY, WINSIZEX, WINSIZEY);
-}

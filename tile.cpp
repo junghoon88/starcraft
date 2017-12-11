@@ -16,12 +16,12 @@ tile::~tile()
 
 HRESULT tile::init(int idX, int idY)
 {
-	_center = PointMake(idX * TILESIZE + (TILESIZE / 2), idY*TILESIZE + (TILESIZE / 2));
+	_center = PointMake(idX * MAPTOOL_TILESIZE + (MAPTOOL_TILESIZE / 2), idY*MAPTOOL_TILESIZE + (MAPTOOL_TILESIZE / 2));
 
 	_idX = idX;
 	_idY = idY;
 
-	_rc = RectMakeCenter(_center.x, _center.y, TILESIZE, TILESIZE);
+	_rc = RectMakeCenter(_center.x, _center.y, MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
 
 	return S_OK;
 }

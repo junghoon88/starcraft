@@ -15,7 +15,7 @@ HRESULT database::init()
 {
 	loadDatabase(L"database.txt");
 
-	_slectScenario = 0;
+	_mapNum = 0;
 
 	_battleVictory = false;
 
@@ -62,6 +62,4 @@ void database::loadDatabase(wstring name)
 void database::setElementDataCurrentHP(wstring str, float ch)
 {
 	iterElement mIter = _mTotalElement.find(str);
-
-	mIter->second->currentHP = ch;
 }

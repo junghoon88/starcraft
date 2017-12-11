@@ -105,6 +105,10 @@ public:
 	void aniRender(HDC hdc, int destX, int destY, animation* ani);
 	void aniAlphaRender(HDC hdc, int destX, int destY, animation* ani, BYTE alpha);
 
+	//센터기준 랜더링
+	void frameRenderCT(HDC hdc, int cenX, int cenY, int currentFrameX, int currentFrameY);
+
+
 	//메모리 디씨 접근자
 	inline HDC getMemDC() { return _imageInfo->hMemDC; }
 

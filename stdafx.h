@@ -11,6 +11,7 @@
 #include <memory.h>
 #include <tchar.h>
 #include <commdlg.h>	//OPENFILENAME
+#include <assert.h>
 
 #include "commonMacroFunction.h"
 #include "randomFunction.h"
@@ -45,7 +46,7 @@ using namespace IOTA_UTIL;
 #define WINSTARTX 0
 #define WINSTARTY 0
 
-#define WINSIZEX 960	//
+#define WINSIZEX 1280	//
 #define WINSIZEY 960	//
 
 
@@ -86,3 +87,4 @@ extern POINT _ptMouse;
 
 extern HFONT _gFont[FONTVERSION_MAX];
 extern HBRUSH _gBrush[BRUSHVERSION_MAX];
+extern HPEN _gPen[PENVERSION_MAX];

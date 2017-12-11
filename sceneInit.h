@@ -11,7 +11,11 @@ private:
 	void initImage(void);
 	void initSound(void);
 
-	void initImageTiles(void);
+	void initImageMaptoolTiles(void);
+	void initImageGamemapTiles(void);
+	void initImageInterface(void);
+	void initImageZergUnits(void);
+	void initImageZergBuildings(void);
 
 public:
 	HRESULT init(void);
