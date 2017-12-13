@@ -1,11 +1,5 @@
 #include "stdafx.h"
 
-inline POINT PointMake(int x, int y)
-{
-	POINT pt = { x, y };
-
-	return pt;
-}
 
 
 

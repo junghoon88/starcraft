@@ -32,7 +32,6 @@ HRESULT gameNode::init(bool managerInit)
 
 	if (_managerInit)
 	{
-		//SetTimer(_hWnd, 1, 10, NULL);
 		KEYMANAGER->init();
 		IMAGEMANAGER->init();
 		TXTDATA->init();
@@ -54,7 +53,6 @@ void gameNode::release(void)
 {
 	if (_managerInit)
 	{
-		//KillTimer(_hWnd, 1);
 		KEYMANAGER->release();					KEYMANAGER->releaseSingleton();
 		IMAGEMANAGER->release();				IMAGEMANAGER->releaseSingleton();
 		TXTDATA->release();						TXTDATA->releaseSingleton();
@@ -101,39 +99,18 @@ LRESULT gameNode::MainProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lPara
 
 	switch (iMessage)
 	{
-		//윈도우 창이 켜질때만 실행이 되는 함수
 		case WM_CREATE:
-
 		break;
-		//case WM_PAINT:
-		//{
-		//	hdc = BeginPaint(hWnd, &ps);
-
-		//	this->render();
-
-		//	EndPaint(hWnd, &ps);
-		//}
-		//break;
-		//case WM_TIMER:
-		//	this->update();
-		//break;
 		case WM_MOUSEMOVE:
 			_ptMouse.x = static_cast<float>LOWORD(lParam);
 			_ptMouse.y = static_cast<float>HIWORD(lParam);
 		break;
 		case WM_KEYDOWN:
-			switch (wParam)
-			{
-				case VK_ESCAPE:
-					PostMessage(hWnd, WM_DESTROY, 0, 0);
-				break;
-			}
 		break;
 		case WM_CHAR:
 			this->getChar(wParam);
 		break;
 		case WM_DESTROY:
-		//윈도우 창 종료 함수
 			PostQuitMessage(0);
 		break;
 	}

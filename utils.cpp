@@ -51,6 +51,44 @@ namespace IOTA_UTIL
 		return angle;
 	}
 
+	//각도 가져오는 함수
+	float getAngleDeg(float x1, float y1, float x2, float y2)
+	{
+		float x = x2 - x1;
+		float y = y2 - y1;
+
+		float distance = sqrtf(x * x + y * y);
+
+		float angle = acosf(x / distance);
+
+		if (y2 > y1)
+		{
+			angle = PI2 - angle;
+			if (angle >= PI2) angle -= PI2;
+		}
+
+		return Rad2Deg(angle);
+	}
+
+	//-PI~PI
+	float getAngleDeg2(float x1, float y1, float x2, float y2)
+	{
+		float x = x2 - x1;
+		float y = y2 - y1;
+
+		float distance = sqrtf(x * x + y * y);
+
+		float angle = acosf(x / distance);
+
+		if (y2 > y1)
+		{
+			angle = PI2 - angle;
+			if (angle >= PI) angle -= PI2;
+		}
+
+		return Rad2Deg(angle);
+	}
+
 
 	float Rad2Deg(float rad)
 	{

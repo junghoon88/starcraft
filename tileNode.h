@@ -10,8 +10,8 @@
 #define MAPTOOL_TILESIZE	32
 
 //게임맵, 맵툴에서 보여줄 타일 개수
-#define MAPTOOL_TILEVIEWX	40
-#define MAPTOOL_TILEVIEWY	30
+#define MAPTOOL_TILEVIEWX	20
+#define MAPTOOL_TILEVIEWY	15
 
 //맵툴 ISOTILE
 #define ISOTILE_WIDTH		(MAPTOOL_TILESIZE*4)
@@ -25,10 +25,10 @@
 //~맵툴-----------------------------------------------------------------
 
 //게임맵----------------------------------------------------------------
-#define GAMEMAP_TILESIZE 64
+#define GAMEMAP_TILESIZE		32
 
 #define GAMEMAP_TILEVIEWX		20
-#define GAMEMAP_TILEVIEWY		11 //30
+#define GAMEMAP_TILEVIEWY		12 //30
 
 
 
@@ -75,11 +75,17 @@ enum TERRAINSET
 enum OBJECTSELECT
 {
 	OBJECTSELECT_NONE = -1,
-	OBJECTSELECT_ENEMY,
-	OBJECTSELECT_AILY,
-	OBJECTSELECT_PLAYER,
-
+	
 	OBJECTSELECT_MAX
+};
+
+enum FOGLEVEL
+{
+	FOGLEVEL_BLACK,		//검은화면
+	FOGLEVEL_GRAY,		//이전에 확보했던 시야
+	FOGLEVEL_VIEW,		//현재 시야
+	FOGLEVEL_DETECT,	//디텍트 가능 시야
+
 };
 
 //타일 구조체
@@ -120,4 +126,12 @@ struct tagisoTile
 	RECT rc;
 
 	bool clicked;
+};
+
+
+struct tagFog
+{
+	RECT		rcFog;
+	FOGLEVEL	level;
+	BYTE		alpha;
 };

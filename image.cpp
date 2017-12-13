@@ -780,6 +780,37 @@ void image::aniAlphaRender(HDC hdc, int destX, int destY, animation* ani, BYTE a
 	alphaRender(hdc, destX, destY, ani->getFramePos().x, ani->getFramePos().y, ani->getFrameWidth(), ani->getFrameHeight(), alpha);
 }
 
+void image::renderCT(HDC hdc, int cenX, int cenY)
+{
+	if (!_imageInfo)
+		return;
+
+	int destX = cenX - (_imageInfo->width  * 0.5f);
+	int destY = cenY - (_imageInfo->height * 0.5f);
+
+	if (_trans)
+	{
+		//특정색상을 DC영역에서 제외해주는 함수
+		GdiTransparentBlt(hdc,		//복사될 DC영역
+			destX,					//복사될 DC영역에 뿌려줄 좌표
+			destY,
+			_imageInfo->width,		//복사될 가로 크기
+			_imageInfo->height,		//복사될 세로 크기
+			_imageInfo->hMemDC,		//복사할 DC
+			0, 0,					//복사할 좌표
+			_imageInfo->width,		//복사할 가로 크기
+			_imageInfo->height,		//복사할 세로 크기
+			_transColor);			//제외할 칼라
+	}
+	else
+	{
+		//백버퍼에 있는 걸 앞으로 고속복사해주는 함수
+		BitBlt(hdc, destX, destY,
+			_imageInfo->width, _imageInfo->height,
+			_imageInfo->hMemDC, 0, 0, SRCCOPY);
+	}
+}
+
 void image::frameRenderCT(HDC hdc, int cenX, int cenY, int currentFrameX, int currentFrameY)
 {
 	if (!_imageInfo)

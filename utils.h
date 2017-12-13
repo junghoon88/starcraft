@@ -19,8 +19,10 @@ namespace IOTA_UTIL
 
 	//각도 가져오는 함수
 	float getAngle(float x1, float y1, float x2, float y2);
-
 	float getAngle2(float x1, float y1, float x2, float y2);
+	float getAngleDeg(float x1, float y1, float x2, float y2);
+	float getAngleDeg2(float x1, float y1, float x2, float y2);
+
 
 	float Rad2Deg(float rad);
 	float Deg2Rad(float deg);

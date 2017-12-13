@@ -1,45 +1,48 @@
 #include "stdafx.h"
 #include "Unit.h"
+#include "Building.h"
 
 POINT Unit::_zuBodySize[UNITNUM_ZERG_MAX];
 
 Unit::Unit(bool initUnitInfo)
+	: _zergUpgrade(NULL), _aStar(NULL)
 {
 	//유닛 몸체 사이즈
 	ZeroMemory(&_zuBodySize, sizeof(POINT) * UNITNUM_ZERG_MAX);
 
 	_zuBodySize[UNITNUM_ZERG_LARVA];
 	_zuBodySize[UNITNUM_ZERG_ZERGEGG];
-	_zuBodySize[UNITNUM_ZERG_DRONE]			= { 46, 46 };
-	_zuBodySize[UNITNUM_ZERG_ZERGLING]		= { 32, 32 };
-	_zuBodySize[UNITNUM_ZERG_HYDRALISK]		= { 42, 46 };
-	_zuBodySize[UNITNUM_ZERG_LURKER]		= { 64, 64 };
+	_zuBodySize[UNITNUM_ZERG_DRONE]			= { 36, 32 };
+	_zuBodySize[UNITNUM_ZERG_ZERGLING]		= { 16, 16 };
+	_zuBodySize[UNITNUM_ZERG_HYDRALISK]		= { 21, 23 };
+	_zuBodySize[UNITNUM_ZERG_LURKER]		= { 32, 32 };
 	_zuBodySize[UNITNUM_ZERG_LURKEREGG];
-	_zuBodySize[UNITNUM_ZERG_ULTRALISK]		= { 76, 64 };
-	_zuBodySize[UNITNUM_ZERG_BROODLING]		= { 38, 38 };
-	_zuBodySize[UNITNUM_ZERG_DEFILER]		= { 54, 50 };
-	_zuBodySize[UNITNUM_ZERG_INFESTEDTERRAN] = { 34, 40 };
-	_zuBodySize[UNITNUM_ZERG_OVERLORD]		= { 100, 100 };
-	_zuBodySize[UNITNUM_ZERG_MUTALISK]		= { 88, 88 };
-	_zuBodySize[UNITNUM_ZERG_SCOURGE]		= { 48, 48 };
-	_zuBodySize[UNITNUM_ZERG_QUEEN]			= { 96, 96 };
+	_zuBodySize[UNITNUM_ZERG_ULTRALISK]		= { 38, 32 };
+	_zuBodySize[UNITNUM_ZERG_BROODLING]		= { 19, 19 };
+	_zuBodySize[UNITNUM_ZERG_DEFILER]		= { 27, 25 };
+	_zuBodySize[UNITNUM_ZERG_INFESTEDTERRAN] = { 17, 20 };
+	_zuBodySize[UNITNUM_ZERG_OVERLORD]		= { 50, 50 };
+	_zuBodySize[UNITNUM_ZERG_MUTALISK]		= { 44, 44 };
+	_zuBodySize[UNITNUM_ZERG_SCOURGE]		= { 24, 24 };
+	_zuBodySize[UNITNUM_ZERG_QUEEN]			= { 48, 48 };
 	_zuBodySize[UNITNUM_ZERG_COCOON];
-	_zuBodySize[UNITNUM_ZERG_GUADIAN]		= { 88, 88 };
-	_zuBodySize[UNITNUM_ZERG_DEVOURER]		= { 88, 88 };
+	_zuBodySize[UNITNUM_ZERG_GUADIAN]		= { 44, 44 };
+	_zuBodySize[UNITNUM_ZERG_DEVOURER]		= { 44, 44 };
 
 }
 
 Unit::Unit()
+	: _zergUpgrade(NULL), _aStar(NULL)
 {
 	_unitNumZ = UNITNUM_ZERG_NONE;
 	_unitNumT = UNITNUM_TERRAN_NONE;
 	_unitNumP = UNITNUM_PROTOSS_NONE;
 
 	//BaseStatus
-	ZeroMemory(&_baseStatus, sizeof(tagBaseStatus));
+	ZeroMemory(&_baseStatus, sizeof(tagUnitBaseStatus));
 
 	//BattleStatus
-	ZeroMemory(&_battleStatus, sizeof(tagBattleStatus));
+	ZeroMemory(&_battleStatus, sizeof(tagUnitBattleStatus));
 }
 
 
@@ -60,14 +63,54 @@ void Unit::release(void)
 
 void Unit::update(void)
 {
+	procCommands();
+	updatePosition();
+	checkCloseList();
+	updateImageFrame();
 }
 
 void Unit::render(void)
 {
-	if (PtInRect(&MAINCAMERA->getRectCamera(), _battleStatus.pt.toPoint()))
+	//if (PtInRect(&MAINCAMERA->getRectCamera(), _battleStatus.pt.toPoint()))
+	//{
+	//}
+	if (_battleStatus.clicked)
 	{
-		_baseStatus.imgBody->frameRenderCT(getMemDC(), _battleStatus.pt.x, _battleStatus.pt.y, _battleStatus.bodyFrame.x, _battleStatus.bodyFrame.y);
+		int width  = _battleStatus.rcEllipse.right - _battleStatus.rcEllipse.left;
+		int height = _battleStatus.rcEllipse.bottom - _battleStatus.rcEllipse.top;
+
+
+
+#if 0
+
+		HPEN oldPen = (HPEN)SelectObject(getMemDC(), _gPen[PENVERSION_UNITCLICK]);
+		Ellipse(getMemDC(), _battleStatus.rcEllipse.left - MAINCAMERA->getCameraX(), _battleStatus.rcEllipse.top - MAINCAMERA->getCameraY(),
+							_battleStatus.rcEllipse.right - MAINCAMERA->getCameraX(), _battleStatus.rcEllipse.bottom - MAINCAMERA->getCameraY());
+		SelectObject(getMemDC(), oldPen);
+		DeleteObject(oldPen);
+
+#else
+		image* _backBuffer2 = IMAGEMANAGER->addImage(L"backBuffer2", WINSIZEX, WINSIZEY);
+		HDC hDCtemp = _backBuffer2->getMemDC();
+		PatBlt(hDCtemp, 0, 0, WINSIZEX, WINSIZEY, WHITENESS);
+
+		HPEN oldPen = (HPEN)SelectObject(hDCtemp, _gPen[PENVERSION_UNITCLICK]);
+		Ellipse(hDCtemp, 0, 0, width, height);
+		SelectObject(hDCtemp, oldPen);
+
+		GdiTransparentBlt(getMemDC(),		//복사될 DC영역
+						_battleStatus.rcEllipse.left - MAINCAMERA->getCameraX(),	//복사될 DC영역에 뿌려줄 좌표
+						_battleStatus.rcEllipse.top - MAINCAMERA->getCameraY(),
+						width, height,												//복사될 가로 세로 크기
+
+						hDCtemp,			//복사할 DC
+						0, 0,				//복사할 좌표
+						width, height,		//복사할 가로 세로 크기
+						RGB(255, 255, 255));			//제외할 칼라
+#endif
+
 	}
+	_baseStatus.imgBody->frameRenderCT(getMemDC(), _battleStatus.pt.x - MAINCAMERA->getCameraX(), _battleStatus.pt.y - MAINCAMERA->getCameraY(), _battleStatus.bodyFrame.x, _battleStatus.bodyFrame.y);
 }
 
 void Unit::updateBattleStatus(void)
@@ -127,4 +170,38 @@ void Unit::updateBattleStatus(void)
 		_battleStatus.curArmor = _baseStatus.armor + _baseStatus.armorPlus * _zergUpgrade->getUpgrade()[UPGRADE_ZERG_FLYERCARAPACE].level;
 	}
 
+}
+
+void Unit::updatePosition(void)
+{
+}
+void Unit::updateImageFrame(void)
+{
+	setImageFrameForAngle();
+}
+
+
+void Unit::receiveCommand(COMMAND cmd, POINT pt)
+{
+	_battleStatus.curCommand = cmd;
+	_battleStatus.useAstar = true;
+	_battleStatus.ptTarget = pt;
+	_battleStatus.unitTarget = NULL;
+	_battleStatus.BuildingTarget = NULL;
+}
+void Unit::receiveCommand(COMMAND cmd, Unit* unit)
+{
+	_battleStatus.curCommand = cmd;
+	_battleStatus.useAstar = true;
+	_battleStatus.ptTarget = { 0, 0 };
+	_battleStatus.unitTarget = unit;
+	_battleStatus.BuildingTarget = NULL;
+}
+void Unit::receiveCommand(COMMAND cmd, Building* building)
+{
+	_battleStatus.curCommand = cmd;
+	_battleStatus.useAstar = true;
+	_battleStatus.ptTarget = { 0, 0 };
+	_battleStatus.unitTarget = NULL;
+	_battleStatus.BuildingTarget = building;
 }

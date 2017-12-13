@@ -2,6 +2,7 @@
 #include "zergProduction.h"
 
 tagProduction zergProduction::_zuProduction[UNITNUM_ZERG_MAX];
+tagProduction zergProduction::_zbProduction[BUILDINGNUM_ZERG_MAX];
 
 zergProduction::zergProduction(bool initInfo)
 {
@@ -51,6 +52,54 @@ zergProduction::zergProduction(bool initInfo)
 			case UNITNUM_ZERG_GUADIAN: 
 				break;
 			case UNITNUM_ZERG_DEVOURER: 
+				break;
+		}
+	}
+
+	for (int i = 0; i < BUILDINGNUM_ZERG_MAX; i++)
+	{
+		switch (i)
+		{
+			//BUILD1
+			case BUILDINGNUM_ZERG_HATCHERY:
+				break;
+			case BUILDINGNUM_ZERG_LAIR:
+				break;
+			case BUILDINGNUM_ZERG_HIVE:
+				break;
+			
+			case BUILDINGNUM_ZERG_CREEPCOLONY:
+				break;
+			case BUILDINGNUM_ZERG_SUNKENCOLONY:
+				break;
+			case BUILDINGNUM_ZERG_SPORECOLONY:
+				break;
+
+			case BUILDINGNUM_ZERG_EXTRACTOR:
+				break;
+			case BUILDINGNUM_ZERG_SPAWNINGPOOL:
+				break;
+			case BUILDINGNUM_ZERG_EVOLUTIONCHAMBER:
+				break;
+			case BUILDINGNUM_ZERG_HYDRALISKDEN:
+				break;
+			
+			//BUILD2
+			case BUILDINGNUM_ZERG_SPIRE:
+				break;
+			case BUILDINGNUM_ZERG_GREATERSPIRE:
+				break;
+			case BUILDINGNUM_ZERG_QUEENSNEST:
+				break;
+			case BUILDINGNUM_ZERG_NYDUSCANAL:
+				break;
+			case BUILDINGNUM_ZERG_ULTRALISKCAVERN:
+				break;
+			case BUILDINGNUM_ZERG_DEFILERMOUND:
+				break;
+			
+			//SPECIAL
+			case BUILDINGNUM_ZERG_INFESTEDCOMMANDCENTER:
 				break;
 		}
 	}

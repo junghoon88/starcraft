@@ -4,67 +4,58 @@
 #include "tile.h"
 #include "gameMap.h"
 
-//1. 이동가능한 타일을 찾는다. (각 타일별로 소모값을 넣는다.)
-//2. 이동가능한 타일 중에서 그 위치에서 공격할 수 있는 타일을 찾는다.
-//3. 공격 가능한 타일중에서 상대편 적의 HP가 가장 낮은 애를 공격한다.
-
-
 class aStar : public gameNode
 {
 private:
-	typedef vector<tile*> vTile;
-	typedef vector<tile*>::iterator viTile;
-
-	typedef map<int, tile*> mTile;
-	typedef map<int, tile*>::iterator miTile;
-
-private:
 	vTile _vTotalList;	// 토탈 타일
 	vTile _vOpenList;	// 갈 수 있는 타일
-	mTile _mAttackList;	// 공격 가능한 위치, 적 타일
+	vTile _vCloseList;	// 가장 가까운 타일
 
 	tile* _staTile;		// 시작 타일
+	tile* _endTile;		// 끝   타일
+	tile* _curTile;		// 현재 타일
 
-
+	bool _valid;
 
 	gameMap* _map;
 
-	int _cost;
-	int _costMax;
-
-	POINT _tileMax;
-
-private:
-	tile* findTile(int idX, int idY);
+	int _findCnt;
+	int _findCntMax;
 
 public:
 	aStar();
 	~aStar();
 
-	HRESULT init(gameMap* map);
+	HRESULT init(void);
+
+	//타일 셋팅할 함수
+	void initTiles(void);
+	void setTiles(POINT startPt, POINT endPt);
+
+
+	//현재 타일에서 갈수 있는 길 찾는 함수
+	vTile addOpenList(tile* currentTile);
+	//경로 탐색 함수
+	void pathFinder(tile* currentTile);
+
+	void clearTiles(void);
+	tile* getTile(POINT tilePt);
+
+
 	void release(void);
 	void update(void);
 	void render(void);
 
 
-	//타일 셋팅할 함수
-	void initTiles(void);
-	void resetTilesAttr(void);
-	void setTiles(POINT startPt, int costMax);
-
-	//현재 타일에서 갈수 있는 길 찾는 함수
-	vector<tile*> addOpenList(tile* currentTile);
-	//경로 탐색 함수
-	void findOpenList(tile* currentTile, int cost = 0);
-
-	//현재 타일에서 공격 가능한지 찾는 함수
-
-	POINT findCloseTile(POINT st, POINT ed);
-
-	void clearTiles(void);
-	tile* getTile(POINT tilePt);
-
 public:
-	inline vector<tile*> getOpenList(void) { return _vOpenList; }
+	inline void setLinkAdressGameMap(gameMap* map) { _map = map; }
+	inline vTile getTotalList(void) { return _vTotalList; }
+	inline void setTotalList(vTile vTotalList) { _vTotalList = vTotalList; }
+	inline vTile getCloseList(void) { return _vCloseList; }
+
+	inline tile* getStartTile(void) { return _staTile; }
+
+	inline void setAttribute(int x, int y, wstring str) { _vTotalList[x + y*TILEX]->setAttribute(str); }
+
 };
 

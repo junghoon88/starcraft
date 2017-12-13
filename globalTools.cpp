@@ -58,6 +58,9 @@ void globalTools::setBrushAll(void)
 			case BRUSHVERSION_GRAY:
 				_gBrush[i] = CreateSolidBrush(RGB(200, 200, 200));
 				break;
+			case BRUSHVERSION_BLACK:
+				_gBrush[i] = CreateSolidBrush(RGB(0, 0, 0));
+				break;
 
 		}
 	}
@@ -76,12 +79,15 @@ void globalTools::setPenAll(void)
 	{
 		switch (i)
 		{
-			case PENVERSION_BLACK:
-				_gPen[i] = CreatePen(PS_SOLID, 1, RGB(0, 0, 0));
-				break;
-			case PENVERSION_BLUE:
-				_gPen[i] = CreatePen(PS_SOLID, 3, RGB(0, 0, 255));
-				break;
+		case PENVERSION_MOUSEDRAG:
+			_gPen[i] = CreatePen(PS_SOLID, 2, RGB(16, 252, 24));
+			break;
+		case PENVERSION_UNITCLICK:
+			_gPen[i] = CreatePen(PS_SOLID, 2, RGB(36, 152, 36));
+			break;
+		case PENVERSION_BLUE:
+			_gPen[i] = CreatePen(PS_SOLID, 3, RGB(0, 0, 255));
+			break;
 		}
 	}
 }

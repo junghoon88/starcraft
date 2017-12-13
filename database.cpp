@@ -13,9 +13,14 @@ database::~database()
 
 HRESULT database::init()
 {
-	loadDatabase(L"database.txt");
+	//loadDatabase(L"database.txt");
 
 	_mapNum = 0;
+
+	for (int i = 0; i < PLAYER_NUM; i++)
+	{
+		_selectRaces[i] = RACES_ZERG;
+	}
 
 	_battleVictory = false;
 

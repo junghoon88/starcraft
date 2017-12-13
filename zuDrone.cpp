@@ -13,17 +13,17 @@ zuDrone::zuDrone()
 
 	_stprintf(_baseStatus.name, L"Zerg Drone");	//이름
 	_baseStatus.imgBody = NULL;					//이미지-몸체
-	_baseStatus.aniFace = NULL;					//이미지-얼굴(우측하단)
+	_baseStatus.imgFace = NULL;					//이미지-얼굴(우측하단)
 	_baseStatus.imgStat1 = NULL;				//이미지-스탯상태(1마리클릭했을때)
 	_baseStatus.imgStat2 = NULL;				//이미지-스탯상태(복수클릭했을때)
 
 	_baseStatus.maxHP = 40.0f;					//HP
 
-	_baseStatus.isShield = FALSE;				//실드여부
+	_baseStatus.useSH = FALSE;				//실드여부
 	_baseStatus.maxSH = 0.0f;					//실드
 
-	_baseStatus.isEnergy = FALSE;				//에너지여부
-	_baseStatus.maxEN = 0.0f;					//에너지
+	_baseStatus.useMP = FALSE;				//에너지여부
+	_baseStatus.maxMP = 0.0f;					//에너지
 
 	_baseStatus.sight = 7.0f;					//시야
 
@@ -59,6 +59,23 @@ zuDrone::zuDrone()
 	//_baseStatus.AWdamageType;							//공격타입
 	//_baseStatus.AWcooldown;							//공격쿨타임
 	//_baseStatus.AWattackRange;						//공격범위
+
+	_baseStatus.commands[0] = COMMAND_MOVE;
+	_baseStatus.commands[1] = COMMAND_STOP;
+	_baseStatus.commands[2] = COMMAND_ATTACK;
+	_baseStatus.commands[3] = COMMAND_NONE;
+	_baseStatus.commands[4] = COMMAND_GATHER;
+	_baseStatus.commands[5] = COMMAND_NONE;// COMMAND_RETURNCARGO;
+	_baseStatus.commands[6] = COMMAND_BUILD1;
+	_baseStatus.commands[7] = COMMAND_BUILD2;
+	_baseStatus.commands[8] = COMMAND_BURROW;
+
+
+	//private:
+	_workState = WORKSTATE_IDLE;
+	_hangingMineral = 0;	//0이면 안들고 있는 것.
+	_hangingGas = 0;		//0이면 안들고 있는 것.
+
 }
 
 
@@ -74,25 +91,28 @@ HRESULT zuDrone::init(PLAYER playerNum, POINT pt)
 	TCHAR strKey[100];
 	_stprintf(strKey, L"ZU-droneBody%d", playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);				//이미지-몸체
-	_baseStatus.aniFace = NULL;											//이미지-얼굴(우측하단)
+	_baseStatus.imgFace = NULL;											//이미지-얼굴(우측하단)
 	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-droneStat1");	//이미지-스탯상태(1마리클릭했을때)
 	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-droneStat2");	//이미지-스탯상태(복수클릭했을때)
 
 
 	//BattleStatus
+	_battleStatus.unitState = UNITSTATE_STOP;
+	_battleStatus.curCommand = COMMAND_STOP;
+	_battleStatus.clicked = false;
 	_battleStatus.curHP = _baseStatus.maxHP;			//현재 HP
 	_battleStatus.maxHP = _baseStatus.maxHP;			//최대 HP
 	_battleStatus.curSH = _baseStatus.maxSH;			//현재 실드
 	_battleStatus.maxSH = _baseStatus.maxSH;			//최대 실드
-	_battleStatus.curEN = 0.0f;							//현재 에너지
-	_battleStatus.maxEN = _baseStatus.maxEN;			//최대 에너지
+	_battleStatus.curMP = 0.0f;							//현재 에너지
+	_battleStatus.maxMP = _baseStatus.maxMP;			//최대 에너지
 
 	_battleStatus.pt.set((float)pt.x, (float)pt.y);							//현재위치
-	_battleStatus.ptTile = { pt.x / MAPTOOL_TILESIZE, pt.y / MAPTOOL_TILESIZE };			//현재위치한 타일
-	_battleStatus.rcBody = RectMakeCenter(pt.x, pt.y, getZuBodySize(_unitNumZ).x, getZuBodySize(_unitNumZ).y);			//유닛 몸체
-	_battleStatus.rcEllipse;		//클릭했을때 보여주는 타원
-	_battleStatus.angle;			//바라보는 각도
+	_battleStatus.moveSpeed = _baseStatus.moveSpeed;
+	_battleStatus.angleDeg = 315.0f;			//바라보는 각도
 	_battleStatus.direction;		//움직일때 이동방향
+
+	updatePosition();
 
 	updateBattleStatus();
 
@@ -106,6 +126,8 @@ void zuDrone::release(void)
 
 void zuDrone::update(void)
 {
+	Unit::update();
+
 	if (KEYMANAGER->isOnceKeyDown(VK_SPACE))
 	{
 		_battleStatus.bodyFrame.x++;
@@ -127,4 +149,18 @@ void zuDrone::updateBattleStatus(void)
 	Unit::updateBattleStatus();
 
 
+}
+
+void zuDrone::updatePosition(void)
+{
+	POINT pt = _battleStatus.pt.toPoint();
+	_battleStatus.ptTile = { pt.x / MAPTOOL_TILESIZE, pt.y / MAPTOOL_TILESIZE };			//현재위치한 타일
+	_battleStatus.rcBody = RectMakeCenter(pt.x, pt.y, getZuBodySize(_unitNumZ).x, getZuBodySize(_unitNumZ).y);			//유닛 몸체
+	_battleStatus.rcEllipse = _battleStatus.rcBody;		//클릭했을때 보여주는 타원
+	_battleStatus.rcEllipse.top += getZuBodySize(_unitNumZ).y / 2;
+}
+
+void zuDrone::updateImageFrame(void)
+{
+	Unit::updateImageFrame();
 }

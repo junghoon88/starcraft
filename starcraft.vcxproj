@@ -94,6 +94,7 @@
     <ClInclude Include="effect.h" />
     <ClInclude Include="effectManager.h" />
     <ClInclude Include="fog.h" />
+    <ClInclude Include="gameController.h" />
     <ClInclude Include="gameInterface.h" />
     <ClInclude Include="gameMap.h" />
     <ClInclude Include="gameNode.h" />
@@ -107,6 +108,7 @@
     <ClInclude Include="loading.h" />
     <ClInclude Include="mainGame.h" />
     <ClInclude Include="MBGManager.h" />
+    <ClInclude Include="miniMap.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="progressBar.h" />
     <ClInclude Include="randomFunction.h" />
@@ -179,6 +181,7 @@
     <ClCompile Include="effect.cpp" />
     <ClCompile Include="effectManager.cpp" />
     <ClCompile Include="fog.cpp" />
+    <ClCompile Include="gameController.cpp" />
     <ClCompile Include="gameInterface.cpp" />
     <ClCompile Include="gameMap.cpp" />
     <ClCompile Include="gameNode.cpp" />
@@ -191,6 +194,7 @@
     <ClCompile Include="loading.cpp" />
     <ClCompile Include="mainGame.cpp" />
     <ClCompile Include="MBGManager.cpp" />
+    <ClCompile Include="miniMap.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="progressBar.cpp" />
     <ClCompile Include="RenderManager.cpp" />
@@ -208,6 +212,7 @@
     <ClCompile Include="timeManager.cpp" />
     <ClCompile Include="timer.cpp" />
     <ClCompile Include="txtData.cpp" />
+    <ClCompile Include="Unit+commands.cpp" />
     <ClCompile Include="Unit.cpp" />
     <ClCompile Include="utils.cpp" />
     <ClCompile Include="winMain.cpp" />

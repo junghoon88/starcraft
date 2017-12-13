@@ -24,7 +24,6 @@
 #include "iniDataManager.h"
 #include "sceneManager.h"
 #include "keyAniManager.h"
-#include "database.h"
 #include "RenderManager.h"
 #include "txtData.h"
 #include "collision.h"
@@ -33,6 +32,7 @@
 
 //전역 매크로변수
 #include "globalMacroVariables.h"
+#include "database.h"
 
 
 using namespace std;
@@ -46,8 +46,8 @@ using namespace IOTA_UTIL;
 #define WINSTARTX 0
 #define WINSTARTY 0
 
-#define WINSIZEX 1280	//
-#define WINSIZEY 960	//
+#define WINSIZEX 640	//
+#define WINSIZEY 480	//
 
 
 #define WINSTYLE WS_CAPTION | WS_SYSMENU
@@ -76,6 +76,9 @@ using namespace IOTA_UTIL;
 #define SAFE_DELETE(p)  {if(p) {delete(p); (p)=NULL;}}
 #define SAFE_DELETE_ARRAY(p) {if(p) { delete[](p); (p) = NULL;}}
 #define SAFE_RELEASE(p) {if(p) {(p)->release(); (p)=NULL;}}
+
+#define SAFE_RELEASEDELETE(p) {if(p) {(p)->release(); delete(p); (p)=NULL;} }
+
 
 //===================================
 // ## 전역 변수 ## 17.08.07 ##

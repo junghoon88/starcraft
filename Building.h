@@ -1,46 +1,42 @@
 #pragma once
 #include "gameNode.h"
 
-struct tagProperties
+#include "zergUpgrade.h"
+
+//전방선언
+class Unit;
+
+struct tagBuildingBaseStatus
 {
 	RACES				race;			//종족
 
+	PLAYER				playerNum;		//플레이어 정보
+
 	TCHAR				name[50];		//이름
 	image*				imgBody;		//이미지-몸체
-	animation*			aniFace;		//이미지-얼굴(우측하단)
+	image*				imgFace;		//이미지-얼굴(우측하단)
 	image*				imgStat;		//이미지-스탯상태(1마리클릭했을때)
 
 	FLOAT				curHP;			//HP
 	FLOAT				maxHP;			//HP
 
-	BOOL				isShield;		//실드여부
+	BOOL				useSH;			//실드여부
 	FLOAT				curSH;			//실드
 	FLOAT				maxSH;			//실드
+
+	BOOL				useMP;			//에너지여부
+	FLOAT				maxMP;			//에너지
 
 	FLOAT				sight;			//시야
 
 	BOOL				isAir;			//공중에 있는지(테란건물)
 	FLOAT				moveSpeed;		//이동속도
 
-	UNITSIZE			unitSize;		//유닛사이즈
-	UINT				transportslots;	//수송 슬롯칸 수
 	UINT				armor;			//방어력
 
-};
-
-struct tagProduction
-{
-	UINT				costMinerals;	//소모 미네랄
-	UINT				costGas;		//소모 가스
-	FLOAT				buildTime;		//빌드시간
-	TCHAR				hotKey;			//단축키
-};
-
-struct tagCombat
-{
 	BOOL				sameGWAW;		//지상공격, 공중공격이 같은지
 
-										//Ground Weapon
+	//Ground Weapon
 	BOOL				GWable;			//지상공격 가능여부
 	TCHAR				GWname[100];	//공격이름
 	UINT				GWdamage;		//공격데미지
@@ -50,7 +46,7 @@ struct tagCombat
 	FLOAT				GWcooldown;		//공격쿨타임
 	FLOAT				GWattackRange;	//공격범위
 
-										//Air Weapon
+	//Air Weapon
 	BOOL				AWable;			//공중공격 가능여부
 	TCHAR				AWname[100];	//공격이름
 	UINT				AWdamage;		//공격데미지
@@ -59,20 +55,43 @@ struct tagCombat
 	DAMAGETYPE			AWdamageType;	//공격타입
 	FLOAT				AWcooldown;		//공격쿨타임
 	FLOAT				AWattackRange;	//공격범위
+
 };
 
-struct tagPosition
+struct tagBuildingBattleStatus
 {
+	BOOL				isDead;
+
+	DWORD				curCommand;
+
+	BOOL				clicked;
+
+	FLOAT				curHP;			//현재 HP
+	FLOAT				maxHP;			//최대 HP
+	FLOAT				curSH;			//현재 실드
+	FLOAT				maxSH;			//최대 실드
+	FLOAT				curMP;			//현재 에너지
+	FLOAT				maxMP;			//최대 에너지
+
+	UINT				curGWdamage;	//현재 지상공격력
+	UINT				curAWdamage;	//현재 공중공격력
+	UINT				curArmor;		//현재 방어력
+
+
 	MYPOINT				pt;				//현재위치
 	POINT				ptTile;			//현재위치한 타일
 	RECT				rcBody;			//건물 몸체
 	RECT				rcTile;			//건물이 차지하는 타일
 
 	RECT				rcEllipse;		//클릭했을때 보여주는 타원
-	DIRECTION			direction;		//움직일때 이동방향
 	FLOAT				angle;			//바라보는 각도
+	DIRECTION			direction;		//움직일때 이동방향
 
+	POINT				bodyFrame;
+	POINT				stat1Frame;
+	POINT				stat2Frame;
 };
+
 
 class Building : public gameNode
 {
@@ -85,14 +104,12 @@ protected:
 	UNITNUM_PROTOSS		_unitNumP;
 
 
-	//Properties
-	tagProperties		_properties;
+	//기본속성과 실시간속성으로 나누자!
+	tagBuildingBaseStatus		_baseStatus;
+	tagBuildingBattleStatus		_battleStatus;
 
-	//Production
-	tagProduction		_production;
+	zergUpgrade*		_zergUpgrade;
 
-	//combat
-	tagCombat			_combat;
 
 
 public:
@@ -107,4 +124,6 @@ public:
 public:
 
 };
+typedef vector<Building*>				vBuildings;
+typedef vector<Building*>::iterator		vBuildingsIter;
 

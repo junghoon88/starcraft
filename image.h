@@ -106,6 +106,7 @@ public:
 	void aniAlphaRender(HDC hdc, int destX, int destY, animation* ani, BYTE alpha);
 
 	//센터기준 랜더링
+	void renderCT(HDC hdc, int cenX, int cenY);
 	void frameRenderCT(HDC hdc, int cenX, int cenY, int currentFrameX, int currentFrameY);
 
 

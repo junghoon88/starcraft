@@ -2,8 +2,15 @@
 #include "gameNode.h"
 #include "tileNode.h"
 
+
+
+
 class fog : public gameNode
 {
+private:
+	image*		_imgFog;
+	tagFog		_fogs[TILEX][TILEY];
+
 public:
 	fog();
 	~fog();

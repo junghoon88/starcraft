@@ -26,5 +26,9 @@ private:
 
 	void renderTiles(void);
 
+public:
+	typedef tagTile(*pTiles)[TILEY];
+
+	inline pTiles getTiles(void) { return _tiles; }
 
 };

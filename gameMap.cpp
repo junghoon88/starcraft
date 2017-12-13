@@ -94,8 +94,8 @@ void gameMap::renderTiles(void)
 	int cameraX = MAINCAMERA->getCameraX();
 	int cameraY = MAINCAMERA->getCameraY();
 
-	int cameraIdX = cameraX / MAPTOOL_TILESIZE - 1;
-	int cameraIdY = cameraY / MAPTOOL_TILESIZE - 1;
+	int cameraIdX = cameraX / GAMEMAP_TILESIZE - 1;
+	int cameraIdY = cameraY / GAMEMAP_TILESIZE - 1;
 
 	for (int y = 0; y < GAMEMAP_TILEVIEWY + 2; y++)
 	{
@@ -110,7 +110,7 @@ void gameMap::renderTiles(void)
 			if (idY >= TILEY) continue;
 			if (_imgTiles[idX][idY] == NULL) continue;
 
-			_imgTiles[idX][idY]->render(getMemDC(), idX*MAPTOOL_TILESIZE - cameraX, idY*MAPTOOL_TILESIZE - cameraY);
+			_imgTiles[idX][idY]->render(getMemDC(), idX*GAMEMAP_TILESIZE - cameraX, idY*GAMEMAP_TILESIZE - cameraY);
 		}
 	}
 }

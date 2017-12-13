@@ -24,8 +24,10 @@ private:
 private:
 	arrElement _mTotalElement;
 
-
 	int _mapNum;
+
+	//플레이어가 선택한 종족 정보
+	RACES	_selectRaces[PLAYER_NUM];
 
 	bool _battleVictory;
 
@@ -50,7 +52,11 @@ public:
 	inline int getMapNum(void) { return _mapNum; }
 	inline void setMapNum(int num) { _mapNum = num; }
 
+	inline RACES getSelectRaces(PLAYER playerNum) { return _selectRaces[playerNum]; }
+
 	inline bool getBattleVictory(void) { return _battleVictory; }
 	inline void setBattleVictory(bool victory) { _battleVictory = victory; }
+
+
 };
 

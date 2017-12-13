@@ -55,8 +55,9 @@ void sceneInit::initImage(void)
 	_loading->loadFrameImage(L"¹öÆ°1", L"image/button1.bmp", 100, 60, 1, 2);
 
 	initImageMaptoolTiles();
-	initImageInterface();
+	initImageGamemapTiles();
 
+	initImageInterface();
 
 	initImageZergUnits();
 }
@@ -149,6 +150,8 @@ void sceneInit::initImageGamemapTiles(void)
 	TCHAR strKey[128] = L"";
 	TCHAR strFile[128] = L"";
 
+	_loading->loadImage(L"gamemap-fog", L"image/gamemap/fog.bmp", GAMEMAP_TILESIZE, GAMEMAP_TILESIZE, false, RGB(0, 0, 0), true);
+
 	//terrain-Asphlat
 	for (int i = 0; i < 1; i++)
 	{
@@ -224,9 +227,34 @@ void sceneInit::initImageGamemapTiles(void)
 
 void sceneInit::initImageInterface(void)
 {
+	//cursor
+	_loading->loadFrameImage(L"cursor-Idle", L"image/interface/cursor-Idle.bmp", 100, 21, 5, 1, true, RGB(255, 0, 255));
+	_loading->loadImage(L"cursor-Dragging", L"image/interface/cursor-Dragging.bmp", 18, 22, true, RGB(255, 0, 255));
+	_loading->loadFrameImage(L"cursor-onme", L"image/interface/cursor-onme.bmp", 574, 41, 14, 1, true, RGB(255, 0, 255));
+	_loading->loadFrameImage(L"cursor-onneutral", L"image/interface/cursor-onneutral.bmp", 574, 41, 14, 1, true, RGB(255, 0, 255));
+	_loading->loadFrameImage(L"cursor-onenemy", L"image/interface/cursor-onenemy.bmp", 574, 41, 14, 1, true, RGB(255, 0, 255));
+
+	//interface
 	_loading->loadImage(L"interfaceZ", L"image/interface/interface-Z.bmp", WINSIZEX, WINSIZEY, true, RGB(255, 0, 255));
 	_loading->loadImage(L"interfaceT", L"image/interface/interface-T.bmp", WINSIZEX, WINSIZEY, true, RGB(255, 0, 255));
 	_loading->loadImage(L"interfaceP", L"image/interface/interface-P.bmp", WINSIZEX, WINSIZEY, true, RGB(255, 0, 255));
+
+	//commands
+	_loading->loadImage(L"command-attack0",		L"image/interface/command/attack0.bmp",		34, 33);
+	_loading->loadImage(L"command-attack1",		L"image/interface/command/attack1.bmp",		34, 33);
+	_loading->loadImage(L"command-build0",		L"image/interface/command/build0.bmp",		34, 33);
+	_loading->loadImage(L"command-build1",		L"image/interface/command/build1.bmp",		34, 33);
+	_loading->loadImage(L"command-burrow0",		L"image/interface/command/burrow0.bmp",		34, 33);
+	_loading->loadImage(L"command-burrow2",		L"image/interface/command/burrow2.bmp",		34, 33);
+	_loading->loadImage(L"command-gather0",		L"image/interface/command/gather0.bmp",		34, 33);
+	_loading->loadImage(L"command-gather1",		L"image/interface/command/gather1.bmp",		34, 33);
+	_loading->loadImage(L"command-move0",		L"image/interface/command/move0.bmp",		34, 33);
+	_loading->loadImage(L"command-move1",		L"image/interface/command/move1.bmp",		34, 33);
+	_loading->loadImage(L"command-return0",		L"image/interface/command/return0.bmp",		34, 33);
+	_loading->loadImage(L"command-return1",		L"image/interface/command/return1.bmp",		34, 33);
+	_loading->loadImage(L"command-stop0",		L"image/interface/command/stop0.bmp",		34, 33);
+	_loading->loadImage(L"command-stop1",		L"image/interface/command/stop1.bmp",		34, 33);
+	_loading->loadImage(L"command-unburrow0",	L"image/interface/command/unburrow0.bmp",	34, 33);
 }
 
 void sceneInit::initImageZergUnits(void)
@@ -247,8 +275,8 @@ void sceneInit::initImageZergUnits(void)
 
 	//Stat---------------------------------------------------------------------------------------------------------------------------------
 	//drone
-	_loading->loadFrameImage(L"ZU-droneStat1", L"image/zerg/unit/drone/droneStat1.bmp", 117, 102, 1, 1, true, RGB(255, 0, 255));
-	_loading->loadFrameImage(L"ZU-droneStat2", L"image/zerg/unit/drone/droneStat2.bmp", 66, 68, 1, 1);
+	_loading->loadFrameImage(L"ZU-droneStat1", L"image/zerg/unit/drone/droneStat1.bmp", 59, 51, 1, 1, true, RGB(255, 0, 255));
+	_loading->loadFrameImage(L"ZU-droneStat2", L"image/zerg/unit/drone/droneStat2.bmp", 33, 34, 1, 1);
 
 }
 

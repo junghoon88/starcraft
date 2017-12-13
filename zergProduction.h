@@ -17,6 +17,7 @@ class zergProduction
 {
 private:
 	static tagProduction _zuProduction[UNITNUM_ZERG_MAX];
+	static tagProduction _zbProduction[BUILDINGNUM_ZERG_MAX];
 
 public:
 	zergProduction(bool initInfo);

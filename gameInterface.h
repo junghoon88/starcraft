@@ -1,5 +1,6 @@
 #pragma once
 #include "gameNode.h"
+
 class gameInterface : public gameNode
 {
 private:

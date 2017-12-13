@@ -106,6 +106,9 @@
     <Filter Include="MainGame\sceneBattle\gameMap">
       <UniqueIdentifier>{23c60061-27c7-4f7e-9dc4-4adda9c652c1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MainGame\sceneBattle\gameInterface">
+      <UniqueIdentifier>{4dd5d68f-1231-4de9-aae5-5ac2813c3396}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -351,17 +354,23 @@
     <ClInclude Include="zergUpgrade.h">
       <Filter>MainGame\RACES\Zerg</Filter>
     </ClInclude>
-    <ClInclude Include="gameInterface.h">
-      <Filter>MainGame\sceneBattle</Filter>
-    </ClInclude>
-    <ClInclude Include="zuDrone.h">
-      <Filter>MainGame\RACES\Zerg</Filter>
-    </ClInclude>
     <ClInclude Include="gameMap.h">
       <Filter>MainGame\sceneBattle\gameMap</Filter>
     </ClInclude>
     <ClInclude Include="fog.h">
       <Filter>MainGame\sceneBattle\gameMap</Filter>
+    </ClInclude>
+    <ClInclude Include="gameInterface.h">
+      <Filter>MainGame\sceneBattle\gameInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="miniMap.h">
+      <Filter>MainGame\sceneBattle\gameInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="gameController.h">
+      <Filter>MainGame\sceneBattle</Filter>
+    </ClInclude>
+    <ClInclude Include="zuDrone.h">
+      <Filter>MainGame\RACES\Zerg</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -584,17 +593,26 @@
     <ClCompile Include="zergUpgrade.cpp">
       <Filter>MainGame\RACES\Zerg</Filter>
     </ClCompile>
-    <ClCompile Include="gameInterface.cpp">
-      <Filter>MainGame\sceneBattle</Filter>
-    </ClCompile>
-    <ClCompile Include="zuDrone.cpp">
-      <Filter>MainGame\RACES\Zerg</Filter>
-    </ClCompile>
     <ClCompile Include="gameMap.cpp">
       <Filter>MainGame\sceneBattle\gameMap</Filter>
     </ClCompile>
     <ClCompile Include="fog.cpp">
       <Filter>MainGame\sceneBattle\gameMap</Filter>
+    </ClCompile>
+    <ClCompile Include="gameInterface.cpp">
+      <Filter>MainGame\sceneBattle\gameInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="miniMap.cpp">
+      <Filter>MainGame\sceneBattle\gameInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="gameController.cpp">
+      <Filter>MainGame\sceneBattle</Filter>
+    </ClCompile>
+    <ClCompile Include="zuDrone.cpp">
+      <Filter>MainGame\RACES\Zerg</Filter>
+    </ClCompile>
+    <ClCompile Include="Unit+commands.cpp">
+      <Filter>MainGame\Common</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
