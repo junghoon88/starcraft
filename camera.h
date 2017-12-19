@@ -8,9 +8,6 @@ private:
 	int _cameraX;
 	int _cameraY;
 
-	int _targetX;
-	int _targetY;
-
 	int _minX;
 	int _minY;
 	int _maxX;
@@ -35,9 +32,6 @@ public:
 	inline void setCameraPos(int x, int y) { _cameraX = x; _cameraY = y; }
 	inline void setCameraX(int x) { _cameraX = x; }
 	inline void setCameraY(int y) { _cameraY = y; }
-	inline void setTargetPos(int x, int y) { _targetX = x; _targetY = y; }
-	inline void setTargetX(int x) { _targetX = x; }
-	inline void setTargetY(int y) { _targetY = y; }
 
 	inline void setMinMax(int minX, int minY, int maxX, int maxY) { _minX = minX; _minY = minY; _maxX = maxX; _maxY = maxY; }
 	inline void setMin(int x, int y) { _minX = x; _minY = y; }

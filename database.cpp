@@ -17,6 +17,8 @@ HRESULT database::init()
 
 	_mapNum = 0;
 
+	_gameStart = false;
+
 	for (int i = 0; i < PLAYER_NUM; i++)
 	{
 		_selectRaces[i] = RACES_ZERG;

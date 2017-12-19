@@ -3,9 +3,6 @@
 #include "player.h"
 #include "gameMap.h"
 
-#include "gameInterface.h"
-#include "gameController.h"
-
 class sceneBattle : public gameNode
 {
 private:
@@ -19,7 +16,7 @@ private:
 	//gameInterface*	_gameInterface[PLAYER_NUM];
 
 	//게임컨트롤러
-	gameController*	_gameController;
+	//gameController*	_gameController;
 
 
 	PLAYER			_selectPlayerNum;		//선택된 플레이어만 interface render 를 한다.
@@ -39,5 +36,6 @@ public:
 	void getChar(WPARAM wParam);
 
 
+	
 };
 

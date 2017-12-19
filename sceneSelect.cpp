@@ -18,11 +18,14 @@ sceneSelect::~sceneSelect()
 HRESULT sceneSelect::init(void)
 {
 	_btn[BTNMENU_GAMESTART] = new button;
-	_btn[BTNMENU_GAMESTART]->init(L"버튼1", L"게임시작", 100, 100, { 0,0 }, { 0,1 }, cbFuncGameStart, this);
+	_btn[BTNMENU_GAMESTART]->init(L"버튼2", L"게임시작", 100, 100, { 0,0 }, { 0,0 }, cbFuncGameStart, this);
+	_btn[BTNMENU_GAMESTART]->setColor(RGB(92, 237, 48));
 	_btn[BTNMENU_MAPTOOL] = new button;
-	_btn[BTNMENU_MAPTOOL]->init(L"버튼1", L"맵에디터",	100, 200, { 0,0 }, { 0,1 }, cbFuncMaptool, this);
+	_btn[BTNMENU_MAPTOOL]->init(L"버튼2", L"맵에디터",	100, 200, { 0,0 }, { 0,0 }, cbFuncMaptool, this);
+	_btn[BTNMENU_MAPTOOL]->setColor(RGB(92, 237, 48));
 	_btn[BTNMENU_EXIT] = new button;
-	_btn[BTNMENU_EXIT]->init(L"버튼1", L"나가기",		100, 300, { 0,0 }, { 0,1 }, cbFuncGameExit, this);
+	_btn[BTNMENU_EXIT]->init(L"버튼2", L"나가기",		100, 300, { 0,0 }, { 0,0 }, cbFuncGameExit, this);
+	_btn[BTNMENU_EXIT]->setColor(RGB(92, 237, 48));
 
 	return S_OK;
 }

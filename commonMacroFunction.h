@@ -33,6 +33,11 @@ inline RECT RectMakeCenter(int x, int y, int width, int height)
 	return rc;
 }
 
+inline void RectangleMake(HDC hdc, RECT rc)
+{
+	Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
+}
+
 //좌표로 부터 가로, 세로가 만들어지는 사각형
 inline void RectangleMake(HDC hdc, int x, int y, int width, int height)
 {

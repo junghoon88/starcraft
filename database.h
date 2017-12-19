@@ -26,6 +26,7 @@ private:
 
 	int _mapNum;
 
+	BOOL	_gameStart;
 	//플레이어가 선택한 종족 정보
 	RACES	_selectRaces[PLAYER_NUM];
 
@@ -51,6 +52,9 @@ public:
 public:
 	inline int getMapNum(void) { return _mapNum; }
 	inline void setMapNum(int num) { _mapNum = num; }
+
+	inline BOOL	getGameStart(void) { return _gameStart; }
+	inline void setGameStart(BOOL start) { _gameStart = start; }
 
 	inline RACES getSelectRaces(PLAYER playerNum) { return _selectRaces[playerNum]; }
 

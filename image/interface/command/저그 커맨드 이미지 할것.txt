@@ -1,0 +1,57 @@
+esc.bmp",						//1, 2
+move.bmp",						//1, 2
+stop.bmp",						//1, 2
+attack.bmp",					//1, 2
+patrol.bmp",					//1, 2
+hold.bmp",						//1, 2
+gather.bmp",					//1, 2
+returncargo.bmp",				//1, 2
+build1.bmp",					//1, 2
+build2.bmp",					//1, 2
+			 					
+								
+burrow.bmp",					//1, 2, 3
+unburrow.bmp",					//1, 2
+infest.bmp",					//1, 2
+parasite.bmp",					//1, 2
+broodring.bmp",					//1, 2, 3
+ensnare.bmp",					//1, 2, 3
+consume.bmp",					//1, 2, 3
+darkswarm.bmp",					//1, 2, 3
+plague.bmp",					//1, 2, 3
+			 					
+			 					
+build_hatchery.bmp",			//1, 2
+build_lair.bmp",				//1, 2, 3
+build_hive.bmp",				//1, 2, 3
+build_creepcolony.bmp",			//1, 2, 3
+build_sunkencolony.bmp",		//1, 2, 3
+build_sporecolony.bmp",			//1, 2, 3
+build_extractor.bmp",			//1, 2
+build_spawningpool.bmp",		//1, 2, 3
+build_evolutionchamber.bmp",	//1, 2, 3
+build_hydraliskden.bmp",		//1, 2, 3
+			 					
+			 					
+build_spire.bmp",				//1, 2, 3
+build_greaterspire.bmp",		//1, 2, 3
+build_queensnest.bmp",			//1, 2, 3
+build_nyduscanal.bmp",			//1, 2, 3
+build_ultraliskcavern.bmp",		//1, 2, 3
+build_defilermound.bmp",		//1, 2, 3
+			 					
+			 					
+unit_drone.bmp",				//1, 2
+unit_zergling.bmp",				//1, 2, 3
+unit_overlord.bmp",				//1, 2
+unit_hydralisk.bmp",			//1, 2, 3
+unit_mutalisk.bmp",				//1, 2, 3
+unit_scourge.bmp",				//1, 2, 3
+unit_queen.bmp",				//1, 2, 3
+unit_ultralisk.bmp",			//1, 2, 3
+unit_defiler.bmp",				//1, 2, 3
+			 					
+unit_lurker.bmp",				//1, 2, 3
+unit_guadian.bmp",				//1, 2, 3
+unit_devourer.bmp",				//1, 2, 3
+unit_infestedterran.bmp",		//1, 2, 3

@@ -3,7 +3,6 @@
 
 
 sceneBattle::sceneBattle()
-	: _gameController(NULL)
 {
 	for (int i = 0; i < PLAYER_NUM; i++)
 	{
@@ -37,17 +36,12 @@ HRESULT sceneBattle::init(void)
 		//_gameInterface[i]->init(selectRaces);
 	}
 
-	_selectPlayerNum = PLAYER1;
-
-
-	_gameController = new gameController;
-	_gameController->init(_selectPlayerNum, _player[_selectPlayerNum]->getRaces());
 	for (int i = 0; i < PLAYER_NUM; i++)
 	{
-		_gameController->setLinkAdressPlayers(_player[i], (PLAYER)i);
+		_player[i]->getGameController()->setLinkAdressPlayers(_player[i], (PLAYER)i);
 	}
-	//_gameController->setLinkAdressGameInterface(_gameInterface[_selectPlayerNum]);
 
+	_selectPlayerNum = PLAYER1;
 
 	ShowCursor(false);
 
@@ -64,20 +58,40 @@ void sceneBattle::release(void)
 
 	SAFE_RELEASEDELETE(_gameMap);
 
-	SAFE_RELEASEDELETE(_gameController);
 
 	ShowCursor(true);
 }
 
 void sceneBattle::update(void)
 {
+	//카메라 이동은 여기(게임컨트롤러에서 하지 않고)
+	if (KEYMANAGER->isStayKeyDown(VK_RIGHT))
+	{
+		MAINCAMERA->moveCamera(DIRECTION_RG);
+	}
+	if (KEYMANAGER->isStayKeyDown(VK_LEFT))
+	{
+		MAINCAMERA->moveCamera(DIRECTION_LF);
+	}
+	if (KEYMANAGER->isStayKeyDown(VK_UP))
+	{
+		MAINCAMERA->moveCamera(DIRECTION_UP);
+	}
+	if (KEYMANAGER->isStayKeyDown(VK_DOWN))
+	{
+		MAINCAMERA->moveCamera(DIRECTION_DN);
+	}
+
+
+
+
 	_gameMap->update();
 	for (int i = 0; i < PLAYER_NUM; i++)
 	{
 		_player[i]->update();
 	}
 	//_gameInterface[_selectPlayerNum]->update();
-	_gameController->update();
+	_player[_selectPlayerNum]->getGameController()->update();
 }
 
 void sceneBattle::render(void)
@@ -88,7 +102,7 @@ void sceneBattle::render(void)
 		_player[i]->render(_player[_selectPlayerNum]->getFog());
 	}
 	//_gameInterface[_selectPlayerNum]->render();
-	_gameController->render();
+	_player[_selectPlayerNum]->getGameController()->render();
 }
 
 void sceneBattle::getChar(WPARAM wParam)

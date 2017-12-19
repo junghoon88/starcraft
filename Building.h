@@ -17,11 +17,9 @@ struct tagBuildingBaseStatus
 	image*				imgFace;		//이미지-얼굴(우측하단)
 	image*				imgStat;		//이미지-스탯상태(1마리클릭했을때)
 
-	FLOAT				curHP;			//HP
 	FLOAT				maxHP;			//HP
 
 	BOOL				useSH;			//실드여부
-	FLOAT				curSH;			//실드
 	FLOAT				maxSH;			//실드
 
 	BOOL				useMP;			//에너지여부
@@ -55,6 +53,8 @@ struct tagBuildingBaseStatus
 	DAMAGETYPE			AWdamageType;	//공격타입
 	FLOAT				AWcooldown;		//공격쿨타임
 	FLOAT				AWattackRange;	//공격범위
+
+	COMMAND				commands[COMMAND_MAX];		//건물이 사용하는 커맨드 셋트
 
 };
 
@@ -99,9 +99,9 @@ protected:
 	//유닛 고유 번호를 입력받는다. 
 	//셋 중 하나는 값이 있어야하며
 	//셋 다 -1 값이 -1이면 에러
-	UNITNUM_ZERG		_unitNumZ;
-	UNITNUM_TERRAN		_unitNumT;
-	UNITNUM_PROTOSS		_unitNumP;
+	BUILDINGNUM_ZERG		_buildingNumZ;
+	//BUILDINGNUM_TERRAN		_buildingNumT;
+	//BUILDINGNUM_PROTOSS		_buildingNumP;
 
 
 	//기본속성과 실시간속성으로 나누자!
@@ -122,6 +122,8 @@ public:
 	virtual void render(void);
 
 public:
+	inline BUILDINGNUM_ZERG getBuildingNumZerg(void) { return _buildingNumZ; }
+
 
 };
 typedef vector<Building*>				vBuildings;

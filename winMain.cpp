@@ -1,6 +1,10 @@
 #include "stdafx.h"
 #include "mainGame.h"
 #include "globalTools.h"
+#include "gameController.h"
+
+#include <process.h>
+
 
 //전역변수를 선언한다면 요기요기요 
 HINSTANCE _hInstance;		//어플 고유번호
@@ -18,7 +22,13 @@ mainGame _mg;
 globalTools _gTools;
 
 
+gameController	_gc;
+unsigned int	_gcId;
+
+BOOL			_gameExit = FALSE;
+
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+
 
 void setWindowsSize(int x, int y, int width, int height);
 
@@ -72,6 +82,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmd
 	_gTools.setBrushAll();
 	_gTools.setPenAll();
 
+
 	//GetMessage : 메시지 정보가 들어오면 그때 반응
 	//PeekMessage : 메시지 정보가 들어오든 말든 무조건 반응(상시 루프돌고있음)
 	while (true)
@@ -88,7 +99,11 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmd
 
 		if (PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
 		{
-			if (message.message == WM_QUIT) break;
+			if (message.message == WM_QUIT)
+			{
+				_gameExit = TRUE;
+				break;
+			}
 			TranslateMessage(&message);	//입력이 들어오는 순간 그 메시지 처리 담당
 			DispatchMessage(&message);	//실제로 윈도우에 그 메시지 전달
 		}
@@ -105,7 +120,22 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmd
 			DWORD tick2 = GetTickCount();
 			DWORD tick = tick2 - tick1;
 
-			printf("");
+			if (tick > 10)
+			{
+				printf("");
+
+			}
+			if (tick > 40)
+			{
+				printf("");
+
+			}
+			if (tick > 80)
+			{
+				printf("");
+
+			}
+
 		}
 	}
 
@@ -145,3 +175,4 @@ void setWindowsSize(int x, int y, int width, int height)
 		(winRect.bottom - winRect.top), SWP_NOZORDER | SWP_NOMOVE);
 
 }
+

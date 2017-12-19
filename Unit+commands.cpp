@@ -38,9 +38,9 @@ void Unit::procCommands(void)
 		break;
 	case COMMAND_UNBURROW:
 		break;
-	case COMMAND_LURKER:
-		break;
 	case COMMAND_INFEST:
+		break;
+	case COMMAND_PARASITE:
 		break;
 	case COMMAND_BROODRING:
 		break;
@@ -87,11 +87,17 @@ void Unit::moveGround(void)
 		{
 			if (_battleStatus.useAstar)
 			{
-				_vCloseList.clear();
-				_aStar->clearTiles();
-				_aStar->setTiles(ptStartTile, ptEndTile);
-				_aStar->pathFinder(_aStar->getStartTile());
-				_vCloseList = _aStar->getCloseList();
+				//AstarProc 에서 처리해줄때까지 기다린다.
+				if (_battleStatus.calcAstar == false)
+				{
+					moveToPoint(_battleStatus.ptTarget);
+					return;
+				}
+
+				//_aStar->setTiles(ptStartTile, ptEndTile);
+				//_aStar->pathFinder(_aStar->getStartTile());
+				//_vCloseList = _aStar->getCloseList();
+				//_battleStatus.useAstar = false;
 				_battleStatus.useAstar = false;
 			}
 
@@ -183,9 +189,9 @@ void Unit::moveComplete(void)
 		break;
 	case COMMAND_UNBURROW:
 		break;
-	case COMMAND_LURKER:
-		break;
 	case COMMAND_INFEST:
+		break;
+	case COMMAND_PARASITE:
 		break;
 	case COMMAND_BROODRING:
 		break;

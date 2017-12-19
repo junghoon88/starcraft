@@ -100,6 +100,7 @@
     <ClInclude Include="gameNode.h" />
     <ClInclude Include="globalMacroVariables.h" />
     <ClInclude Include="globalTools.h" />
+    <ClInclude Include="hotkeys.h" />
     <ClInclude Include="image.h" />
     <ClInclude Include="imageManager.h" />
     <ClInclude Include="iniDataManager.h" />
@@ -107,7 +108,6 @@
     <ClInclude Include="keyManager.h" />
     <ClInclude Include="loading.h" />
     <ClInclude Include="mainGame.h" />
-    <ClInclude Include="MBGManager.h" />
     <ClInclude Include="miniMap.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="progressBar.h" />
@@ -186,6 +186,7 @@
     <ClCompile Include="gameMap.cpp" />
     <ClCompile Include="gameNode.cpp" />
     <ClCompile Include="globalTools.cpp" />
+    <ClCompile Include="hotkeys.cpp" />
     <ClCompile Include="image.cpp" />
     <ClCompile Include="imageManager.cpp" />
     <ClCompile Include="iniDataManager.cpp" />
@@ -193,7 +194,6 @@
     <ClCompile Include="keyManager.cpp" />
     <ClCompile Include="loading.cpp" />
     <ClCompile Include="mainGame.cpp" />
-    <ClCompile Include="MBGManager.cpp" />
     <ClCompile Include="miniMap.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="progressBar.cpp" />

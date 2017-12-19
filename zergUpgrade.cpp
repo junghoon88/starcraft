@@ -6,6 +6,9 @@ zergUpgrade::zergUpgrade()
 {
 	for (int i = 0; i < UPGRADE_ZERG_MAX; i++)
 	{
+		_upgrade[i].isProcessing = false;
+		_upgrade[i].complete = false;
+
 		switch (i)
 		{
 		case UPGRADE_ZERG_CARAPACE:
@@ -37,6 +40,9 @@ zergUpgrade::zergUpgrade()
 
 	for (int i = 0; i < EVOLUTION_ZERG_MAX; i++)
 	{
+		_evolution[i].isProcessing = false;
+		_evolution[i].complete = false;
+
 		switch (i)
 		{
 		case EVOLUTION_ZERG_VECTRAL_SACS:

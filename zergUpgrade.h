@@ -12,19 +12,23 @@ struct tagUpgradeCost
 
 struct tagUpgrade
 {
-	TCHAR					name[128];	//이름
-	UINT					level;		//레벨
-	UINT					maxLevel;	//맥스레벨
-										
-	vector<tagUpgradeCost>	vCost;		//레벨별 업그레이드 비용
+	TCHAR					name[128];		//이름
+	UINT					level;			//레벨
+	UINT					maxLevel;		//맥스레벨
+
+	BOOL					isProcessing;	//진행중
+	BOOL					complete;		//완료
+
+	vector<tagUpgradeCost>	vCost;			//레벨별 업그레이드 비용
 };
 
 struct tagEvolution
 {
-	TCHAR			name[128];	//이름
-	BOOL			complete;	//진화완료 여부
+	TCHAR			name[128];		//이름
+	BOOL			isProcessing;	//진행중
+	BOOL			complete;		//완료
 								
-	tagUpgradeCost	cost;		//업그레이드 비용
+	tagUpgradeCost	cost;			//업그레이드 비용
 };
 
 class zergUpgrade

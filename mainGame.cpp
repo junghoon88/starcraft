@@ -14,8 +14,10 @@ mainGame::mainGame()
 	_winsize = { WINSIZEX, WINSIZEY };
 	_FPS = 60.0f;
 
-	//Unit클래스 내에 전역변수를 초기화하기 위해
+	//Unit클래스 내에 static변수를 초기화하기 위해
 	_unit = new Unit(true);
+
+	_gameStart = FALSE;
 }
 
 
@@ -107,6 +109,13 @@ void mainGame::checkScene(void)
 	if (SCENEMANAGER->willChangeScene() == TRUE)
 	{
 		SCENEMANAGER->changeScene();
+
+		MAINCAMERA->setCameraPos(0, 0);
+
+		if (_gameStart == FALSE && SCENEMANAGER->isCurScene(L"전투씬"))
+		{
+			_gameStart = TRUE;
+		}
 	}
 }
 

@@ -3,3 +3,6 @@ http://namu.mirror.wiki/w/%EC%8A%A4%ED%83%80%ED%81%AC%EB%9E%98%ED%94%84%ED%8A%B8
 
 스타크래프트 위키
 http://starcraft.wikia.com/wiki/Category:Gameplay
+
+스타크래프트 MOD 제작 툴 다운로드
+http://www.samods.org/starcraft/modding_tools

@@ -72,7 +72,7 @@ struct tagUnitBaseStatus
 	FLOAT				AWcooldown;		//공격쿨타임
 	FLOAT				AWattackRange;	//공격범위
 
-	DWORD				commands[COMMAND_MAX];		//유닛이 사용하는 커맨드 셋트
+	COMMAND				commands[COMMAND_MAX];		//유닛이 사용하는 커맨드 셋트
 	
 };
 
@@ -80,10 +80,12 @@ struct tagUnitBaseStatus
 struct tagUnitBattleStatus
 {
 	BOOL				isDead;
+	BOOL				isBusy;			//AStarThread 에서 계산중일때 죽어서 Delete 되는것 방지
 	UNITSTATE			unitState;
 
 	COMMAND				curCommand;
 	BOOL				useAstar;
+	BOOL				calcAstar;
 	POINT				ptTarget;
 	Unit*				unitTarget;
 	Building*			BuildingTarget;
@@ -119,12 +121,6 @@ struct tagUnitBattleStatus
 	POINT				stat1Frame;
 	POINT				stat2Frame;
 
-};
-
-//PlayerInfo
-struct tagPlayerControl
-{
-	BOOL				clicked;
 };
 
 class Unit : public gameNode
@@ -171,6 +167,7 @@ public:
 	//커맨드를 처리한다.
 	void procCommands(void);
 
+	void receiveCommand(COMMAND cmd);
 	void receiveCommand(COMMAND cmd, POINT pt);
 	void receiveCommand(COMMAND cmd, Unit* unit);
 	void receiveCommand(COMMAND cmd, Building* building);
@@ -201,6 +198,12 @@ public:
 
 	inline tagUnitBaseStatus getBaseStatus(void) { return _baseStatus; }
 	inline tagUnitBattleStatus getBattleStatus(void) { return _battleStatus; }
+
+	//A* 관련
+	inline BOOL getIsBusy(void) { return _battleStatus.isBusy; }
+	inline void setIsBusy(BOOL busy) { _battleStatus.isBusy = busy; }
+	inline void setCalcAstar(BOOL calc) { _battleStatus.calcAstar = calc; }
+	inline void setVCloseList(vTile list) { _vCloseList = list; }
 
 
 	inline void setClicked(BOOL clicked) { _battleStatus.clicked = clicked; }

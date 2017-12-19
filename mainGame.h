@@ -10,6 +10,7 @@ private:
 	float		_FPS;
 
 	Unit*		_unit;
+	BOOL		_gameStart;
 
 
 
@@ -38,6 +39,8 @@ public:
 	inline void setStop(bool stop) { _stop = stop; }
 	inline POINT getWinSize(void) { return _winsize; }
 	inline float getFPS(void) { return _FPS; }
+
+	inline BOOL getGameStart(void) { return _gameStart; }
 
 };
 

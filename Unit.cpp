@@ -180,28 +180,50 @@ void Unit::updateImageFrame(void)
 	setImageFrameForAngle();
 }
 
+void Unit::receiveCommand(COMMAND cmd)
+{
+	_battleStatus.curCommand = cmd;
+	_battleStatus.useAstar = false;
+	_battleStatus.calcAstar = false;
+	//_battleStatus.ptTarget = { -1, -1 };
+	//_battleStatus.unitTarget = NULL;
+	//_battleStatus.BuildingTarget = NULL;
 
+	_vCloseList.clear();
+}
 void Unit::receiveCommand(COMMAND cmd, POINT pt)
 {
 	_battleStatus.curCommand = cmd;
 	_battleStatus.useAstar = true;
+	_battleStatus.calcAstar = false;
 	_battleStatus.ptTarget = pt;
 	_battleStatus.unitTarget = NULL;
 	_battleStatus.BuildingTarget = NULL;
+
+	_vCloseList.clear();
+	//_aStar->clearTiles();
 }
 void Unit::receiveCommand(COMMAND cmd, Unit* unit)
 {
 	_battleStatus.curCommand = cmd;
 	_battleStatus.useAstar = true;
+	_battleStatus.calcAstar = false;
 	_battleStatus.ptTarget = { 0, 0 };
 	_battleStatus.unitTarget = unit;
 	_battleStatus.BuildingTarget = NULL;
+
+	_vCloseList.clear();
+	//_aStar->clearTiles();
 }
 void Unit::receiveCommand(COMMAND cmd, Building* building)
 {
 	_battleStatus.curCommand = cmd;
 	_battleStatus.useAstar = true;
+	_battleStatus.calcAstar = false;
 	_battleStatus.ptTarget = { 0, 0 };
 	_battleStatus.unitTarget = NULL;
 	_battleStatus.BuildingTarget = building;
+
+	_vCloseList.clear();
+	//_aStar->clearTiles();
 }

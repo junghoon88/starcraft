@@ -66,23 +66,9 @@ void gameMap::setTileImage(void)
 				_stprintf(strKey, L"gamemap-terrain-Dirt-%02d", _tiles[x][y].terrainNum);
 				_imgTiles[x][y] = IMAGEMANAGER->findImage(strKey);
 				break;
-			case TERRAIN_MUD:
-				break;
-			case TERRAIN_DIRTWALL:
-				break;
+			//case TERRAIN_DIRTWALL:
+			//	break;
 			case TERRAIN_WATER:
-				break;
-			case TERRAIN_GRASS:
-				break;
-			case TERRAIN_GRASSWALL:
-				break;
-			case TERRAIN_STRUCTURE:
-				break;
-			case TERRAIN_STRUCTUREWALL:
-				break;
-			case TERRAIN_ASPHALT:
-				break;
-			case TERRAIN_ROCKYGROUND:
 				break;
 			}
 		}

@@ -54,6 +54,31 @@ void aStar::setTiles(POINT startPt, POINT endPt)
 	bool staCheck = false;
 	bool endCheck = false;
 
+	tile* temp = _vTotalList[startPt.x + startPt.y * TILEX];
+	if (startPt.x == temp->getIdX() && startPt.y == temp->getIdY())
+	{
+		_staTile = _vTotalList[startPt.x + startPt.y * TILEX];
+		_staTile->setAttribute(L"start");
+
+		//현재위치는 처음시작위치와 같도록함
+		_curTile = _staTile;
+		staCheck = true;
+	}
+	temp = _vTotalList[endPt.x + endPt.y * TILEX];
+	if (endPt.x == temp->getIdX() && endPt.y == temp->getIdY())
+	{
+		_endTile = _vTotalList[endPt.x + endPt.y * TILEX];
+		_endTile->setAttribute(L"end");
+		endCheck = true;
+	}
+
+	if (staCheck && endCheck)
+	{
+		_valid = true;
+		return;
+	}
+
+
 	for (int i = 0; i < _vTotalList.size(); i++)
 	{
 		POINT pt;
@@ -64,6 +89,9 @@ void aStar::setTiles(POINT startPt, POINT endPt)
 		{
 			_staTile = _vTotalList[i];
 			_staTile->setAttribute(L"start");
+
+			//현재위치는 처음시작위치와 같도록함
+			_curTile = _staTile;
 			staCheck = true;
 		}
 		else if (pt.x == endPt.x && pt.y == endPt.y)
@@ -101,7 +129,7 @@ vector<tile*> aStar::addOpenList(tile* currentTile)
 			tile* node = _vTotalList[((startY + i) * TILEX) + (startX + j)];
 
 			if (!node->getIsOpen()) continue;
-			if (node->getAttribute() == L"start") continue;
+			if (node == _staTile) continue;
 			if (node->getAttribute() == L"unmove") continue;
 
 			node->setParentNode(currentTile);
@@ -128,6 +156,11 @@ vector<tile*> aStar::addOpenList(tile* currentTile)
 		}
 	}
 
+	if (_vOpenList.size() == 0)
+	{
+		printf("");
+	}
+
 	return _vOpenList;
 }
 
@@ -138,7 +171,7 @@ void aStar::pathFinder(tile* currentTile)
 		return;
 
 	float tempTotalCost = 5000;
-	tile* tempTile;
+	tile* tempTile = NULL;
 
 	int openListSize = addOpenList(currentTile).size();
 	for (int i = 0; i < openListSize; i++)
@@ -199,6 +232,10 @@ void aStar::pathFinder(tile* currentTile)
 		}
 	}
 
+	if (tempTile == NULL)
+	{
+		printf("");
+	}
 	_curTile = tempTile;
 
 	//재귀함수
