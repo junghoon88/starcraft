@@ -102,6 +102,8 @@ void mainGame::render(void)
 
 void mainGame::getChar(WPARAM wParam)
 {
+	SCENEMANAGER->getChar(wParam);
+
 }
 
 void mainGame::checkScene(void)

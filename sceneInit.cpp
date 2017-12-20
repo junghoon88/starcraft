@@ -55,6 +55,8 @@ void sceneInit::initImage(void)
 	_loading->loadFrameImage(L"버튼1", L"image/button1.bmp", 100, 60, 1, 2);
 	_loading->loadFrameImage(L"버튼2", L"image/button2.bmp", 123, 29, 1, 1);
 
+	initImageNeutralResource();
+
 	initImageMaptoolTiles();
 	initImageGamemapTiles();
 
@@ -68,12 +70,29 @@ void sceneInit::initSound(void)
 
 }
 
+void sceneInit::initImageNeutralResource(void)
+{
+	_loading->loadFrameImage(L"NeutralResource-Mineral0", L"image/neutral/min00.bmp", 64, 384, 1, 4, true, RGB(255, 0, 255));
+	_loading->loadFrameImage(L"NeutralResource-Mineral1", L"image/neutral/min01.bmp", 64, 384, 1, 4, true, RGB(255, 0, 255));
+	_loading->loadFrameImage(L"NeutralResource-Mineral2", L"image/neutral/min02.bmp", 64, 384, 1, 4, true, RGB(255, 0, 255));
+	_loading->loadImage(L"NeutralResource-Gas", L"image/neutral/gas.bmp", MAPTOOL_TILESIZE * 4, MAPTOOL_TILESIZE * 2, true, RGB(255, 0, 255));
+}
+
 void sceneInit::initImageMaptoolTiles(void)
 {
 	TCHAR strKey[128] = L"";
 	TCHAR strFile[128] = L"";
 
 
+	//terrain-Dirt
+	for (int i = 0; i < 1; i++)
+	{
+		_stprintf(strKey, L"maptool-terrain-Dirt-%02d", i);
+		_stprintf(strFile, L"image/maptool/tiles/terrain-Dirt/%02d.bmp", i);
+		_loading->loadImage(strKey, strFile, MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
+	}
+
+	//terrain-HighDirt
 	_loading->loadFrameImage(L"maptool-terrain-HighDirt", L"image/maptool/tiles/terrain-HighDirt/IDLE3x2.bmp", MAPTOOL_TILESIZE*3, MAPTOOL_TILESIZE*2, 3, 2);
 
 	_loading->loadFrameImage(L"maptool-terrain-HighDirt-LD", L"image/maptool/tiles/terrain-HighDirt/LD2x3.bmp", MAPTOOL_TILESIZE * 2, MAPTOOL_TILESIZE * 3, 2, 3);
@@ -84,6 +103,23 @@ void sceneInit::initImageMaptoolTiles(void)
 	_loading->loadFrameImage(L"maptool-terrain-HighDirt-RG", L"image/maptool/tiles/terrain-HighDirt/RG2x3.bmp", MAPTOOL_TILESIZE * 2, MAPTOOL_TILESIZE * 3, 2, 3);
 	_loading->loadFrameImage(L"maptool-terrain-HighDirt-RU", L"image/maptool/tiles/terrain-HighDirt/RU2x2.bmp", MAPTOOL_TILESIZE * 2, MAPTOOL_TILESIZE * 2, 2, 2);
 
+	//terrain-Water
+	for (int i = 0; i < 1; i++)
+	{
+		_stprintf(strKey, L"maptool-terrain-Water-%02d", i);
+		_stprintf(strFile, L"image/maptool/tiles/terrain-Water/%02d.bmp", i);
+		_loading->loadImage(strKey, strFile, MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
+	}
+
+	//icon
+	_loading->loadImage(L"maptool-icon-Mineral",	L"image/maptool/iconMineral.bmp",		MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
+	_loading->loadImage(L"maptool-icon-Gas",		L"image/maptool/iconGas.bmp",			MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
+	_loading->loadImage(L"maptool-icon-LocationP1", L"image/maptool/iconLocationP1.bmp",	MAPTOOL_TILESIZE, MAPTOOL_TILESIZE, true, RGB(255, 0, 255));
+	_loading->loadImage(L"maptool-icon-LocationP2", L"image/maptool/iconLocationP2.bmp",	MAPTOOL_TILESIZE, MAPTOOL_TILESIZE, true, RGB(255, 0, 255));
+
+
+
+#if 0
 	//terrain-Asphlat
 	for (int i = 0; i < 1; i++)
 	{
@@ -92,13 +128,6 @@ void sceneInit::initImageMaptoolTiles(void)
 		_loading->loadImage(strKey, strFile, MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
 	}
 
-	//terrain-Dirt
-	for (int i = 0; i < 1; i++)
-	{
-		_stprintf(strKey, L"maptool-terrain-Dirt-%02d", i);
-		_stprintf(strFile, L"image/maptool/tiles/terrain-Dirt/%02d.bmp", i);
-		_loading->loadImage(strKey, strFile, MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
-	}
 
 	//terrain-Grass
 	for (int i = 0; i < 1; i++)
@@ -108,7 +137,6 @@ void sceneInit::initImageMaptoolTiles(void)
 		_loading->loadImage(strKey, strFile, MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
 	}
 
-	//terrain-HighDirt
 	for (int i = 0; i < 1; i++)
 	{
 		_stprintf(strKey, L"maptool-terrain-HighDirt-%02d", i);
@@ -147,14 +175,7 @@ void sceneInit::initImageMaptoolTiles(void)
 		_stprintf(strFile, L"image/maptool/tiles/terrain-Structure/%02d.bmp", i);
 		_loading->loadImage(strKey, strFile, MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
 	}
-
-	//terrain-Water
-	for (int i = 0; i < 1; i++)
-	{
-		_stprintf(strKey, L"maptool-terrain-Water-%02d", i);
-		_stprintf(strFile, L"image/maptool/tiles/terrain-Water/%02d.bmp", i);
-		_loading->loadImage(strKey, strFile, MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
-	}
+#endif
 }
 
 void sceneInit::initImageGamemapTiles(void)

@@ -49,6 +49,7 @@ struct tagDragInfo
 	int b;
 };
 
+
 class sceneMaptool : public gameNode
 {
 private:
@@ -62,8 +63,11 @@ private:
 	POINT			_isoCursor;
 
 	SAMPLETERRAIN	_curTerrain;
-	RECT			_rcSelectTerrain[SAMPLETERRAIN_MAX];
 	SAMPLEOBJECT	_curObject;
+	RECT			_rcSelectTerrain[SAMPLETERRAIN_MAX];
+	RECT			_rcSelectObject[SAMPLEOBJECT_MAX];
+	image*			_imgSelectObject[SAMPLEOBJECT_MAX];
+	editbox*		_editboxNrAmout;
 
 	BOOL			_isClicked;
 	BOOL			_endDrag;
@@ -96,18 +100,18 @@ public:
 private:
 	void initButtons(void);
 	void initTiles(void);
-	void initIsoTiles(void);
 	void initMiniMap(void);
 
 
 	void updateCamera(void);
-	void selectTerrain(void);
+	void selectTerrainObject(void);
 	void calcIsoTile(void);
 	void clickIsoTile(void);
 
 	void setDirt(void);
 	void setHighDirt(void);
 	void setHighDirtEdge(int cx, int cy, DWORD edge);
+	void setWater(void);
 
 	void updateTileImage(void);
 	void setTileImageAll(void);
@@ -121,6 +125,9 @@ private:
 	void renderTiles(void);
 	void renderDragingIsoTiles(void);
 	void renderCurIsoTile(void);
+
+	void renderObject(void);
+
 	void renderSideWindow(void);
 	
 	void renderMiniMap(void);

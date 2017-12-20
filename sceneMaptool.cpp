@@ -3,7 +3,7 @@
 
 
 sceneMaptool::sceneMaptool()
-	: _imgMiniMap(NULL)
+	: _imgMiniMap(NULL), _editboxNrAmout(NULL)
 {
 	for (int i = 0; i < BTNCTRL_MAX; i++)
 	{
@@ -20,6 +20,12 @@ sceneMaptool::sceneMaptool()
 
 	_isClicked = false;
 	_endDrag = false;
+
+
+	for (int i = 0; i < SAMPLEOBJECT_MAX; i++)
+	{
+		_imgSelectObject[i] = NULL;
+	}
 
 }
 
@@ -39,13 +45,31 @@ HRESULT sceneMaptool::init(void)
 
 	setTileImageAll();
 
-	//initIsoTiles();
 
 	_curTerrain = SAMPLETERRAIN_DIRT;
-	_rcSelectTerrain[SAMPLETERRAIN_DIRT] = RectMake(SIDEWINDOW_STARTX + 10, _rcMiniMap.bottom + 30, MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
-	_rcSelectTerrain[SAMPLETERRAIN_HIGTDIRT] = RectMake(_rcSelectTerrain[SAMPLETERRAIN_DIRT].right + 5, _rcSelectTerrain[SAMPLETERRAIN_DIRT].top, MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
-	_rcSelectTerrain[SAMPLETERRAIN_WATER] = RectMake(_rcSelectTerrain[SAMPLETERRAIN_HIGTDIRT].right + 5, _rcSelectTerrain[SAMPLETERRAIN_HIGTDIRT].top, MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
 
+	_rcSelectTerrain[SAMPLETERRAIN_DIRT]		= RectMake(SIDEWINDOW_STARTX + 10, _rcMiniMap.bottom + 30, MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
+	_rcSelectTerrain[SAMPLETERRAIN_HIGTDIRT]	= RectMake(_rcSelectTerrain[SAMPLETERRAIN_DIRT].right + 5,		_rcMiniMap.bottom + 30, MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
+	_rcSelectTerrain[SAMPLETERRAIN_WATER]		= RectMake(_rcSelectTerrain[SAMPLETERRAIN_HIGTDIRT].right + 5,	_rcMiniMap.bottom + 30, MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
+
+	_curObject = SAMPLEOBJECT_NONE;
+	_rcSelectObject[SAMPLEOBJECT_MINERAL]	= RectMake(SIDEWINDOW_STARTX + 10, _rcSelectTerrain[SAMPLETERRAIN_DIRT].bottom + 30, MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
+	_rcSelectObject[SAMPLEOBJECT_GAS]		= RectMake(_rcSelectObject[SAMPLEOBJECT_MINERAL].right + 5,	_rcSelectTerrain[SAMPLETERRAIN_DIRT].bottom + 30, MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
+	_rcSelectObject[SAMPLEOBJECT_PLAYER1]	= RectMake(_rcSelectObject[SAMPLEOBJECT_GAS].right + 5,		_rcSelectTerrain[SAMPLETERRAIN_DIRT].bottom + 30, MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
+	_rcSelectObject[SAMPLEOBJECT_PLAYER2]	= RectMake(_rcSelectObject[SAMPLEOBJECT_PLAYER1].right + 5, _rcSelectTerrain[SAMPLETERRAIN_DIRT].bottom + 30, MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
+	
+	_imgSelectObject[SAMPLEOBJECT_MINERAL]	= IMAGEMANAGER->findImage(L"maptool-icon-Mineral");
+	_imgSelectObject[SAMPLEOBJECT_GAS]		= IMAGEMANAGER->findImage(L"maptool-icon-Gas");
+	_imgSelectObject[SAMPLEOBJECT_PLAYER1]	= IMAGEMANAGER->findImage(L"maptool-icon-LocationP1");
+	_imgSelectObject[SAMPLEOBJECT_PLAYER2]	= IMAGEMANAGER->findImage(L"maptool-icon-LocationP2");
+
+
+	_editboxNrAmout = new editbox;
+	_editboxNrAmout->init();
+	_editboxNrAmout->setOnlyNum(true);
+	_editboxNrAmout->setMinMax(0, 50000);
+	_editboxNrAmout->setStrNum(1500);
+	_editboxNrAmout->setRect(RectMake(SIDEWINDOW_STARTX + 10, _rcSelectObject[SAMPLEOBJECT_MINERAL].bottom + 30, 100, 30));
 
 
 	return S_OK;
@@ -66,17 +90,23 @@ void sceneMaptool::update(void)
 	updateCamera();
 
 	//터레인 선택
-	selectTerrain();
+	selectTerrainObject();
 
-	//마우스가 위치한 ISO 계산
-	calcIsoTile();
+	if (_curTerrain != SAMPLETERRAIN_NONE)
+	{
+		//마우스가 위치한 ISO 계산
+		calcIsoTile();
 
-	//마우스가 클릭했을 때
-	clickIsoTile();
+		//마우스가 클릭했을 때
+		clickIsoTile();
+	}
+
 
 	//타일 이미지 갱신
 	updateTileImage();
 
+
+	_editboxNrAmout->update();
 
 	for (int i = 0; i < BTNCTRL_MAX; i++)
 	{
@@ -88,20 +118,27 @@ void sceneMaptool::render(void)
 {
 	renderTiles();
 
-	//드래그 상태일 때 파란색으로 영역 표시해주기
-	renderDragingIsoTiles();
+	if (_curTerrain != SAMPLETERRAIN_NONE)
+	{
+		//드래그 상태일 때 파란색으로 영역 표시해주기
+		renderDragingIsoTiles();
 
-	//현재 커서의 ISO 보여주기
-	renderCurIsoTile();
+		//현재 커서의 ISO 보여주기
+		renderCurIsoTile();
+	}
+
+	if (_curObject != SAMPLEOBJECT_NONE)
+	{
+		renderObject();
+	}
 
 	renderSideWindow();
-
 
 }
 
 void sceneMaptool::getChar(WPARAM wParam)
 {
-
+	_editboxNrAmout->getChar(wParam);
 }
 
 void sceneMaptool::initButtons(void)
@@ -144,31 +181,12 @@ void sceneMaptool::initTiles(void)
 			_tiles[x][y].terrain = TERRAIN_DIRT;
 			_tiles[x][y].terrainNum = { 0, 0 };
 			_tiles[x][y].obj = 0;
+			_tiles[x][y].nrAmount = 0;
 			_tiles[x][y].rc = RectMake(x * MAPTOOL_TILESIZE, y * MAPTOOL_TILESIZE, MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
-			_tiles[x][y].isClick = false;
 		}
 	}
 }
 
-
-void sceneMaptool::initIsoTiles(void)
-{
-#if 0
-	int firstCenterX = MAPTOOL_TILESIZE * MAPTOOL_TILEVIEWX * 0.5f;
-	int firstCenterY = -(MAPTOOL_TILESIZE * MAPTOOL_TILEVIEWX * 0.5f);
-
-	for (int i = 0; i < ISOTILEY; i++)
-	{
-		for (int j = 0; j < ISOTILEX; j++)
-		{
-			_isoTile[j][i].pt.x = firstCenterX + ISOTILE_HALF_WIDTH  * (i - j);
-			_isoTile[j][i].pt.y = firstCenterY + ISOTILE_HALF_HEIGHT * (i + j);
-			_isoTile[j][i].rc = RectMakeCenter(_isoTile[j][i].pt.x, _isoTile[j][i].pt.y, ISOTILE_WIDTH, ISOTILE_HEIGHT);
-			_isoTile[j][i].clicked = false;
-		}
-	}
-#endif
-}
 
 void sceneMaptool::updateCamera(void)
 {
@@ -218,7 +236,7 @@ void sceneMaptool::updateCamera(void)
 	_rcMiniMapCamera = RectMake(x, y, width, height);
 }
 
-void sceneMaptool::selectTerrain(void)
+void sceneMaptool::selectTerrainObject(void)
 {
 	for (int i = 0; i < SAMPLETERRAIN_MAX; i++)
 	{
@@ -227,6 +245,20 @@ void sceneMaptool::selectTerrain(void)
 			if (KEYMANAGER->isOnceKeyDown(VK_LBUTTON))
 			{
 				_curTerrain = (SAMPLETERRAIN)i;
+				_curObject = SAMPLEOBJECT_NONE;
+				return;
+			}
+		}
+	}
+
+	for (int i = 0; i < SAMPLEOBJECT_MAX; i++)
+	{
+		if (PtInRect(&_rcSelectObject[i], _ptMouse))
+		{
+			if (KEYMANAGER->isOnceKeyDown(VK_LBUTTON))
+			{
+				_curTerrain = SAMPLETERRAIN_NONE;
+				_curObject = (SAMPLEOBJECT)i;
 				return;
 			}
 		}
@@ -237,71 +269,6 @@ void sceneMaptool::calcIsoTile(void)
 {
 	if (_ptMouse.x >= SIDEWINDOW_STARTX)
 		return;
-
-
-#if 0
-	if (KEYMANAGER->isOnceKeyDown(VK_LBUTTON))
-	{
-		for (int i = 0; i < ISOTILEY; i++)
-		{
-			for (int j = 0; j < ISOTILEX; j++)
-			{
-				if (PtInRect(&_isoTile[j][i].rc, _ptMouse))
-				{
-					//1사분면
-					if (_ptMouse.y <= _isoTile[j][i].pt.y && _ptMouse.x >= _isoTile[j][i].pt.x)
-					{
-						float angleDeg = Rad2Deg(getAngle(_isoTile[j][i].rc.right, _isoTile[j][i].pt.y, _ptMouse.x, _ptMouse.y));
-						float angleDegRef = Rad2Deg(getAngle(_isoTile[j][i].rc.right, _isoTile[j][i].pt.y, _isoTile[j][i].pt.x, _isoTile[j][i].rc.top));
-						if (angleDeg >= angleDegRef)
-						{
-							_isoTile[j][i].clicked ^= 1;
-							break;
-						}
-						else continue;
-					}
-					//2사분면
-					if (_ptMouse.y <= _isoTile[j][i].pt.y && _ptMouse.x < _isoTile[j][i].pt.x)
-					{
-						float angleDeg = Rad2Deg(getAngle(_isoTile[j][i].rc.left, _isoTile[j][i].pt.y, _ptMouse.x, _ptMouse.y));
-						float angleDegRef = Rad2Deg(getAngle(_isoTile[j][i].rc.left, _isoTile[j][i].pt.y, _isoTile[j][i].pt.x, _isoTile[j][i].rc.top));
-						if (angleDeg <= angleDegRef)
-						{
-							_isoTile[j][i].clicked ^= 1;
-							break;
-						}
-						else continue;
-					}
-					//3사분면
-					if (_ptMouse.y > _isoTile[j][i].pt.y && _ptMouse.x < _isoTile[j][i].pt.x)
-					{
-						float angleDeg = Rad2Deg(getAngle(_isoTile[j][i].rc.left, _isoTile[j][i].pt.y, _ptMouse.x, _ptMouse.y));
-						float angleDegRef = Rad2Deg(getAngle(_isoTile[j][i].rc.left, _isoTile[j][i].pt.y, _isoTile[j][i].pt.x, _isoTile[j][i].rc.bottom));
-						if (angleDeg >= angleDegRef)
-						{
-							_isoTile[j][i].clicked ^= 1;
-							break;
-						}
-						else continue;
-					}
-					//4사분면
-					if (_ptMouse.y > _isoTile[j][i].pt.y && _ptMouse.x >= _isoTile[j][i].pt.x)
-					{
-						float angleDeg = Rad2Deg(getAngle(_isoTile[j][i].rc.right, _isoTile[j][i].pt.y, _ptMouse.x, _ptMouse.y));
-						float angleDegRef = Rad2Deg(getAngle(_isoTile[j][i].rc.right, _isoTile[j][i].pt.y, _isoTile[j][i].pt.x, _isoTile[j][i].rc.bottom));
-						if (angleDeg <= angleDegRef)
-						{
-							_isoTile[j][i].clicked ^= 1;
-							break;
-						}
-						else continue;
-					}
-				}
-				else _isoTile[j][i].clicked = 0;
-			}
-		}
-	}
-#endif
 
 	POINT cursorPt = { _ptMouse.x + MAINCAMERA->getCameraX() , _ptMouse.y + MAINCAMERA->getCameraY() };
 	POINT cursorTile;
@@ -508,122 +475,9 @@ void sceneMaptool::calcIsoTile(void)
 
 void sceneMaptool::clickIsoTile(void)
 {
-#if 0
 	if (_ptMouse.x >= SIDEWINDOW_STARTX)
-	{
 		return;
-	}
 
-	if (KEYMANAGER->isOnceKeyDown(VK_LBUTTON) == false)
-	{
-		return;
-	}
-
-	int cx = _isoCursor.x / MAPTOOL_TILESIZE;
-	int cy = _isoCursor.y / MAPTOOL_TILESIZE;
-
-
-	for (int i = cx - 4; i < cx + 4; i++)
-	{
-		for (int j = cy - 2; j < cy + 3; j++)
-		{
-			//예외처리
-			if (i == cx - 4 && j == cy - 2) continue;
-			if (i == cx - 3 && j == cy - 2) continue;
-			if (i == cx + 3 && j == cy - 2) continue;
-			if (i == cx + 4 && j == cy - 2) continue;
-			if (i == cx - 4 && j == cy + 2) continue;
-			if (i == cx - 3 && j == cy + 2) continue;
-			if (i == cx + 3 && j == cy + 2) continue;
-			if (i == cx + 4 && j == cy + 2) continue;
-
-			if (i < 0) continue;
-			if (j < 0) continue;
-			if (i >= TILEX) continue;
-			if (j >= TILEY) continue;
-
-			//왼쪽위
-			if (i >= cx - 2 && i < cx && j >= cy - 2 && j < cy)
-			{
-				if ((_tiles[i][j].terrain & TERRAIN_HIGHTDIRT) != TERRAIN_HIGHTDIRT)
-				{
-					_tiles[i][j].terrain = TERRAIN_HIGHTDIRT;
-					_tiles[i][j].terrain |= HIGHTDIRT_LF;
-					_tiles[i][j].terrain |= HIGHTDIRT_UP;
-					_tiles[i][j].terrainNum.x = i - (cx - 2);
-					_tiles[i][j].terrainNum.y = j - (cy - 2);
-					_isChangedTile[i][j] = true;
-				}
-			}
-			//오른쪽 위
-			else if (i >= cx && i < cx + 2 && j >= cy - 2 && j < cy)
-			{
-				if ((_tiles[i][j].terrain & TERRAIN_HIGHTDIRT) != TERRAIN_HIGHTDIRT)
-				{
-					_tiles[i][j].terrain = TERRAIN_HIGHTDIRT;
-					_tiles[i][j].terrain |= HIGHTDIRT_RG;
-					_tiles[i][j].terrain |= HIGHTDIRT_UP;
-					_tiles[i][j].terrainNum.x = i - (cx);
-					_tiles[i][j].terrainNum.y = j - (cy - 2);
-					_isChangedTile[i][j] = true;
-				}
-
-			}
-			//왼쪽
-			else if (i >= cx - 4 && i < cx - 2 && j >= cy - 1 && j < cy + 2)
-			{
-				if ((_tiles[i][j].terrain & TERRAIN_HIGHTDIRT) != TERRAIN_HIGHTDIRT)
-				{
-					_tiles[i][j].terrain = TERRAIN_HIGHTDIRT;
-					_tiles[i][j].terrain |= HIGHTDIRT_LF;
-					_tiles[i][j].terrainNum.x = i - (cx - 4);
-					_tiles[i][j].terrainNum.y = j - (cy - 1);
-					_isChangedTile[i][j] = true;
-				}
-			}
-			//오른쪽
-			else if (i >= cx + 2 && i < cx + 4 && j >= cy - 1 && j < cy + 2)
-			{
-				if ((_tiles[i][j].terrain & TERRAIN_HIGHTDIRT) != TERRAIN_HIGHTDIRT)
-				{
-					_tiles[i][j].terrain = TERRAIN_HIGHTDIRT;
-					_tiles[i][j].terrain |= HIGHTDIRT_RG;
-					_tiles[i][j].terrainNum.x = i - (cx + 2);
-					_tiles[i][j].terrainNum.y = j - (cy - 1);
-					_isChangedTile[i][j] = true;
-				}
-			}
-			//왼쪽아래
-			else if (i >= cx - 2 && i < cx && j >= cy && j < cy + 3)
-			{
-				if ((_tiles[i][j].terrain & TERRAIN_HIGHTDIRT) != TERRAIN_HIGHTDIRT)
-				{
-					_tiles[i][j].terrain = TERRAIN_HIGHTDIRT;
-					_tiles[i][j].terrain |= HIGHTDIRT_LF;
-					_tiles[i][j].terrain |= HIGHTDIRT_DN;
-					_tiles[i][j].terrainNum.x = i - (cx - 2);
-					_tiles[i][j].terrainNum.y = j - (cy);
-					_isChangedTile[i][j] = true;
-				}
-			}
-			//오른쪽아래
-			else if (i >= cx && i < cx + 2 && j >= cy && j < cy + 3)
-			{
-				if ((_tiles[i][j].terrain & TERRAIN_HIGHTDIRT) != TERRAIN_HIGHTDIRT)
-				{
-					_tiles[i][j].terrain = TERRAIN_HIGHTDIRT;
-					_tiles[i][j].terrain |= HIGHTDIRT_RG;
-					_tiles[i][j].terrain |= HIGHTDIRT_DN;
-					_tiles[i][j].terrainNum.x = i - (cx);
-					_tiles[i][j].terrainNum.y = j - (cy);
-					_isChangedTile[i][j] = true;
-				}
-			}
-
-
-		}
-	}
-#else
 	int cx = _isoCursor.x / MAPTOOL_TILESIZE;
 	int cy = _isoCursor.y / MAPTOOL_TILESIZE;
 
@@ -739,14 +593,29 @@ void sceneMaptool::clickIsoTile(void)
 	if (_endDrag == false)
 	return;
 
-	setHighDirt();
+	switch (_curTerrain)
+	{
+	case SAMPLETERRAIN_DIRT:
+		setDirt();
+		break;
+	case SAMPLETERRAIN_HIGTDIRT:
+		setHighDirt();
+		break;
+	case SAMPLETERRAIN_WATER:
+		setWater();
+		break;
+	}
 
 
 	_endDrag = false;
 	_vDragInfo.clear();
-#endif
+}
+
+void sceneMaptool::setDirt(void)
+{
 
 }
+
 
 void sceneMaptool::setHighDirt(void)
 {
@@ -942,6 +811,12 @@ void sceneMaptool::setHighDirtEdge(int cx, int cy, DWORD edge)
 		}
 	}
 }
+
+void sceneMaptool::setWater(void)
+{
+
+}
+
 
 
 void sceneMaptool::updateTileImage(void)
@@ -1164,6 +1039,11 @@ void sceneMaptool::renderCurIsoTile(void)
 	DeleteObject(oldPen);
 }
 
+void sceneMaptool::renderObject(void)
+{
+
+}
+
 
 
 void sceneMaptool::renderSideWindow(void)
@@ -1176,6 +1056,15 @@ void sceneMaptool::renderSideWindow(void)
 	{
 		RectangleMake(getMemDC(), _rcSelectTerrain[i]);
 	}
+
+	for (int i = 0; i < SAMPLEOBJECT_MAX; i++)
+	{
+		RectangleMake(getMemDC(), _rcSelectObject[i]);
+		_imgSelectObject[i]->render(getMemDC(), _rcSelectObject[i].left, _rcSelectObject[i].top);
+	}
+
+	_editboxNrAmout->render();
+
 
 	for (int i = 0; i < BTNCTRL_MAX; i++)
 	{

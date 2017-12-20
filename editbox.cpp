@@ -44,7 +44,7 @@ void editbox::update(void)
 	}
 	else
 	{
-		if (KEYMANAGER->isStayKeyDown(VK_LBUTTON))
+		if (_clicked == true && KEYMANAGER->isStayKeyDown(VK_LBUTTON))
 		{
 			_clicked = false;
 			if (_onlyNum)
@@ -212,6 +212,18 @@ void editbox::getChar(WPARAM wParam)
 	else if (wParam == VK_RETURN)
 	{
 		_clicked = false;
+
+		if (_onlyNum)
+		{
+			if (this->getStrNum() < _minNum)
+			{
+				_stprintf(_str, L"%d", _minNum);
+			}
+			else if (this->getStrNum() > _maxNum)
+			{
+				_stprintf(_str, L"%d", _maxNum);
+			}
+		}
 		return;
 	}
 	else

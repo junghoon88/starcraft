@@ -36,7 +36,8 @@
 
 
 //비트필드 타일 속성
-#define ATTR_INCASTLE	0x00000001	//
+#define ATTR_UNMOVE		0x00000001	//
+
 
 #define HIGHTDIRT_LF  0x0001
 #define HIGHTDIRT_RG  0x0002
@@ -80,13 +81,6 @@ enum TERRAINSET
 	TERRAINSET_MAX
 };
 
-//오브젝트 선택
-enum OBJECTSELECT
-{
-	OBJECTSELECT_NONE = -1,
-	
-	OBJECTSELECT_MAX
-};
 
 enum FOGLEVEL
 {
@@ -100,13 +94,15 @@ enum FOGLEVEL
 //타일 구조체
 struct tagTile
 {
-	DWORD terrain;	//터레인
-	POINT terrainNum;		//터레인 인덱스
+	DWORD	terrain;	//터레인
+	POINT	terrainNum;		//터레인 인덱스
 
-	DWORD obj;			//
-	RECT rc;			//
+	DWORD	obj;			//
+	UINT	nrAmount;//NeutralResource 자원양
 
-	BOOL isClick;		//오브젝트 선택
+	DWORD	attribute;
+	
+	RECT	rc;			//
 };
 
 struct tagSampleTile
@@ -116,12 +112,6 @@ struct tagSampleTile
 	TCHAR strImgKey[100];
 };
 
-struct tagSampleObject
-{
-	RECT rcTile;
-	image* img;
-	TCHAR strImgKey[100];
-};
 
 struct tagCurrentTile
 {
