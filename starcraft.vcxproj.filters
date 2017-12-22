@@ -369,6 +369,12 @@
     <ClInclude Include="hotkeys.h">
       <Filter>MainGame\Common</Filter>
     </ClInclude>
+    <ClInclude Include="nrMineral.h">
+      <Filter>MainGame\sceneBattle\gameMap</Filter>
+    </ClInclude>
+    <ClInclude Include="nrGas.h">
+      <Filter>MainGame\sceneBattle\gameMap</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -610,6 +616,12 @@
     </ClCompile>
     <ClCompile Include="gameNode.cpp">
       <Filter>2DFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="nrGas.cpp">
+      <Filter>MainGame\sceneBattle\gameMap</Filter>
+    </ClCompile>
+    <ClCompile Include="nrMineral.cpp">
+      <Filter>MainGame\sceneBattle\gameMap</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

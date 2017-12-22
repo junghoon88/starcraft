@@ -18,12 +18,46 @@ inline void LineMakeAngle(HDC hdc, int x1, int y1, float length, float angle)
 	LineTo(hdc, x2, y2);
 }
 
+inline void LineToRect(HDC hdc, RECT rc)
+{
+	MoveToEx(hdc, rc.left, rc.top, NULL);
+	LineTo(hdc, rc.right, rc.top);
+	LineTo(hdc, rc.right, rc.bottom);
+	LineTo(hdc, rc.left, rc.bottom);
+	LineTo(hdc, rc.left, rc.top);
+}
+
+inline void LineToRect(HDC hdc, RECT rc, int margin)
+{
+	rc.left   -= margin;
+	rc.top    -= margin;
+	rc.right  += margin + 1;
+	rc.bottom += margin + 1;
+
+	MoveToEx(hdc, rc.left, rc.top, NULL);
+	LineTo(hdc, rc.right, rc.top);
+	LineTo(hdc, rc.right, rc.bottom);
+	LineTo(hdc, rc.left, rc.bottom);
+	LineTo(hdc, rc.left, rc.top);
+}
+
 
 inline RECT RectMake(int x, int y, int width, int height)
 {
 	RECT rc = { x, y, x + width, y + height };
 
 	return rc;
+}
+
+inline RECT RectMultiply(RECT rc, float multiple)
+{
+	RECT rcTemp = rc;
+	rcTemp.left   *= multiple;
+	rcTemp.top    *= multiple;
+	rcTemp.right  *= multiple;
+	rcTemp.bottom *= multiple;
+	
+	return rcTemp;
 }
 
 inline RECT RectMakeCenter(int x, int y, int width, int height)

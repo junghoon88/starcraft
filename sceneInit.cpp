@@ -72,9 +72,9 @@ void sceneInit::initSound(void)
 
 void sceneInit::initImageNeutralResource(void)
 {
-	_loading->loadFrameImage(L"NeutralResource-Mineral0", L"image/neutral/min00.bmp", 64, 384, 1, 4, true, RGB(255, 0, 255));
 	_loading->loadFrameImage(L"NeutralResource-Mineral1", L"image/neutral/min01.bmp", 64, 384, 1, 4, true, RGB(255, 0, 255));
 	_loading->loadFrameImage(L"NeutralResource-Mineral2", L"image/neutral/min02.bmp", 64, 384, 1, 4, true, RGB(255, 0, 255));
+	_loading->loadFrameImage(L"NeutralResource-Mineral3", L"image/neutral/min03.bmp", 64, 384, 1, 4, true, RGB(255, 0, 255));
 	_loading->loadImage(L"NeutralResource-Gas", L"image/neutral/gas.bmp", MAPTOOL_TILESIZE * 4, MAPTOOL_TILESIZE * 2, true, RGB(255, 0, 255));
 }
 
@@ -85,12 +85,7 @@ void sceneInit::initImageMaptoolTiles(void)
 
 
 	//terrain-Dirt
-	for (int i = 0; i < 1; i++)
-	{
-		_stprintf(strKey, L"maptool-terrain-Dirt-%02d", i);
-		_stprintf(strFile, L"image/maptool/tiles/terrain-Dirt/%02d.bmp", i);
-		_loading->loadImage(strKey, strFile, MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
-	}
+	_loading->loadFrameImage(L"maptool-terrain-Dirt", L"image/maptool/tiles/terrain-Dirt/terrainDirt.bmp", 768, 640, 24, 20);
 
 	//terrain-HighDirt
 	_loading->loadFrameImage(L"maptool-terrain-HighDirt", L"image/maptool/tiles/terrain-HighDirt/IDLE3x2.bmp", MAPTOOL_TILESIZE*3, MAPTOOL_TILESIZE*2, 3, 2);
@@ -108,74 +103,23 @@ void sceneInit::initImageMaptoolTiles(void)
 	{
 		_stprintf(strKey, L"maptool-terrain-Water-%02d", i);
 		_stprintf(strFile, L"image/maptool/tiles/terrain-Water/%02d.bmp", i);
-		_loading->loadImage(strKey, strFile, MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
+		_loading->loadFrameImage(strKey, strFile, MAPTOOL_TILESIZE, MAPTOOL_TILESIZE, 1, 1);
 	}
 
 	//icon
 	_loading->loadImage(L"maptool-icon-Mineral",	L"image/maptool/iconMineral.bmp",		MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
 	_loading->loadImage(L"maptool-icon-Gas",		L"image/maptool/iconGas.bmp",			MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
-	_loading->loadImage(L"maptool-icon-LocationP1", L"image/maptool/iconLocationP1.bmp",	MAPTOOL_TILESIZE, MAPTOOL_TILESIZE, true, RGB(255, 0, 255));
-	_loading->loadImage(L"maptool-icon-LocationP2", L"image/maptool/iconLocationP2.bmp",	MAPTOOL_TILESIZE, MAPTOOL_TILESIZE, true, RGB(255, 0, 255));
+	_loading->loadImage(L"maptool-icon-LocationP1", L"image/maptool/iconLocationP1.bmp",	MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
+	_loading->loadImage(L"maptool-icon-LocationP2", L"image/maptool/iconLocationP2.bmp",	MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
+	_loading->loadImage(L"maptool-icon-iconEraser", L"image/maptool/iconEraser.bmp",		MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
 
+	//object
+	_loading->loadImage(L"maptool-object-LocationP1", L"image/maptool/location-p1.bmp", MAPTOOL_TILESIZE * 4, MAPTOOL_TILESIZE * 3, true, RGB(255, 0, 255));
+	_loading->loadImage(L"maptool-object-LocationP2", L"image/maptool/location-p2.bmp", MAPTOOL_TILESIZE * 4, MAPTOOL_TILESIZE * 3, true, RGB(255, 0, 255));
 
+	_loading->loadImage(L"maptool-object-enableTile",  L"image/maptool/tiles/enableTile.bmp", MAPTOOL_TILESIZE, MAPTOOL_TILESIZE, false, RGB(0, 0, 0), true);
+	_loading->loadImage(L"maptool-object-disableTile", L"image/maptool/tiles/disableTile.bmp", MAPTOOL_TILESIZE, MAPTOOL_TILESIZE, false, RGB(0, 0, 0), true);
 
-#if 0
-	//terrain-Asphlat
-	for (int i = 0; i < 1; i++)
-	{
-		_stprintf(strKey, L"maptool-terrain-Asphlat-%02d", i);
-		_stprintf(strFile, L"image/maptool/tiles/terrain-Asphlat/%02d.bmp", i);
-		_loading->loadImage(strKey, strFile, MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
-	}
-
-
-	//terrain-Grass
-	for (int i = 0; i < 1; i++)
-	{
-		_stprintf(strKey, L"maptool-terrain-Grass-%02d", i);
-		_stprintf(strFile, L"image/maptool/tiles/terrain-Grass/%02d.bmp", i);
-		_loading->loadImage(strKey, strFile, MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
-	}
-
-	for (int i = 0; i < 1; i++)
-	{
-		_stprintf(strKey, L"maptool-terrain-HighDirt-%02d", i);
-		_stprintf(strFile, L"image/maptool/tiles/terrain-HighDirt/%02d.bmp", i);
-		_loading->loadImage(strKey, strFile, MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
-	}
-
-	//terrain-HighGrass
-	for (int i = 0; i < 1; i++)
-	{
-		_stprintf(strKey, L"maptool-terrain-HighGrass-%02d", i);
-		_stprintf(strFile, L"image/maptool/tiles/terrain-HighDirt/%02d.bmp", i);
-		_loading->loadImage(strKey, strFile, MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
-	}
-
-	//terrain-Mud
-	for (int i = 0; i < 1; i++)
-	{
-		_stprintf(strKey, L"maptool-terrain-Mud-%02d", i);
-		_stprintf(strFile, L"image/maptool/tiles/terrain-Mud/%02d.bmp", i);
-		_loading->loadImage(strKey, strFile, MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
-	}
-
-	//terrain-RockyGround
-	for (int i = 0; i < 1; i++)
-	{
-		_stprintf(strKey, L"maptool-terrain-RockyGround-%02d", i);
-		_stprintf(strFile, L"image/maptool/tiles/terrain-RockyGround/%02d.bmp", i);
-		_loading->loadImage(strKey, strFile, MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
-	}
-
-	//terrain-Structure
-	for (int i = 0; i < 1; i++)
-	{
-		_stprintf(strKey, L"maptool-terrain-Structure-%02d", i);
-		_stprintf(strFile, L"image/maptool/tiles/terrain-Structure/%02d.bmp", i);
-		_loading->loadImage(strKey, strFile, MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
-	}
-#endif
 }
 
 void sceneInit::initImageGamemapTiles(void)
@@ -185,77 +129,7 @@ void sceneInit::initImageGamemapTiles(void)
 
 	_loading->loadImage(L"gamemap-fog", L"image/gamemap/fog.bmp", GAMEMAP_TILESIZE, GAMEMAP_TILESIZE, false, RGB(0, 0, 0), true);
 
-	//terrain-Asphlat
-	for (int i = 0; i < 1; i++)
-	{
-		_stprintf(strKey, L"gamemap-terrain-Asphlat-%02d", i);
-		_stprintf(strFile, L"image/gamemap/tiles/terrain-Asphlat/%02d.bmp", i);
-		_loading->loadImage(strKey, strFile, GAMEMAP_TILESIZE, GAMEMAP_TILESIZE);
-	}
 
-	//terrain-Dirt
-	for (int i = 0; i < 1; i++)
-	{
-		_stprintf(strKey, L"gamemap-terrain-Dirt-%02d", i);
-		_stprintf(strFile, L"image/gamemap/tiles/terrain-Dirt/%02d.bmp", i);
-		_loading->loadImage(strKey, strFile, GAMEMAP_TILESIZE, GAMEMAP_TILESIZE);
-	}
-
-	//terrain-Grass
-	for (int i = 0; i < 1; i++)
-	{
-		_stprintf(strKey, L"gamemap-terrain-Grass-%02d", i);
-		_stprintf(strFile, L"image/gamemap/tiles/terrain-Grass/%02d.bmp", i);
-		_loading->loadImage(strKey, strFile, GAMEMAP_TILESIZE, GAMEMAP_TILESIZE);
-	}
-
-	//terrain-HighDirt
-	for (int i = 0; i < 1; i++)
-	{
-		_stprintf(strKey, L"gamemap-terrain-HighDirt-%02d", i);
-		_stprintf(strFile, L"image/gamemap/tiles/terrain-HighDirt/%02d.bmp", i);
-		_loading->loadImage(strKey, strFile, GAMEMAP_TILESIZE, GAMEMAP_TILESIZE);
-	}
-
-	//terrain-HighGrass
-	for (int i = 0; i < 1; i++)
-	{
-		_stprintf(strKey, L"gamemap-terrain-HighGrass-%02d", i);
-		_stprintf(strFile, L"image/gamemap/tiles/terrain-HighDirt/%02d.bmp", i);
-		_loading->loadImage(strKey, strFile, GAMEMAP_TILESIZE, GAMEMAP_TILESIZE);
-	}
-
-	//terrain-Mud
-	for (int i = 0; i < 1; i++)
-	{
-		_stprintf(strKey, L"gamemap-terrain-Mud-%02d", i);
-		_stprintf(strFile, L"image/gamemap/tiles/terrain-Mud/%02d.bmp", i);
-		_loading->loadImage(strKey, strFile, GAMEMAP_TILESIZE, GAMEMAP_TILESIZE);
-	}
-
-	//terrain-RockyGround
-	for (int i = 0; i < 1; i++)
-	{
-		_stprintf(strKey, L"gamemap-terrain-RockyGround-%02d", i);
-		_stprintf(strFile, L"image/gamemap/tiles/terrain-RockyGround/%02d.bmp", i);
-		_loading->loadImage(strKey, strFile, GAMEMAP_TILESIZE, GAMEMAP_TILESIZE);
-	}
-
-	//terrain-Structure
-	for (int i = 0; i < 1; i++)
-	{
-		_stprintf(strKey, L"gamemap-terrain-Structure-%02d", i);
-		_stprintf(strFile, L"image/gamemap/tiles/terrain-Structure/%02d.bmp", i);
-		_loading->loadImage(strKey, strFile, GAMEMAP_TILESIZE, GAMEMAP_TILESIZE);
-	}
-
-	//terrain-Water
-	for (int i = 0; i < 1; i++)
-	{
-		_stprintf(strKey, L"gamemap-terrain-Water-%02d", i);
-		_stprintf(strFile, L"image/gamemap/tiles/terrain-Water/%02d.bmp", i);
-		_loading->loadImage(strKey, strFile, GAMEMAP_TILESIZE, GAMEMAP_TILESIZE);
-	}
 }
 
 void sceneInit::initImageInterface(void)

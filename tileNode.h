@@ -37,6 +37,8 @@
 
 //비트필드 타일 속성
 #define ATTR_UNMOVE		0x00000001	//
+#define ATTR_UNBUILD	0x00000002	//
+
 
 
 #define HIGHTDIRT_LF  0x0001
@@ -65,22 +67,31 @@ enum TERRAIN
 	TERRAIN_MAX
 };
 
-//맵에디터에서 선택할 터레인 종류
-enum TERRAINSET
+enum OBJECT
 {
-	TERRAINSET_DIRT,		//
-	TERRAINSET_MUD,			//
-	TERRAINSET_HIGHDIRT,	//
-	TERRAINSET_WATER,		//
-	TERRAINSET_GRASS,		//
-	TERRAINSET_HIGHGRASS,	//
-	TERRAINSET_STRUCTURE,	//
-	TERRAINSET_ASPHALT,		//
-	TERRAINSET_ROCKYGROUND,	//
+	OBJECT_NONE, 
 
-	TERRAINSET_MAX
+	//자원(미네랄, 가스)
+	OBJECT_MINERAL1_START,	//미네랄의 (0,0)위치
+	OBJECT_MINERAL1_BODY,	//미네랄이 차지하는 (0,0) 제외 위치
+	OBJECT_MINERAL2_START,	//미네랄의 이미지는 총 3가지(랜덤배치)
+	OBJECT_MINERAL2_BODY,	//
+	OBJECT_MINERAL3_START,	//
+	OBJECT_MINERAL3_BODY,	//
+	OBJECT_GAS_START,		//가스의 (0,0)위치
+	OBJECT_GAS_BODY,		//가스가 차지하는 (0,0) 제외 위치
+
+	//플레이어 시작위치
+	OBJECT_LOCATION_P1_START,		//플레이어 시작위치 (0,0)위치
+	OBJECT_LOCATION_P1_BODY,		//플레이어 시작위치 (0,0)제외 위치
+	OBJECT_LOCATION_P2_START,		//
+	OBJECT_LOCATION_P2_BODY,		//
+	
+	//여기까지는 맵툴에서만 사용
+
+	//여기부터는 게임맵에서 추가될 수 있음
+
 };
-
 
 enum FOGLEVEL
 {

@@ -11,6 +11,7 @@
 #define TERRAINNUM_HIGHDIRT_UP	0x0040
 #define TERRAINNUM_HIGHDIRT_DN	0x0080
 
+
 enum BTNCTRL
 {
 	BTNCTRL_SAVE,
@@ -38,6 +39,8 @@ enum SAMPLEOBJECT
 	SAMPLEOBJECT_PLAYER1,
 	SAMPLEOBJECT_PLAYER2,
 
+	SAMPLEOBJECT_ERASER,
+
 	SAMPLEOBJECT_MAX
 };
 
@@ -49,6 +52,12 @@ struct tagDragInfo
 	int b;
 };
 
+enum OBJSTATE
+{
+	OBJSTATE_NONE,		//오브젝트 없음
+	OBJSTATE_PLACEABLE,	//오브젝트 설치할 수 있음
+	OBJSTATE_OVERLAP,	//오브젝트 설치불가(겹침)
+};
 
 class sceneMaptool : public gameNode
 {
@@ -58,17 +67,26 @@ private:
 	image*			_imgTiles[TILEX][TILEY];			//타일 이미지
 	BOOL			_isChangedTile[TILEX][TILEY];		//타일 정보 변경 여부
 
-	//ISO타일
-	//tagisoTile _isoTile[ISOTILEX][ISOTILEY];	//X : 왼쪽아래로, Y:오른쪽아래로
-	POINT			_isoCursor;
+	//마우스 관련
+	POINT			_cursorPt;		//카메라 위치 적용된 마우스 위치
+	POINT			_cursorTile;	//카메라 위치 적용된 마우스 위치의 타일 번호
+	POINT			_isoCursor;		//ISO타일 표시용 커서 위치 
 
-	SAMPLETERRAIN	_curTerrain;
-	SAMPLEOBJECT	_curObject;
-	RECT			_rcSelectTerrain[SAMPLETERRAIN_MAX];
-	RECT			_rcSelectObject[SAMPLEOBJECT_MAX];
-	image*			_imgSelectObject[SAMPLEOBJECT_MAX];
-	editbox*		_editboxNrAmout;
+	//터레인, 오브젝트
+	SAMPLETERRAIN	_curTerrain;									//현재 선택한 터레인
+	SAMPLEOBJECT	_curObject;										//현재 선택한 오브젝트
+	RECT			_rcSelectTerrain[SAMPLETERRAIN_MAX];			//선택가능한 터레인 rect
+	image*			_imgSelectTerrain[SAMPLETERRAIN_MAX];			//선택가능한 터레인 image
+	RECT			_rcSelectObject[SAMPLEOBJECT_MAX];				//선택가능한 오브젝트 rect
+	image*			_imgSelectObject[SAMPLEOBJECT_MAX];				//선택가능한 오브젝트 image
+	editbox*		_editboxNrAmount;								//자원수량 입력용 editbox
+	image*			_imgObject;										//선택한 오브젝트 마우스에 보여주기용 이미지
+	OBJSTATE		_objState[OBJECTSIZE_MAX_X][OBJECTSIZE_MAX_Y];	//오브젝트 최대 크기는 4,3으로
 
+	BOOL			_isLocatedP1;
+	BOOL			_isLocatedP2;
+
+	//맵타일 마우스 처리
 	BOOL			_isClicked;
 	BOOL			_endDrag;
 	POINT			_startIso;
@@ -78,9 +96,10 @@ private:
 
 
 	//minimap
-	image*	_imgMiniMap;
-	RECT	_rcMiniMap;
-	RECT	_rcMiniMapCamera;
+	image*		_imgMiniMap;
+	RECT		_rcMiniMap;
+	RECT		_rcMiniMapCamera;
+	COLORREF	_colorMiniMap[TILEX][TILEY];
 
 	//버튼
 	button* _btnCtrl[BTNCTRL_MAX];
@@ -101,20 +120,30 @@ private:
 	void initButtons(void);
 	void initTiles(void);
 	void initMiniMap(void);
+	void initSampleTerrainObject(void);
 
-
+	//update
 	void updateCamera(void);
+	void calcMouseRealPosition(void);
 	void selectTerrainObject(void);
 	void calcIsoTile(void);
 	void clickIsoTile(void);
+	void dragIsoTile(void);
+	bool calcObjectTile(void);
+	void clickObjectTile(void);
+	void eraseObject(int tilex, int tiley);
+	POINT findObjectStartPoint(int tilex, int tiley);
 
-	void setDirt(void);
+
+
+	void setDirt(int cx, int cy);
 	void setHighDirt(void);
 	void setHighDirtEdge(int cx, int cy, DWORD edge);
 	void setWater(void);
 
 	void updateTileImage(void);
 	void setTileImageAll(void);
+	void updateMiniMap(void);
 
 
 	void saveData(const TCHAR* fileName);
@@ -122,14 +151,12 @@ private:
 	void saveFile(void);
 	void loadFile(void);
 
+	//render
 	void renderTiles(void);
 	void renderDragingIsoTiles(void);
 	void renderCurIsoTile(void);
-
 	void renderObject(void);
-
 	void renderSideWindow(void);
-	
 	void renderMiniMap(void);
 
 

@@ -127,11 +127,15 @@ void gameController::render(void)
 	if(_isDraging)
 	{
 		HPEN oldPen = (HPEN)SelectObject(getMemDC(), _gPen[PENVERSION_MOUSEDRAG]);
+
 		//Rectangle(getMemDC(), _ptDragStart.x, _ptDragStart.y, _ptMouse.x, _ptMouse.y);
-		LineMake(getMemDC(), _ptDragStart.x, _ptDragStart.y, _ptMouse.x, _ptDragStart.y);
-		LineMake(getMemDC(), _ptDragStart.x, _ptDragStart.y, _ptDragStart.x, _ptMouse.y);
-		LineMake(getMemDC(), _ptMouse.x, _ptMouse.y, _ptDragStart.x, _ptMouse.y);
-		LineMake(getMemDC(), _ptMouse.x, _ptMouse.y, _ptMouse.x, _ptDragStart.y);
+		//LineMake(getMemDC(), _ptDragStart.x, _ptDragStart.y, _ptMouse.x, _ptDragStart.y);
+		//LineMake(getMemDC(), _ptDragStart.x, _ptDragStart.y, _ptDragStart.x, _ptMouse.y);
+		//LineMake(getMemDC(), _ptMouse.x, _ptMouse.y, _ptDragStart.x, _ptMouse.y);
+		//LineMake(getMemDC(), _ptMouse.x, _ptMouse.y, _ptMouse.x, _ptDragStart.y);
+		RECT rc = { _ptDragStart.x, _ptDragStart.y, _ptMouse.x, _ptMouse.y };
+		LineToRect(getMemDC(), rc);
+
 		SelectObject(getMemDC(), oldPen);
 		DeleteObject(oldPen);
 	}

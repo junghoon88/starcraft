@@ -2,6 +2,10 @@
 #include "gameNode.h"
 #include "tileNode.h"
 
+#include "nrMineral.h"
+#include "nrGas.h"
+
+
 class gameMap : public gameNode
 {
 private:
@@ -9,6 +13,12 @@ private:
 	tagTile _tiles[TILEX][TILEY];
 	//타일이미지
 	image*	_imgTiles[TILEX][TILEY];
+
+	vector<nrMineral*>  _vMineral;
+	vector<nrGas*>		_vGas;
+
+	POINT				_locationP1;
+	POINT				_locationP2;
 
 public:
 	gameMap();
@@ -21,10 +31,14 @@ public:
 
 private:
 	//맵툴에서 그린 맵 로드함수
-	void loadData(int num);
+	void loadData(void);
 	void setTileImage(void);
+	void createNeutralResource(void);
 
+	//render
 	void renderTiles(void);
+
+	void renderObject(void);
 
 public:
 	typedef tagTile(*pTiles)[TILEY];

@@ -3,8 +3,12 @@
 
 gameMap::gameMap()
 {
-}
+	ZeroMemory(&_tiles, sizeof(tagTile) * TILEX * TILEY);
+	ZeroMemory(&_imgTiles, sizeof(image*) * TILEX * TILEY);
 
+	_locationP1 = { 0, 0 };
+	_locationP2 = { 0, 0 };
+}
 
 gameMap::~gameMap()
 {
@@ -13,8 +17,11 @@ gameMap::~gameMap()
 HRESULT gameMap::init(void)
 {
 	//맵로드
-	int num = DATABASE->getMapNum();
-	loadData(num);
+	loadData();
+
+	//불러온 타일 정보를 가지고 타일이미지를 넣어준다.
+	setTileImage();
+	createNeutralResource();
 
 	return S_OK;
 }
@@ -30,9 +37,10 @@ void gameMap::update(void)
 void gameMap::render(void)
 {
 	renderTiles();
+	renderObject();
 }
 
-void gameMap::loadData(int num)
+void gameMap::loadData(void)
 {
 	HANDLE file;
 	DWORD read;
@@ -47,9 +55,6 @@ void gameMap::loadData(int num)
 
 
 	CloseHandle(file);
-
-	//불러온 타일 정보를 가지고 타일이미지를 넣어준다.
-	setTileImage();
 }
 
 void gameMap::setTileImage(void)
@@ -62,18 +67,77 @@ void gameMap::setTileImage(void)
 		{
 			switch (_tiles[x][y].terrain)
 			{
-			case TERRAIN_DIRT:
-				_stprintf(strKey, L"gamemap-terrain-Dirt-%02d", _tiles[x][y].terrainNum);
-				_imgTiles[x][y] = IMAGEMANAGER->findImage(strKey);
-				break;
-			//case TERRAIN_DIRTWALL:
-			//	break;
+			case TERRAIN_DIRT:			_imgTiles[x][y] = IMAGEMANAGER->findImage(L"maptool-terrain-Dirt");			break;
+
+			case TERRAIN_HIGHTDIRT:		_imgTiles[x][y] = IMAGEMANAGER->findImage(L"maptool-terrain-HighDirt");		break;
+			case TERRAIN_HIGHTDIRT_LF:	_imgTiles[x][y] = IMAGEMANAGER->findImage(L"maptool-terrain-HighDirt-LF");	break;
+			case TERRAIN_HIGHTDIRT_LU:	_imgTiles[x][y] = IMAGEMANAGER->findImage(L"maptool-terrain-HighDirt-LU");	break;
+			case TERRAIN_HIGHTDIRT_LD:	_imgTiles[x][y] = IMAGEMANAGER->findImage(L"maptool-terrain-HighDirt-LD");	break;
+			case TERRAIN_HIGHTDIRT_RG:	_imgTiles[x][y] = IMAGEMANAGER->findImage(L"maptool-terrain-HighDirt-RG");	break;
+			case TERRAIN_HIGHTDIRT_RU:	_imgTiles[x][y] = IMAGEMANAGER->findImage(L"maptool-terrain-HighDirt-RU");	break;
+			case TERRAIN_HIGHTDIRT_RD:	_imgTiles[x][y] = IMAGEMANAGER->findImage(L"maptool-terrain-HighDirt-RD");	break;
+
 			case TERRAIN_WATER:
 				break;
 			}
 		}
 	}
 }
+
+void gameMap::createNeutralResource(void)
+{
+	for (int y = 0; y < TILEY; y++)
+	{
+		for (int x = 0; x < TILEX; x++)
+		{
+			switch (_tiles[x][y].obj)
+			{
+			case OBJECT_MINERAL1_START:
+			{
+				nrMineral* mineral = new nrMineral(x, y, _tiles[x][y].nrAmount, 1);
+				_vMineral.push_back(mineral);
+			}
+			break;
+			case OBJECT_MINERAL2_START:
+			{
+				nrMineral* mineral = new nrMineral(x, y, _tiles[x][y].nrAmount, 2);
+				_vMineral.push_back(mineral);
+			}
+			break;
+			case OBJECT_MINERAL3_START:
+			{
+				nrMineral* mineral = new nrMineral(x, y, _tiles[x][y].nrAmount, 3);
+				_vMineral.push_back(mineral);
+			}
+			break;
+			case OBJECT_GAS_START:
+			{
+				nrGas* gas = new nrGas(x, y, _tiles[x][y].nrAmount);
+				_vGas.push_back(gas);
+			}
+			break;
+
+				//플레이어 시작위치
+			case OBJECT_LOCATION_P1_START:
+				_locationP1 = { x, y };
+				_tiles[x][y].obj = OBJECT_NONE;
+			break;
+			case OBJECT_LOCATION_P1_BODY:
+				_tiles[x][y].obj = OBJECT_NONE;
+			break;
+
+			case OBJECT_LOCATION_P2_START:
+				_locationP2 = { x, y };
+				_tiles[x][y].obj = OBJECT_NONE;
+			break;
+			case OBJECT_LOCATION_P2_BODY:
+				_tiles[x][y].obj = OBJECT_NONE;
+			break;
+			}
+		}
+	}
+}
+
 
 void gameMap::renderTiles(void)
 {
@@ -96,7 +160,39 @@ void gameMap::renderTiles(void)
 			if (idY >= TILEY) continue;
 			if (_imgTiles[idX][idY] == NULL) continue;
 
-			_imgTiles[idX][idY]->render(getMemDC(), idX*GAMEMAP_TILESIZE - cameraX, idY*GAMEMAP_TILESIZE - cameraY);
+			_imgTiles[idX][idY]->frameRender(getMemDC(), idX*GAMEMAP_TILESIZE - cameraX, idY*GAMEMAP_TILESIZE - cameraY, _tiles[idX][idY].terrainNum.x, _tiles[idX][idY].terrainNum.y);
+		}
+	}
+}
+
+void gameMap::renderObject(void)
+{
+	int cameraX = MAINCAMERA->getCameraX();
+	int cameraY = MAINCAMERA->getCameraY();
+
+	RECT rcCamera = MAINCAMERA->getRectCamera();
+	rcCamera.bottom = rcCamera.top + GAMEMAP_TILEVIEWY * GAMEMAP_TILESIZE;
+
+	RECT temp;
+
+	for (int i = 0; i < _vMineral.size(); i++)
+	{
+		if(IntersectRect(&temp, &rcCamera, &_vMineral[i]->getRectBody()))
+		{
+			int mineralFrameY = 0;
+			int nrAmount = _vMineral[i]->getAmount();
+			if (nrAmount >= 1500)	mineralFrameY = 0;
+			else					mineralFrameY = 3 - nrAmount / 500;
+
+			_vMineral[i]->getImage()->frameRender(getMemDC(), _vMineral[i]->getRectBody().left - cameraX, _vMineral[i]->getRectBody().top - MAPTOOL_TILESIZE - cameraY, 0, mineralFrameY);
+		}
+	}
+
+	for (int i = 0; i < _vGas.size(); i++)
+	{
+		if (IntersectRect(&temp, &rcCamera, &_vGas[i]->getRectBody()))
+		{
+			_vGas[i]->getImage()->render(getMemDC(), _vGas[i]->getRectBody().left - cameraX, _vGas[i]->getRectBody().top - cameraY);
 		}
 	}
 }

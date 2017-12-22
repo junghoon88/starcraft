@@ -109,6 +109,8 @@
     <ClInclude Include="loading.h" />
     <ClInclude Include="mainGame.h" />
     <ClInclude Include="miniMap.h" />
+    <ClInclude Include="nrGas.h" />
+    <ClInclude Include="nrMineral.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="progressBar.h" />
     <ClInclude Include="randomFunction.h" />
@@ -195,6 +197,8 @@
     <ClCompile Include="loading.cpp" />
     <ClCompile Include="mainGame.cpp" />
     <ClCompile Include="miniMap.cpp" />
+    <ClCompile Include="nrGas.cpp" />
+    <ClCompile Include="nrMineral.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="progressBar.cpp" />
     <ClCompile Include="RenderManager.cpp" />

@@ -14,6 +14,20 @@
 #define COMMAND_WIDTH		32
 #define COMMAND_HEIGHT		32
 
+
+#define OBJECTSIZE_MAX_X	4
+#define OBJECTSIZE_MAX_Y	4
+
+#define OBJ_MINERAL_WIDTH			2
+#define OBJ_MINERAL_HEIGHT			1
+#define OBJ_GAS_WIDTH				4
+#define OBJ_GAS_HEIGHT				2
+#define OBJ_LOCATION_PLAYER_WIDTH	4
+#define OBJ_LOCATION_PLAYER_HEIGHT	3
+#define OBJ_ERASER_WIDTH			1
+#define OBJ_ERASER_HEIGHT			1
+
+
 //command
 enum COMMAND
 {
