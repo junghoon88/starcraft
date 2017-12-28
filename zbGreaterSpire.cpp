@@ -11,7 +11,7 @@ zbGreaterSpire::~zbGreaterSpire()
 {
 }
 
-HRESULT zbGreaterSpire::init(void)
+HRESULT zbGreaterSpire::init(POINT ptTIle)
 {
 
 	return S_OK;

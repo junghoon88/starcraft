@@ -7,7 +7,7 @@ nrGas::nrGas(int tilex, int tiley, UINT amount)
 	: _img(NULL)
 {
 	_rcTile = RectMake(tilex, tiley, OBJ_MINERAL_WIDTH, OBJ_MINERAL_HEIGHT);
-	_rcBody = RectMultiply(_rcTile, GAMEMAP_TILESIZE);
+	_rcBody = RectMultiply(_rcTile, TILESIZE);
 
 	_amount = amount;
 

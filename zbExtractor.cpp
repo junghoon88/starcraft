@@ -11,7 +11,7 @@ zbExtractor::~zbExtractor()
 {
 }
 
-HRESULT zbExtractor::init(void)
+HRESULT zbExtractor::init(POINT ptTIle)
 {
 
 	return S_OK;

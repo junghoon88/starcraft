@@ -24,7 +24,6 @@
 #include "iniDataManager.h"
 #include "sceneManager.h"
 #include "keyAniManager.h"
-#include "RenderManager.h"
 #include "txtData.h"
 #include "collision.h"
 #include "camera.h"
@@ -33,6 +32,8 @@
 //전역 매크로변수
 #include "globalMacroVariables.h"
 #include "database.h"
+
+#include "RenderManager.h"
 
 
 using namespace std;

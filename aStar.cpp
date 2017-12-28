@@ -31,11 +31,7 @@ void aStar::initTiles(void)
 		{
 			tile* node = new tile;
 			node->init(j, i, _map->getTiles()[j][i].rc);
-			//DWORD attr = _map->getAttribute()[i * TILEX + j];
-			//if ((attr & ATTR_UNMOVE) == ATTR_UNMOVE)
-			//{
-			//	node->setAttribute(L"unmove");
-			//}
+			node->setAttribute(_map->getTiles()[j][i].attribute);
 
 			_vTotalList.push_back(node);
 		}
@@ -58,7 +54,6 @@ void aStar::setTiles(POINT startPt, POINT endPt)
 	if (startPt.x == temp->getIdX() && startPt.y == temp->getIdY())
 	{
 		_staTile = _vTotalList[startPt.x + startPt.y * TILEX];
-		_staTile->setAttribute(L"start");
 
 		//현재위치는 처음시작위치와 같도록함
 		_curTile = _staTile;
@@ -68,7 +63,6 @@ void aStar::setTiles(POINT startPt, POINT endPt)
 	if (endPt.x == temp->getIdX() && endPt.y == temp->getIdY())
 	{
 		_endTile = _vTotalList[endPt.x + endPt.y * TILEX];
-		_endTile->setAttribute(L"end");
 		endCheck = true;
 	}
 
@@ -88,7 +82,6 @@ void aStar::setTiles(POINT startPt, POINT endPt)
 		if (pt.x == startPt.x && pt.y == startPt.y)
 		{
 			_staTile = _vTotalList[i];
-			_staTile->setAttribute(L"start");
 
 			//현재위치는 처음시작위치와 같도록함
 			_curTile = _staTile;
@@ -97,7 +90,6 @@ void aStar::setTiles(POINT startPt, POINT endPt)
 		else if (pt.x == endPt.x && pt.y == endPt.y)
 		{
 			_endTile = _vTotalList[i];
-			_endTile->setAttribute(L"end");
 			endCheck = true;
 		}
 
@@ -130,7 +122,7 @@ vector<tile*> aStar::addOpenList(tile* currentTile)
 
 			if (!node->getIsOpen()) continue;
 			if (node == _staTile) continue;
-			if (node->getAttribute() == L"unmove") continue;
+			if ((node->getAttribute() & ATTR_UNMOVE) == ATTR_UNMOVE) continue;
 
 			node->setParentNode(currentTile);
 
@@ -145,7 +137,7 @@ vector<tile*> aStar::addOpenList(tile* currentTile)
 				}
 			}
 
-			if (node->getAttribute() != L"end")
+			if (node != _endTile)
 			{
 				//node->setColor(RGB(128, 64, 28));
 			}
@@ -216,7 +208,7 @@ void aStar::pathFinder(tile* currentTile)
 		return;
 	}
 
-	if (tempTile == _endTile) //(tempTile->getAttribute() == L"end")
+	if (tempTile == _endTile)
 	{
 		return;
 	}
@@ -265,14 +257,6 @@ void aStar::clearTiles(void)
 	for (int i = 0; i < _vTotalList.size(); i++)
 	{
 		_vTotalList[i]->setIsOpen(true);
-		if (_vTotalList[i]->getAttribute() == L"start")
-		{
-			_vTotalList[i]->setAttribute(L"");
-		}
-		if (_vTotalList[i]->getAttribute() == L"end")
-		{
-			_vTotalList[i]->setAttribute(L"");
-		}
 	}
 
 	_findCnt = 0;

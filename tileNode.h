@@ -5,28 +5,24 @@
 #define TILEX		128
 #define TILEY		128
 
-//맵툴-----------------------------------------------------------------
 //한 타일의 규격
-#define MAPTOOL_TILESIZE	32
+#define TILESIZE	32
 
-//게임맵, 맵툴에서 보여줄 타일 개수
+//맵툴-----------------------------------------------------------------
+//맵툴에서 보여줄 타일 개수
 #define MAPTOOL_TILEVIEWX	15 //20 이 최대크기
 #define MAPTOOL_TILEVIEWY	15
 
 //맵툴 ISOTILE
-#define ISOTILE_WIDTH		(MAPTOOL_TILESIZE*4)
-#define ISOTILE_HEIGHT		(MAPTOOL_TILESIZE*2)
+#define ISOTILE_WIDTH		(TILESIZE*4)
+#define ISOTILE_HEIGHT		(TILESIZE*2)
 
-#define ISOTILE_HALF_WIDTH	(MAPTOOL_TILESIZE*2)
-#define ISOTILE_HALF_HEIGHT	(MAPTOOL_TILESIZE)
-
-#define ISOTILEX			(MAPTOOL_TILEVIEWX/2)
-#define ISOTILEY			(MAPTOOL_TILEVIEWY)
+#define ISOTILE_HALF_WIDTH	(TILESIZE*2)
+#define ISOTILE_HALF_HEIGHT	(TILESIZE)
 //~맵툴-----------------------------------------------------------------
 
 //게임맵----------------------------------------------------------------
-#define GAMEMAP_TILESIZE		32
-
+//게임맵에서 보여줄 타일 개수
 #define GAMEMAP_TILEVIEWX		20
 #define GAMEMAP_TILEVIEWY		12 //30
 
@@ -38,6 +34,7 @@
 //비트필드 타일 속성
 #define ATTR_UNMOVE		0x00000001	//
 #define ATTR_UNBUILD	0x00000002	//
+#define ATTR_CREEP		0x00000004
 
 
 

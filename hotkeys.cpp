@@ -30,6 +30,9 @@ HRESULT hotkeys::init(void)
 		case COMMAND_RETURNCARGO:				_hotkey[i] = 'C';			break;
 		case COMMAND_BUILD1:					_hotkey[i] = 'B';			break;
 		case COMMAND_BUILD2:					_hotkey[i] = 'V';			break;
+		case COMMAND_SELECT_LARVA:				_hotkey[i] = 'S';			break;
+		case COMMAND_SETRALLYPOINT:					_hotkey[i] = 'R';			break;
+
 
 		//ZERG
 		case COMMAND_BURROW:					_hotkey[i] = 'U';			break;

@@ -11,7 +11,7 @@ zbDefilerMound::~zbDefilerMound()
 {
 }
 
-HRESULT zbDefilerMound::init(void)
+HRESULT zbDefilerMound::init(POINT ptTIle)
 {
 
 	return S_OK;

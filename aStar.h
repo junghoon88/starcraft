@@ -55,7 +55,7 @@ public:
 
 	inline tile* getStartTile(void) { return _staTile; }
 
-	inline void setAttribute(int x, int y, wstring str) { _vTotalList[x + y*TILEX]->setAttribute(str); }
+	inline void setAttribute(int x, int y, DWORD attr) { _vTotalList[x + y*TILEX]->setAttribute(attr); }
 
 };
 

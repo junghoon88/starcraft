@@ -11,7 +11,7 @@ zbSunkenColony::~zbSunkenColony()
 {
 }
 
-HRESULT zbSunkenColony::init(void)
+HRESULT zbSunkenColony::init(POINT ptTIle)
 {
 
 	return S_OK;

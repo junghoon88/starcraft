@@ -11,7 +11,7 @@ zbQueensNest::~zbQueensNest()
 {
 }
 
-HRESULT zbQueensNest::init(void)
+HRESULT zbQueensNest::init(POINT ptTIle)
 {
 
 	return S_OK;

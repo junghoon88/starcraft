@@ -114,7 +114,13 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmd
 			DWORD tick1 = GetTickCount();
 
 			_mg.update();
+
+			DWORD tick3 = GetTickCount();
+
 			_mg.render();
+
+			DWORD tick4 = GetTickCount();
+
 			_mg.checkScene();
 
 			DWORD tick2 = GetTickCount();

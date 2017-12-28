@@ -11,7 +11,7 @@ zbNydusCanal::~zbNydusCanal()
 {
 }
 
-HRESULT zbNydusCanal::init(void)
+HRESULT zbNydusCanal::init(POINT ptTIle)
 {
 
 	return S_OK;

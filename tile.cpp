@@ -17,13 +17,13 @@ tile::~tile()
 
 HRESULT tile::init(int idX, int idY)
 {
-	_center.x = (LONG)((float)(idX + 0.5f) * GAMEMAP_TILESIZE);
-	_center.y = (LONG)((float)(idY + 0.5f) * GAMEMAP_TILESIZE);
+	_center.x = (LONG)((float)(idX + 0.5f) * TILESIZE);
+	_center.y = (LONG)((float)(idY + 0.5f) * TILESIZE);
 
 	_idX = idX;
 	_idY = idY;
 
-	_rc = RectMakeCenter(_center.x, _center.y, GAMEMAP_TILESIZE, GAMEMAP_TILESIZE);
+	_rc = RectMakeCenter(_center.x, _center.y, TILESIZE, TILESIZE);
 
 	return S_OK;
 }
@@ -51,5 +51,5 @@ void tile::update()
 void tile::render()
 {
 	//FillRect(getMemDC(), &_rc, );
-	RectangleMake(getMemDC(), _rc.left, _rc.top, GAMEMAP_TILESIZE, GAMEMAP_TILESIZE);
+	RectangleMake(getMemDC(), _rc.left, _rc.top, TILESIZE, TILESIZE);
 }

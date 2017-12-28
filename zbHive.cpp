@@ -11,7 +11,7 @@ zbHive::~zbHive()
 {
 }
 
-HRESULT zbHive::init(void)
+HRESULT zbHive::init(POINT ptTIle)
 {
 
 	return S_OK;

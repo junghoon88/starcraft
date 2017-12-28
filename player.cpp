@@ -30,7 +30,7 @@ unsigned CALLBACK AstarThread(void* pArguments)
 
 
 
-		tagUnitBattleStatus battleStatus = units[num]->getBattleStatus();
+		tagBattleStatus battleStatus = units[num]->getBattleStatus();
 
 		//AStar 를 사용하지 않으면 다음
 		if (battleStatus.useAstar == FALSE)
@@ -43,10 +43,10 @@ unsigned CALLBACK AstarThread(void* pArguments)
 		units[num]->setIsBusy(TRUE);
 
 		POINT ptStartTile, ptEndTile;
-		ptStartTile.x = battleStatus.pt.toPoint().x / GAMEMAP_TILESIZE;
-		ptStartTile.y = battleStatus.pt.toPoint().y / GAMEMAP_TILESIZE;
-		ptEndTile.x = battleStatus.ptTarget.x / GAMEMAP_TILESIZE;
-		ptEndTile.y = battleStatus.ptTarget.y / GAMEMAP_TILESIZE;
+		ptStartTile.x = battleStatus.pt.toPoint().x / TILESIZE;
+		ptStartTile.y = battleStatus.pt.toPoint().y / TILESIZE;
+		ptEndTile.x = battleStatus.ptTarget.x / TILESIZE;
+		ptEndTile.y = battleStatus.ptTarget.y / TILESIZE;
 
 
 		p->getAstar()->clearTiles();
@@ -61,6 +61,7 @@ unsigned CALLBACK AstarThread(void* pArguments)
 	return 0;
 }
 
+#if 0
 unsigned CALLBACK ControllerThread(void* pArguments)
 {
 	player* p = (player*)pArguments;
@@ -85,9 +86,10 @@ unsigned CALLBACK ControllerThread(void* pArguments)
 	}
 	return 0;
 }
+#endif
 
 player::player()
-	: _zergUpgrade(NULL), _gameMap(NULL), _fog(NULL), _aStar(NULL), _gameController(NULL)
+	: _zergUpgrade(NULL), _gameMap(NULL), _fog(NULL), _aStar(NULL), _gameController(NULL)//, _gameObjectPool(NULL)
 {
 }
 
@@ -99,6 +101,10 @@ player::~player()
 
 HRESULT player::init(PLAYER playerNum, RACES races)
 {
+	_myMineral = 500;
+	_myGas = 100;
+	_myControl = _myControlMax = 0;
+
 	_playerNum = playerNum;
 	_races = races;
 
@@ -116,6 +122,7 @@ HRESULT player::init(PLAYER playerNum, RACES races)
 	_gameController = new gameController;
 	_gameController->init(playerNum, _races);
 	_gameController->setLinkAdressMyPlayer(this);
+	_gameController->setLinkAdressGameMap(_gameMap);
 
 
 	unsigned int threadId = 0;
@@ -123,11 +130,14 @@ HRESULT player::init(PLAYER playerNum, RACES races)
 	//_hControllerThread = (HANDLE)_beginthreadex(NULL, 0, &ControllerThread, this, 0, &threadId);
 	_endThread = FALSE;
 
+
+
 	//debug
-	zuDrone* drone = new zuDrone;
+	zuDrone* drone = new zuDrone(playerNum);
 	drone->setLinkAdressZergUpgrade(_zergUpgrade);
 	drone->setLinkAdressAstar(_aStar);
-	drone->init(playerNum, { 200, 200 });
+	drone->setLinkAdressPlayer(this);
+	drone->init({ 200, 200 });
 	_vUnits.push_back(drone);
 
 
@@ -169,10 +179,19 @@ void player::release(void)
 
 void player::update(void) 
 {
+	checkUnitValid();
+	checkBuildingVaild();
+
 	for (UINT i = 0; i < _vUnits.size(); i++)
 	{
 		_vUnits[i]->update();
 	}
+
+	for (UINT i = 0; i < _vBuildings.size(); i++)
+	{
+		_vBuildings[i]->update();
+	}
+
 
 	checkInCamera();
 
@@ -184,6 +203,10 @@ void player::render(fog* fog)
 	for (UINT i = 0; i < _vUnitsInCamera.size(); i++)
 	{
 		_vUnitsInCamera[i]->render();
+	}
+	for (UINT i = 0; i < _vBuildings.size(); i++)
+	{
+		_vBuildings[i]->render();
 	}
 
 	//_fog->render();
@@ -208,7 +231,7 @@ void player::checkInCamera(void)
 	}
 }
 
-bool player::haveBuilding(BUILDINGNUM_ZERG num)
+bool player::isHaveBuilding(BUILDINGNUM_ZERG num)
 {
 	for (UINT i = 0; i < _vBuildings.size(); i++)
 	{
@@ -221,4 +244,82 @@ bool player::haveBuilding(BUILDINGNUM_ZERG num)
 
 
 	return false;
+}
+
+bool player::useResource(UINT mineral, UINT gas)
+{
+	if (_myMineral >= mineral && _myGas >= gas)
+	{
+		_myMineral -= mineral;
+		_myGas -= gas;
+		return true;
+	}
+	else
+	{
+		if (_myMineral < mineral)
+		{
+			//미네랄 부족
+		}
+		else if (_myGas < gas)
+		{
+			//가스 부족
+		}
+	}
+
+	return false;
+}
+
+bool player::useResource(UINT mineral, UINT gas, float control)
+{
+	if (_myMineral >= mineral && _myGas >= gas && (_myControl + control) <= _myControlMax)
+	{
+		_myMineral -= mineral;
+		_myGas -= gas;
+		return true;
+	}
+	else
+	{
+		if (_myMineral < mineral)
+		{
+			//미네랄 부족
+		}
+		else if (_myGas < gas)
+		{
+			//가스 부족
+		}
+		else if ((_myControl + control) > _myControlMax)
+		{
+			//인구수 부족
+		}
+	}
+
+
+	return false;
+}
+
+
+
+void player::checkUnitValid(void)
+{
+	for (int i = 0; i < _vUnits.size(); )
+	{
+		if (_vUnits[i]->getValid() == false)
+		{
+			_gameController->changeSelectInfoToNextObect(_vUnits[i]);
+			_vUnits.erase(_vUnits.begin() + i);
+		}
+		else ++i;
+	}
+}
+void player::checkBuildingVaild(void)
+{
+	for (int i = 0; i < _vBuildings.size(); )
+	{
+		if (_vBuildings[i]->getValid() == false)
+		{
+			_gameController->changeSelectInfoToNextObect(_vBuildings[i]);
+			_vBuildings.erase(_vBuildings.begin() + i);
+		}
+		else ++i;
+	}
 }

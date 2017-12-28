@@ -1,5 +1,6 @@
 #pragma once
 #include "gameNode.h"
+#include "gameObject.h"
 #include "Building.h"
 #include "Unit.h"
 
@@ -11,6 +12,7 @@
 #include "aStar.h"
 
 #include "gameController.h"
+#include "gameObjectPool.h"
 
 class player : public gameNode
 {
@@ -18,10 +20,15 @@ private:
 	//static 변수
 
 private:
-	vBuildings						_vBuildings;			//플레이어가 가지고 있는 건물들
+	UINT							_myMineral;
+	UINT							_myGas;
+	FLOAT							_myControl;
+	FLOAT							_myControlMax;
+
 	vUnits							_vUnits;				//플레이어가 가지고 있는 유닛들
-	vBuildings						_vBuildingsInCamera;	//카메라에 보여주는 건물들
 	vUnits							_vUnitsInCamera;		//카메라에 보여주는 유닛들
+	vBuildings						_vBuildings;			//플레이어가 가지고 있는 건물들
+	vBuildings						_vBuildingsInCamera;	//카메라에 보여주는 건물들
 
 
 
@@ -45,7 +52,9 @@ private:
 
 	//interface
 	gameController*					_gameController;
-
+	
+	//게임오브젝트풀
+	//gameObjectPool*					_gameObjectPool;
 
 public:
 	player();
@@ -56,19 +65,33 @@ public:
 	void update(void);
 	void render(fog* fog);
 
-	bool haveBuilding(BUILDINGNUM_ZERG num);
+	bool isHaveBuilding(BUILDINGNUM_ZERG num);
+
+	bool useResource(UINT mineral, UINT gas);
+	bool useResource(UINT mineral, UINT gas, float control);
+
+
+	void checkUnitValid(void);
+	void checkBuildingVaild(void);
+
+
+
 
 private:
 	void checkInCamera(void);
 
 public:
 	inline void setLinkAdressGamemap(gameMap* map) { _gameMap = map; }
+	//inline void setLinkAdressGameObjectPool(gameObjectPool* pool) { _gameObjectPool = pool; }
+
+	inline void addUnit(Unit* unit) { _vUnits.push_back(unit); }
+	inline void addBuilding(Building* building) { _vBuildings.push_back(building); }
 
 
-	inline vBuildings getBuildings(void) { return _vBuildings; }
-	inline vUnits    getUnits(void) { return _vUnits; }
-	inline vBuildings getBuildingsInCamera(void) { return _vBuildingsInCamera; }
-	inline vUnits    getUnitsInCamera(void) { return _vUnitsInCamera; }
+	inline vUnits		getUnits(void) { return _vUnits; }
+	inline vUnits		getUnitsInCamera(void)		{ return _vUnitsInCamera; }
+	inline vBuildings	getBuildings(void)			{ return _vBuildings; }
+	inline vBuildings	getBuildingsInCamera(void)	{ return _vBuildingsInCamera; }
 
 	inline PLAYER getPlayerNum(void) { return _playerNum; }
 

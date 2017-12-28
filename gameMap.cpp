@@ -144,8 +144,8 @@ void gameMap::renderTiles(void)
 	int cameraX = MAINCAMERA->getCameraX();
 	int cameraY = MAINCAMERA->getCameraY();
 
-	int cameraIdX = cameraX / GAMEMAP_TILESIZE - 1;
-	int cameraIdY = cameraY / GAMEMAP_TILESIZE - 1;
+	int cameraIdX = cameraX / TILESIZE - 1;
+	int cameraIdY = cameraY / TILESIZE - 1;
 
 	for (int y = 0; y < GAMEMAP_TILEVIEWY + 2; y++)
 	{
@@ -160,7 +160,9 @@ void gameMap::renderTiles(void)
 			if (idY >= TILEY) continue;
 			if (_imgTiles[idX][idY] == NULL) continue;
 
-			_imgTiles[idX][idY]->frameRender(getMemDC(), idX*GAMEMAP_TILESIZE - cameraX, idY*GAMEMAP_TILESIZE - cameraY, _tiles[idX][idY].terrainNum.x, _tiles[idX][idY].terrainNum.y);
+
+			//_imgTiles[idX][idY]->frameRender(getMemDC(), idX*TILESIZE - cameraX, idY*TILESIZE - cameraY, _tiles[idX][idY].terrainNum.x, _tiles[idX][idY].terrainNum.y);
+			RENDERMANAGER->insertImgFrame(ZORDER_TILES, _imgTiles[idX][idY], idX*TILESIZE - cameraX, idY*TILESIZE - cameraY, _tiles[idX][idY].terrainNum.x, _tiles[idX][idY].terrainNum.y);
 		}
 	}
 }
@@ -171,7 +173,7 @@ void gameMap::renderObject(void)
 	int cameraY = MAINCAMERA->getCameraY();
 
 	RECT rcCamera = MAINCAMERA->getRectCamera();
-	rcCamera.bottom = rcCamera.top + GAMEMAP_TILEVIEWY * GAMEMAP_TILESIZE;
+	rcCamera.bottom = rcCamera.top + GAMEMAP_TILEVIEWY * TILESIZE;
 
 	RECT temp;
 
@@ -184,7 +186,8 @@ void gameMap::renderObject(void)
 			if (nrAmount >= 1500)	mineralFrameY = 0;
 			else					mineralFrameY = 3 - nrAmount / 500;
 
-			_vMineral[i]->getImage()->frameRender(getMemDC(), _vMineral[i]->getRectBody().left - cameraX, _vMineral[i]->getRectBody().top - MAPTOOL_TILESIZE - cameraY, 0, mineralFrameY);
+			//_vMineral[i]->getImage()->frameRender(getMemDC(), _vMineral[i]->getRectBody().left - cameraX, _vMineral[i]->getRectBody().top - TILESIZE - cameraY, 0, mineralFrameY);
+			RENDERMANAGER->insertImgFrame(ZORDER_GAMEOBJECT, _vMineral[i]->getImage(), _vMineral[i]->getRectBody().left - cameraX, _vMineral[i]->getRectBody().top - TILESIZE - cameraY, 0, mineralFrameY, _vMineral[i]->getRectBody());
 		}
 	}
 
@@ -192,7 +195,8 @@ void gameMap::renderObject(void)
 	{
 		if (IntersectRect(&temp, &rcCamera, &_vGas[i]->getRectBody()))
 		{
-			_vGas[i]->getImage()->render(getMemDC(), _vGas[i]->getRectBody().left - cameraX, _vGas[i]->getRectBody().top - cameraY);
+			//_vGas[i]->getImage()->render(getMemDC(), _vGas[i]->getRectBody().left - cameraX, _vGas[i]->getRectBody().top - cameraY);
+			RENDERMANAGER->insertImg(ZORDER_GAMEOBJECT, _vGas[i]->getImage(), _vGas[i]->getRectBody().left - cameraX, _vGas[i]->getRectBody().top - cameraY);
 		}
 	}
 }

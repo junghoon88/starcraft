@@ -167,10 +167,10 @@ void sceneMaptool::initMiniMap(void)
 	_imgMiniMap = IMAGEMANAGER->addImage(L"¸ÊÅø¹Ì´Ï¸Ê", TILEX, TILEY);
 	PatBlt(_imgMiniMap->getMemDC(), 0, 0, TILEX, TILEY, BLACKNESS);
 
-	int x = MAINCAMERA->getCameraX() / MAPTOOL_TILESIZE;
-	int y = MAINCAMERA->getCameraY() / MAPTOOL_TILESIZE;
-	int width  = WINSIZEX / MAPTOOL_TILESIZE;
-	int height = WINSIZEY / MAPTOOL_TILESIZE;
+	int x = MAINCAMERA->getCameraX() / TILESIZE;
+	int y = MAINCAMERA->getCameraY() / TILESIZE;
+	int width  = WINSIZEX / TILESIZE;
+	int height = WINSIZEY / TILESIZE;
 
 	_rcMiniMap = RectMake(SIDEWINDOW_STARTX + 16, 16, TILEX, TILEY);
 	_rcMiniMapCamera = RectMake(x, y, width, height);
@@ -182,9 +182,9 @@ void sceneMaptool::initSampleTerrainObject(void)
 {
 	_curTerrain = SAMPLETERRAIN_DIRT;
 
-	_rcSelectTerrain[SAMPLETERRAIN_DIRT]     = RectMake(SIDEWINDOW_STARTX + 10, _rcMiniMap.bottom + 30, MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
-	_rcSelectTerrain[SAMPLETERRAIN_HIGTDIRT] = RectMake(_rcSelectTerrain[SAMPLETERRAIN_DIRT].right + 5, _rcMiniMap.bottom + 30, MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
-	_rcSelectTerrain[SAMPLETERRAIN_WATER]    = RectMake(_rcSelectTerrain[SAMPLETERRAIN_HIGTDIRT].right + 5, _rcMiniMap.bottom + 30, MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
+	_rcSelectTerrain[SAMPLETERRAIN_DIRT]     = RectMake(SIDEWINDOW_STARTX + 10, _rcMiniMap.bottom + 30, TILESIZE, TILESIZE);
+	_rcSelectTerrain[SAMPLETERRAIN_HIGTDIRT] = RectMake(_rcSelectTerrain[SAMPLETERRAIN_DIRT].right + 5, _rcMiniMap.bottom + 30, TILESIZE, TILESIZE);
+	_rcSelectTerrain[SAMPLETERRAIN_WATER]    = RectMake(_rcSelectTerrain[SAMPLETERRAIN_HIGTDIRT].right + 5, _rcMiniMap.bottom + 30, TILESIZE, TILESIZE);
 
 	_imgSelectTerrain[SAMPLETERRAIN_DIRT]     = IMAGEMANAGER->findImage(L"maptool-terrain-Dirt");
 	_imgSelectTerrain[SAMPLETERRAIN_HIGTDIRT] = IMAGEMANAGER->findImage(L"maptool-terrain-HighDirt");
@@ -193,11 +193,11 @@ void sceneMaptool::initSampleTerrainObject(void)
 	
 
 	_curObject = SAMPLEOBJECT_NONE;
-	_rcSelectObject[SAMPLEOBJECT_MINERAL] = RectMake(SIDEWINDOW_STARTX + 10, _rcSelectTerrain[SAMPLETERRAIN_DIRT].bottom + 30, MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
-	_rcSelectObject[SAMPLEOBJECT_GAS]     = RectMake(_rcSelectObject[SAMPLEOBJECT_MINERAL].right + 5, _rcSelectTerrain[SAMPLETERRAIN_DIRT].bottom + 30, MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
-	_rcSelectObject[SAMPLEOBJECT_PLAYER1] = RectMake(_rcSelectObject[SAMPLEOBJECT_GAS].right + 5, _rcSelectTerrain[SAMPLETERRAIN_DIRT].bottom + 30, MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
-	_rcSelectObject[SAMPLEOBJECT_PLAYER2] = RectMake(_rcSelectObject[SAMPLEOBJECT_PLAYER1].right + 5, _rcSelectTerrain[SAMPLETERRAIN_DIRT].bottom + 30, MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
-	_rcSelectObject[SAMPLEOBJECT_ERASER]  = RectMake(_rcSelectObject[SAMPLEOBJECT_PLAYER2].left, _rcSelectObject[SAMPLEOBJECT_PLAYER2].bottom + 10, MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
+	_rcSelectObject[SAMPLEOBJECT_MINERAL] = RectMake(SIDEWINDOW_STARTX + 10, _rcSelectTerrain[SAMPLETERRAIN_DIRT].bottom + 30, TILESIZE, TILESIZE);
+	_rcSelectObject[SAMPLEOBJECT_GAS]     = RectMake(_rcSelectObject[SAMPLEOBJECT_MINERAL].right + 5, _rcSelectTerrain[SAMPLETERRAIN_DIRT].bottom + 30, TILESIZE, TILESIZE);
+	_rcSelectObject[SAMPLEOBJECT_PLAYER1] = RectMake(_rcSelectObject[SAMPLEOBJECT_GAS].right + 5, _rcSelectTerrain[SAMPLETERRAIN_DIRT].bottom + 30, TILESIZE, TILESIZE);
+	_rcSelectObject[SAMPLEOBJECT_PLAYER2] = RectMake(_rcSelectObject[SAMPLEOBJECT_PLAYER1].right + 5, _rcSelectTerrain[SAMPLETERRAIN_DIRT].bottom + 30, TILESIZE, TILESIZE);
+	_rcSelectObject[SAMPLEOBJECT_ERASER]  = RectMake(_rcSelectObject[SAMPLEOBJECT_PLAYER2].left, _rcSelectObject[SAMPLEOBJECT_PLAYER2].bottom + 10, TILESIZE, TILESIZE);
 
 	_imgSelectObject[SAMPLEOBJECT_MINERAL] = IMAGEMANAGER->findImage(L"maptool-icon-Mineral");
 	_imgSelectObject[SAMPLEOBJECT_GAS]     = IMAGEMANAGER->findImage(L"maptool-icon-Gas");
@@ -235,7 +235,7 @@ void sceneMaptool::initTiles(void)
 			_tiles[x][y].obj = 0;
 			_tiles[x][y].nrAmount = 0;
 			_tiles[x][y].attribute = 0;
-			_tiles[x][y].rc = RectMake(x * MAPTOOL_TILESIZE, y * MAPTOOL_TILESIZE, MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
+			_tiles[x][y].rc = RectMake(x * TILESIZE, y * TILESIZE, TILESIZE, TILESIZE);
 		}
 	}
 	memset(&_isChangedTile, 1, sizeof(BOOL) * TILEX * TILEY);
@@ -251,8 +251,8 @@ void sceneMaptool::updateCamera(void)
 			float x = _ptMouse.x - _rcMiniMap.left;
 			float y = _ptMouse.y - _rcMiniMap.top;
 
-			float halfWidth  = (WINSIZEX / MAPTOOL_TILESIZE) * 0.5f;
-			float halfHeight = (WINSIZEY / MAPTOOL_TILESIZE) * 0.5f;
+			float halfWidth  = (WINSIZEX / TILESIZE) * 0.5f;
+			float halfHeight = (WINSIZEY / TILESIZE) * 0.5f;
 
 			if (x <= halfWidth)					x = halfWidth;
 			else if (x >= TILEX - halfWidth)	x = TILEX - halfWidth;
@@ -261,7 +261,7 @@ void sceneMaptool::updateCamera(void)
 			else if (y >= TILEY - halfHeight)	y = TILEY - halfHeight;
 
 
-			MAINCAMERA->setCameraPos((x - halfWidth) * MAPTOOL_TILESIZE, (y - halfHeight) * MAPTOOL_TILESIZE);
+			MAINCAMERA->setCameraPos((x - halfWidth) * TILESIZE, (y - halfHeight) * TILESIZE);
 		}
 	}
 
@@ -282,10 +282,10 @@ void sceneMaptool::updateCamera(void)
 		MAINCAMERA->moveCamera(DIRECTION_DN);
 	}
 
-	int x = MAINCAMERA->getCameraX() / MAPTOOL_TILESIZE;
-	int y = MAINCAMERA->getCameraY() / MAPTOOL_TILESIZE;
-	int width  = WINSIZEX / MAPTOOL_TILESIZE;
-	int height = WINSIZEY / MAPTOOL_TILESIZE;
+	int x = MAINCAMERA->getCameraX() / TILESIZE;
+	int y = MAINCAMERA->getCameraY() / TILESIZE;
+	int width  = WINSIZEX / TILESIZE;
+	int height = WINSIZEY / TILESIZE;
 
 	_rcMiniMapCamera = RectMake(x, y, width, height);
 }
@@ -294,8 +294,8 @@ void sceneMaptool::calcMouseRealPosition(void)
 {
 	_cursorPt.x = _ptMouse.x + MAINCAMERA->getCameraX();
 	_cursorPt.y = _ptMouse.y + MAINCAMERA->getCameraY();
-	_cursorTile.x = (LONG)(_cursorPt.x / MAPTOOL_TILESIZE);
-	_cursorTile.y = (LONG)(_cursorPt.y / MAPTOOL_TILESIZE);
+	_cursorTile.x = (LONG)(_cursorPt.x / TILESIZE);
+	_cursorTile.y = (LONG)(_cursorPt.y / TILESIZE);
 }
 
 
@@ -561,8 +561,8 @@ void sceneMaptool::clickIsoTile(void)
 	if (KEYMANAGER->isStayKeyDown(VK_LBUTTON) == false)
 		return;
 
-	int cx = _isoCursor.x / MAPTOOL_TILESIZE;
-	int cy = _isoCursor.y / MAPTOOL_TILESIZE;
+	int cx = _isoCursor.x / TILESIZE;
+	int cy = _isoCursor.y / TILESIZE;
 
 	setDirt(cx, cy);
 }
@@ -572,8 +572,8 @@ void sceneMaptool::dragIsoTile(void)
 	if (_ptMouse.x >= SIDEWINDOW_STARTX)
 		return;
 
-	int cx = _isoCursor.x / MAPTOOL_TILESIZE;
-	int cy = _isoCursor.y / MAPTOOL_TILESIZE;
+	int cx = _isoCursor.x / TILESIZE;
+	int cy = _isoCursor.y / TILESIZE;
 
 	if (KEYMANAGER->isOnceKeyDown(VK_LBUTTON))
 	{
@@ -844,6 +844,8 @@ void sceneMaptool::clickObjectTile(void)
 						case 3: _tiles[_cursorTile.x + i][_cursorTile.y + j].obj = OBJECT_MINERAL3_BODY; break;
 						}
 					}
+
+					_tiles[_cursorTile.x + i][_cursorTile.y + j].attribute |= ATTR_UNBUILD;
 				}
 			}
 		}
@@ -863,6 +865,8 @@ void sceneMaptool::clickObjectTile(void)
 					{
 						_tiles[_cursorTile.x + i][_cursorTile.y + j].obj = OBJECT_GAS_BODY;
 					}
+
+					_tiles[_cursorTile.x + i][_cursorTile.y + j].attribute |= ATTR_UNBUILD;
 				}
 			}
 		}
@@ -1304,8 +1308,8 @@ void sceneMaptool::updateTileImage(void)
 	int cameraX = MAINCAMERA->getCameraX();
 	int cameraY = MAINCAMERA->getCameraY();
 
-	int cameraIdX = cameraX / MAPTOOL_TILESIZE - 1;
-	int cameraIdY = cameraY / MAPTOOL_TILESIZE - 1;
+	int cameraIdX = cameraX / TILESIZE - 1;
+	int cameraIdY = cameraY / TILESIZE - 1;
 
 	for (int y = 0; y < MAPTOOL_TILEVIEWY + 2; y++)
 	{
@@ -1498,8 +1502,8 @@ void sceneMaptool::renderTiles(void)
 	int cameraX = MAINCAMERA->getCameraX();
 	int cameraY = MAINCAMERA->getCameraY();
 
-	int cameraIdX = cameraX / MAPTOOL_TILESIZE - 1;
-	int cameraIdY = cameraY / MAPTOOL_TILESIZE - 1;
+	int cameraIdX = cameraX / TILESIZE - 1;
+	int cameraIdY = cameraY / TILESIZE - 1;
 
 	for (int y = 0; y < MAPTOOL_TILEVIEWY + 2; y++)
 	{
@@ -1516,11 +1520,11 @@ void sceneMaptool::renderTiles(void)
 
 			if (_tiles[idX][idY].terrain == TERRAIN_DIRT)
 			{
-				_imgTiles[idX][idY]->frameRender(getMemDC(), idX*MAPTOOL_TILESIZE - cameraX, idY*MAPTOOL_TILESIZE - cameraY, _tiles[idX][idY].terrainNum.x, _tiles[idX][idY].terrainNum.y);
+				_imgTiles[idX][idY]->frameRender(getMemDC(), idX*TILESIZE - cameraX, idY*TILESIZE - cameraY, _tiles[idX][idY].terrainNum.x, _tiles[idX][idY].terrainNum.y);
 			}
 			else
 			{
-				_imgTiles[idX][idY]->frameRender(getMemDC(), idX*MAPTOOL_TILESIZE - cameraX, idY*MAPTOOL_TILESIZE - cameraY, _tiles[idX][idY].terrainNum.x, _tiles[idX][idY].terrainNum.y);
+				_imgTiles[idX][idY]->frameRender(getMemDC(), idX*TILESIZE - cameraX, idY*TILESIZE - cameraY, _tiles[idX][idY].terrainNum.x, _tiles[idX][idY].terrainNum.y);
 			}
 
 		}
@@ -1538,13 +1542,13 @@ void sceneMaptool::renderDragingIsoTiles(void)
 {
 	if (_isClicked == true && _endDrag == false)
 	{
-		HPEN oldPen = (HPEN)SelectObject(getMemDC(), _gPen[PENVERSION_BLUE]);
+		HPEN oldPen = (HPEN)SelectObject(getMemDC(), _gPen[PENVERSION_BLUE2]);
 
 		for (int i = 0; i < _vDragInfo.size(); i++)
 		{
 			POINT temp;
-			temp.x = (_vDragInfo[i].x) * MAPTOOL_TILESIZE - MAINCAMERA->getCameraX();
-			temp.y = (_vDragInfo[i].y) * MAPTOOL_TILESIZE - MAINCAMERA->getCameraY();
+			temp.x = (_vDragInfo[i].x) * TILESIZE - MAINCAMERA->getCameraX();
+			temp.y = (_vDragInfo[i].y) * TILESIZE - MAINCAMERA->getCameraY();
 
 			LineMake(getMemDC(), temp.x - ISOTILE_HALF_WIDTH, temp.y, temp.x, temp.y - ISOTILE_HALF_HEIGHT);
 			LineMake(getMemDC(), temp.x - ISOTILE_HALF_WIDTH, temp.y, temp.x, temp.y + ISOTILE_HALF_HEIGHT);
@@ -1573,8 +1577,8 @@ void sceneMaptool::renderObject(void)
 	int cameraX = MAINCAMERA->getCameraX();
 	int cameraY = MAINCAMERA->getCameraY();
 
-	int cameraIdX = cameraX / MAPTOOL_TILESIZE - 1;
-	int cameraIdY = cameraY / MAPTOOL_TILESIZE - 1;
+	int cameraIdX = cameraX / TILESIZE - 1;
+	int cameraIdY = cameraY / TILESIZE - 1;
 
 	//±ò·Á ÀÖ´Â ¿ÀºêÁ§Æ®
 	for (int y = 0; y < MAPTOOL_TILEVIEWY + 2; y++)
@@ -1600,19 +1604,19 @@ void sceneMaptool::renderObject(void)
 				if (_tiles[idX][idY].nrAmount >= 1500)	mineralFrameY = 0;
 				else									mineralFrameY = 3 - _tiles[idX][idY].nrAmount / 500;
 
-				IMAGEMANAGER->frameRender(L"NeutralResource-Mineral1", getMemDC(), _tiles[idX][idY].rc.left - cameraX, _tiles[idX][idY].rc.top - MAPTOOL_TILESIZE - cameraY, 0, mineralFrameY);
+				IMAGEMANAGER->frameRender(L"NeutralResource-Mineral1", getMemDC(), _tiles[idX][idY].rc.left - cameraX, _tiles[idX][idY].rc.top - TILESIZE - cameraY, 0, mineralFrameY);
 				break;
 			case OBJECT_MINERAL2_START:
 				if (_tiles[idX][idY].nrAmount >= 1500)	mineralFrameY = 0;
 				else									mineralFrameY = 3 - _tiles[idX][idY].nrAmount / 500;
 
-				IMAGEMANAGER->frameRender(L"NeutralResource-Mineral2", getMemDC(), _tiles[idX][idY].rc.left - cameraX, _tiles[idX][idY].rc.top - MAPTOOL_TILESIZE - cameraY, 0, mineralFrameY);
+				IMAGEMANAGER->frameRender(L"NeutralResource-Mineral2", getMemDC(), _tiles[idX][idY].rc.left - cameraX, _tiles[idX][idY].rc.top - TILESIZE - cameraY, 0, mineralFrameY);
 				break;
 			case OBJECT_MINERAL3_START:
 				if (_tiles[idX][idY].nrAmount >= 1500)	mineralFrameY = 0;
 				else									mineralFrameY = 3 - _tiles[idX][idY].nrAmount / 500;
 
-				IMAGEMANAGER->frameRender(L"NeutralResource-Mineral3", getMemDC(), _tiles[idX][idY].rc.left - cameraX, _tiles[idX][idY].rc.top - MAPTOOL_TILESIZE - cameraY, 0, mineralFrameY);
+				IMAGEMANAGER->frameRender(L"NeutralResource-Mineral3", getMemDC(), _tiles[idX][idY].rc.left - cameraX, _tiles[idX][idY].rc.top - TILESIZE - cameraY, 0, mineralFrameY);
 				break;
 			case OBJECT_GAS_START:
 				IMAGEMANAGER->render(L"NeutralResource-Gas", getMemDC(), _tiles[idX][idY].rc.left - cameraX, _tiles[idX][idY].rc.top - cameraY);
@@ -1636,7 +1640,7 @@ void sceneMaptool::renderObject(void)
 	switch (_curObject)
 	{
 	case SAMPLEOBJECT_MINERAL:
-		_imgObject->frameRender(getMemDC(), _tiles[_cursorTile.x][_cursorTile.y].rc.left - cameraX, _tiles[_cursorTile.x][_cursorTile.y].rc.top - MAPTOOL_TILESIZE - cameraY, 0, 0);
+		_imgObject->frameRender(getMemDC(), _tiles[_cursorTile.x][_cursorTile.y].rc.left - cameraX, _tiles[_cursorTile.x][_cursorTile.y].rc.top - TILESIZE - cameraY, 0, 0);
 		width  = OBJ_MINERAL_WIDTH;
 		height = OBJ_MINERAL_HEIGHT;
 		break;
@@ -1701,7 +1705,7 @@ void sceneMaptool::renderSideWindow(void)
 		if (_curTerrain == (SAMPLETERRAIN)i)
 		{
 			RECT rcTemp = _rcSelectTerrain[i];
-			HPEN oldPen = (HPEN)SelectObject(getMemDC(), _gPen[PENVERSION_BLUE]);
+			HPEN oldPen = (HPEN)SelectObject(getMemDC(), _gPen[PENVERSION_BLUE2]);
 			LineToRect(getMemDC(), _rcSelectTerrain[i], 2);
 			SelectObject(getMemDC(), oldPen);
 		}
@@ -1715,7 +1719,7 @@ void sceneMaptool::renderSideWindow(void)
 
 		if (_curObject == (SAMPLEOBJECT)i)
 		{
-			HPEN oldPen = (HPEN)SelectObject(getMemDC(), _gPen[PENVERSION_BLUE]);
+			HPEN oldPen = (HPEN)SelectObject(getMemDC(), _gPen[PENVERSION_BLUE2]);
 			LineToRect(getMemDC(), _rcSelectObject[i], 2);
 			SelectObject(getMemDC(), oldPen);
 		}

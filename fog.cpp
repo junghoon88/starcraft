@@ -23,7 +23,7 @@ HRESULT fog::init(void)
 	{
 		for (int x = 0; x < TILEX; x++)
 		{
-			_fogs[x][y].rcFog = RectMake(x*GAMEMAP_TILESIZE, y*GAMEMAP_TILESIZE, GAMEMAP_TILESIZE, GAMEMAP_TILESIZE);
+			_fogs[x][y].rcFog = RectMake(x*TILESIZE, y*TILESIZE, TILESIZE, TILESIZE);
 		}
 	}
 
@@ -43,8 +43,8 @@ void fog::render(void)
 	int cameraX = MAINCAMERA->getCameraX();
 	int cameraY = MAINCAMERA->getCameraY();
 
-	int cameraIdX = cameraX / GAMEMAP_TILESIZE - 1;
-	int cameraIdY = cameraY / GAMEMAP_TILESIZE - 1;
+	int cameraIdX = cameraX / TILESIZE - 1;
+	int cameraIdY = cameraY / TILESIZE - 1;
 
 	for (int y = 0; y < GAMEMAP_TILEVIEWY + 2; y++)
 	{
@@ -60,7 +60,7 @@ void fog::render(void)
 			
 			if (_imgFog == NULL) continue;
 
-			_imgFog->render(getMemDC(), idX*GAMEMAP_TILESIZE - cameraX, idY*GAMEMAP_TILESIZE - cameraY);
+			_imgFog->render(getMemDC(), idX*TILESIZE - cameraX, idY*TILESIZE - cameraY);
 		}
 	}
 }

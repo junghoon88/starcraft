@@ -11,7 +11,7 @@ zbLair::~zbLair()
 {
 }
 
-HRESULT zbLair::init(void)
+HRESULT zbLair::init(POINT ptTIle)
 {
 
 	return S_OK;

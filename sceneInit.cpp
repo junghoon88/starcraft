@@ -22,6 +22,7 @@ HRESULT sceneInit::init(void)
 	initImage();
 	initSound();
 
+
 	return S_OK;
 }
 
@@ -63,6 +64,7 @@ void sceneInit::initImage(void)
 	initImageInterface();
 
 	initImageZergUnits();
+	initImageZergBuildings();
 }
 
 void sceneInit::initSound(void)
@@ -75,7 +77,7 @@ void sceneInit::initImageNeutralResource(void)
 	_loading->loadFrameImage(L"NeutralResource-Mineral1", L"image/neutral/min01.bmp", 64, 384, 1, 4, true, RGB(255, 0, 255));
 	_loading->loadFrameImage(L"NeutralResource-Mineral2", L"image/neutral/min02.bmp", 64, 384, 1, 4, true, RGB(255, 0, 255));
 	_loading->loadFrameImage(L"NeutralResource-Mineral3", L"image/neutral/min03.bmp", 64, 384, 1, 4, true, RGB(255, 0, 255));
-	_loading->loadImage(L"NeutralResource-Gas", L"image/neutral/gas.bmp", MAPTOOL_TILESIZE * 4, MAPTOOL_TILESIZE * 2, true, RGB(255, 0, 255));
+	_loading->loadImage(L"NeutralResource-Gas", L"image/neutral/gas.bmp", TILESIZE * 4, TILESIZE * 2, true, RGB(255, 0, 255));
 }
 
 void sceneInit::initImageMaptoolTiles(void)
@@ -88,37 +90,37 @@ void sceneInit::initImageMaptoolTiles(void)
 	_loading->loadFrameImage(L"maptool-terrain-Dirt", L"image/maptool/tiles/terrain-Dirt/terrainDirt.bmp", 768, 640, 24, 20);
 
 	//terrain-HighDirt
-	_loading->loadFrameImage(L"maptool-terrain-HighDirt", L"image/maptool/tiles/terrain-HighDirt/IDLE3x2.bmp", MAPTOOL_TILESIZE*3, MAPTOOL_TILESIZE*2, 3, 2);
+	_loading->loadFrameImage(L"maptool-terrain-HighDirt", L"image/maptool/tiles/terrain-HighDirt/IDLE3x2.bmp", TILESIZE*3, TILESIZE*2, 3, 2);
 
-	_loading->loadFrameImage(L"maptool-terrain-HighDirt-LD", L"image/maptool/tiles/terrain-HighDirt/LD2x3.bmp", MAPTOOL_TILESIZE * 2, MAPTOOL_TILESIZE * 3, 2, 3);
-	_loading->loadFrameImage(L"maptool-terrain-HighDirt-LF", L"image/maptool/tiles/terrain-HighDirt/LF2x3.bmp", MAPTOOL_TILESIZE * 2, MAPTOOL_TILESIZE * 3, 2, 3);
-	_loading->loadFrameImage(L"maptool-terrain-HighDirt-LU", L"image/maptool/tiles/terrain-HighDirt/LU2x2.bmp", MAPTOOL_TILESIZE * 2, MAPTOOL_TILESIZE * 2, 2, 2);
+	_loading->loadFrameImage(L"maptool-terrain-HighDirt-LD", L"image/maptool/tiles/terrain-HighDirt/LD2x3.bmp", TILESIZE * 2, TILESIZE * 3, 2, 3);
+	_loading->loadFrameImage(L"maptool-terrain-HighDirt-LF", L"image/maptool/tiles/terrain-HighDirt/LF2x3.bmp", TILESIZE * 2, TILESIZE * 3, 2, 3);
+	_loading->loadFrameImage(L"maptool-terrain-HighDirt-LU", L"image/maptool/tiles/terrain-HighDirt/LU2x2.bmp", TILESIZE * 2, TILESIZE * 2, 2, 2);
 
-	_loading->loadFrameImage(L"maptool-terrain-HighDirt-RD", L"image/maptool/tiles/terrain-HighDirt/RD2x3.bmp", MAPTOOL_TILESIZE * 2, MAPTOOL_TILESIZE * 3, 2, 3);
-	_loading->loadFrameImage(L"maptool-terrain-HighDirt-RG", L"image/maptool/tiles/terrain-HighDirt/RG2x3.bmp", MAPTOOL_TILESIZE * 2, MAPTOOL_TILESIZE * 3, 2, 3);
-	_loading->loadFrameImage(L"maptool-terrain-HighDirt-RU", L"image/maptool/tiles/terrain-HighDirt/RU2x2.bmp", MAPTOOL_TILESIZE * 2, MAPTOOL_TILESIZE * 2, 2, 2);
+	_loading->loadFrameImage(L"maptool-terrain-HighDirt-RD", L"image/maptool/tiles/terrain-HighDirt/RD2x3.bmp", TILESIZE * 2, TILESIZE * 3, 2, 3);
+	_loading->loadFrameImage(L"maptool-terrain-HighDirt-RG", L"image/maptool/tiles/terrain-HighDirt/RG2x3.bmp", TILESIZE * 2, TILESIZE * 3, 2, 3);
+	_loading->loadFrameImage(L"maptool-terrain-HighDirt-RU", L"image/maptool/tiles/terrain-HighDirt/RU2x2.bmp", TILESIZE * 2, TILESIZE * 2, 2, 2);
 
 	//terrain-Water
 	for (int i = 0; i < 1; i++)
 	{
 		_stprintf(strKey, L"maptool-terrain-Water-%02d", i);
 		_stprintf(strFile, L"image/maptool/tiles/terrain-Water/%02d.bmp", i);
-		_loading->loadFrameImage(strKey, strFile, MAPTOOL_TILESIZE, MAPTOOL_TILESIZE, 1, 1);
+		_loading->loadFrameImage(strKey, strFile, TILESIZE, TILESIZE, 1, 1);
 	}
 
 	//icon
-	_loading->loadImage(L"maptool-icon-Mineral",	L"image/maptool/iconMineral.bmp",		MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
-	_loading->loadImage(L"maptool-icon-Gas",		L"image/maptool/iconGas.bmp",			MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
-	_loading->loadImage(L"maptool-icon-LocationP1", L"image/maptool/iconLocationP1.bmp",	MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
-	_loading->loadImage(L"maptool-icon-LocationP2", L"image/maptool/iconLocationP2.bmp",	MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
-	_loading->loadImage(L"maptool-icon-iconEraser", L"image/maptool/iconEraser.bmp",		MAPTOOL_TILESIZE, MAPTOOL_TILESIZE);
+	_loading->loadImage(L"maptool-icon-Mineral",	L"image/maptool/iconMineral.bmp",		TILESIZE, TILESIZE);
+	_loading->loadImage(L"maptool-icon-Gas",		L"image/maptool/iconGas.bmp",			TILESIZE, TILESIZE);
+	_loading->loadImage(L"maptool-icon-LocationP1", L"image/maptool/iconLocationP1.bmp",	TILESIZE, TILESIZE);
+	_loading->loadImage(L"maptool-icon-LocationP2", L"image/maptool/iconLocationP2.bmp",	TILESIZE, TILESIZE);
+	_loading->loadImage(L"maptool-icon-iconEraser", L"image/maptool/iconEraser.bmp",		TILESIZE, TILESIZE);
 
 	//object
-	_loading->loadImage(L"maptool-object-LocationP1", L"image/maptool/location-p1.bmp", MAPTOOL_TILESIZE * 4, MAPTOOL_TILESIZE * 3, true, RGB(255, 0, 255));
-	_loading->loadImage(L"maptool-object-LocationP2", L"image/maptool/location-p2.bmp", MAPTOOL_TILESIZE * 4, MAPTOOL_TILESIZE * 3, true, RGB(255, 0, 255));
+	_loading->loadImage(L"maptool-object-LocationP1", L"image/maptool/location-p1.bmp", TILESIZE * 4, TILESIZE * 3, true, RGB(255, 0, 255));
+	_loading->loadImage(L"maptool-object-LocationP2", L"image/maptool/location-p2.bmp", TILESIZE * 4, TILESIZE * 3, true, RGB(255, 0, 255));
 
-	_loading->loadImage(L"maptool-object-enableTile",  L"image/maptool/tiles/enableTile.bmp", MAPTOOL_TILESIZE, MAPTOOL_TILESIZE, false, RGB(0, 0, 0), true);
-	_loading->loadImage(L"maptool-object-disableTile", L"image/maptool/tiles/disableTile.bmp", MAPTOOL_TILESIZE, MAPTOOL_TILESIZE, false, RGB(0, 0, 0), true);
+	_loading->loadImage(L"maptool-object-enableTile",  L"image/maptool/tiles/enableTile.bmp", TILESIZE, TILESIZE, false, RGB(0, 0, 0), true);
+	_loading->loadImage(L"maptool-object-disableTile", L"image/maptool/tiles/disableTile.bmp", TILESIZE, TILESIZE, false, RGB(0, 0, 0), true);
 
 }
 
@@ -127,13 +129,17 @@ void sceneInit::initImageGamemapTiles(void)
 	TCHAR strKey[128] = L"";
 	TCHAR strFile[128] = L"";
 
-	_loading->loadImage(L"gamemap-fog", L"image/gamemap/fog.bmp", GAMEMAP_TILESIZE, GAMEMAP_TILESIZE, false, RGB(0, 0, 0), true);
+	_loading->loadImage(L"gamemap-fog", L"image/gamemap/fog.bmp", TILESIZE, TILESIZE, false, RGB(0, 0, 0), true);
 
 
 }
 
 void sceneInit::initImageInterface(void)
 {
+	//progressbar
+	_loading->loadImage(L"frontBarMutating", L"image/interface/progressbarF.bmp", 107, 9, true, RGB(255, 0, 255));
+	_loading->loadImage(L"backBarMutating",  L"image/interface/progressbarB.bmp", 107, 9);
+
 	//cursor
 	_loading->loadFrameImage(L"cursor-Idle",			L"image/interface/cursor-Idle.bmp",			100, 21, 5, 1, true, RGB(255, 0, 255));
 	_loading->loadImage(L"cursor-Dragging",				L"image/interface/cursor-Dragging.bmp",		 18, 22, true, RGB(255, 0, 255));
@@ -172,6 +178,10 @@ void sceneInit::initImageInterface(void)
 	_loading->loadFrameImage(L"command-returncargo",			  L"image/interface/command/returncargo.bmp",				 COMMAND_WIDTH * 3, COMMAND_HEIGHT, 3, 1, true, RGB(0, 0, 0));
 	_loading->loadFrameImage(L"command-build1",					  L"image/interface/command/build1.bmp",					 COMMAND_WIDTH * 3, COMMAND_HEIGHT, 3, 1, true, RGB(0, 0, 0));
 	_loading->loadFrameImage(L"command-build2",					  L"image/interface/command/build2.bmp",					 COMMAND_WIDTH * 3, COMMAND_HEIGHT, 3, 1, true, RGB(0, 0, 0));
+
+	_loading->loadFrameImage(L"command-select_larva",			  L"image/interface/command/select_larva.bmp",				 COMMAND_WIDTH * 3, COMMAND_HEIGHT, 3, 1, true, RGB(0, 0, 0));
+	_loading->loadFrameImage(L"command-set_rally_point",		  L"image/interface/command/set_rally_point.bmp",			 COMMAND_WIDTH * 3, COMMAND_HEIGHT, 3, 1, true, RGB(0, 0, 0));
+
 																										 
 	//ZERG
 	_loading->loadFrameImage(L"command-burrow",					  L"image/interface/command/burrow.bmp",					 COMMAND_WIDTH * 3, COMMAND_HEIGHT, 3, 1, true, RGB(0, 0, 0));
@@ -257,18 +267,157 @@ void sceneInit::initImageZergUnits(void)
 	//Body---------------------------------------------------------------------------------------------------------------------------------
 	for (int i = 0; i < PLAYER_NUM; i++)
 	{
+		//larva
+		_stprintf(strKey, L"ZU-larvaBody%d", i);
+		_stprintf(strFile, L"image/zerg/unit/larva/larvaBody%d.bmp", i);
+		_loading->loadFrameImage(strKey, strFile, 288, 36, 8, 1, true, RGB(0, 255, 255));
+
+		//zergegg
+		_stprintf(strKey, L"ZU-zergeggBody%d", i);
+		_stprintf(strFile, L"image/zerg/unit/zergegg/zergeggBody%d.bmp", i);
+		_loading->loadFrameImage(strKey, strFile, 960, 96, 10, 1, true, RGB(0, 255, 255));
+
 		//drone
 		_stprintf(strKey, L"ZU-droneBody%d", i);
 		_stprintf(strFile, L"image/zerg/unit/drone/droneBody%d.bmp", i);
 		_loading->loadFrameImage(strKey, strFile, 576, 1008, 8, 14, true, RGB(255, 0, 255));
 
-
 	}
 
+
+
 	//Stat---------------------------------------------------------------------------------------------------------------------------------
+	//larva
+	_loading->loadImage(L"ZU-larvaStat1", L"image/zerg/unit/larva/larvaStat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZU-larvaStat2", L"image/zerg/unit/larva/larvaStat2.bmp", 33, 34);
+
+	//zergegg
+	_loading->loadImage(L"ZU-zergeggStat1", L"image/zerg/unit/zergegg/zergeggStat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZU-zergeggStat2", L"image/zerg/unit/zergegg/zergeggStat2.bmp", 33, 34);
+
+
 	//drone
-	_loading->loadFrameImage(L"ZU-droneStat1", L"image/zerg/unit/drone/droneStat1.bmp", 59, 51, 1, 1, true, RGB(255, 0, 255));
-	_loading->loadFrameImage(L"ZU-droneStat2", L"image/zerg/unit/drone/droneStat2.bmp", 33, 34, 1, 1);
+	_loading->loadImage(L"ZU-droneStat1", L"image/zerg/unit/drone/droneStat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZU-droneStat2", L"image/zerg/unit/drone/droneStat2.bmp", 33, 34);
+
+	//zergling
+	_loading->loadImage(L"ZU-zerglingStat1", L"image/zerg/unit/zergling/zerglingStat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZU-zerglingStat2", L"image/zerg/unit/zergling/zerglingStat2.bmp", 33, 34);
+
+	//hydralisk
+	_loading->loadImage(L"ZU-hydraliskStat1", L"image/zerg/unit/hydralisk/hydraliskStat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZU-hydraliskStat2", L"image/zerg/unit/hydralisk/hydraliskStat2.bmp", 33, 34);
+
+
+	//lurker
+	_loading->loadImage(L"ZU-lurkerStat1", L"image/zerg/unit/lurker/lurkerStat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZU-lurkerStat2", L"image/zerg/unit/lurker/lurkerStat2.bmp", 33, 34);
+
+	//lurkeregg
+	_loading->loadImage(L"ZU-lurkereggStat1", L"image/zerg/unit/lurkeregg/lurkereggStat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZU-lurkereggStat2", L"image/zerg/unit/lurkeregg/lurkereggStat2.bmp", 33, 34);
+
+	//ultralisk
+	_loading->loadImage(L"ZU-ultraliskStat1", L"image/zerg/unit/ultralisk/ultraliskStat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZU-ultraliskStat2", L"image/zerg/unit/ultralisk/ultraliskStat2.bmp", 33, 34);
+
+	//broodling
+	_loading->loadImage(L"ZU-broodlingStat1", L"image/zerg/unit/broodling/broodlingStat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZU-broodlingStat2", L"image/zerg/unit/broodling/broodlingStat2.bmp", 33, 34);
+
+	//defiler
+	_loading->loadImage(L"ZU-defilerStat1", L"image/zerg/unit/defiler/defilerStat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZU-defilerStat2", L"image/zerg/unit/defiler/defilerStat2.bmp", 33, 34);
+
+	//infestedterran
+
+	//overlord
+	_loading->loadImage(L"ZU-overlordStat1", L"image/zerg/unit/overlord/overlordStat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZU-overlordStat2", L"image/zerg/unit/overlord/overlordStat2.bmp", 33, 34);
+
+	//mutalisk
+	_loading->loadImage(L"ZU-mutaliskStat1", L"image/zerg/unit/mutalisk/mutaliskStat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZU-mutaliskStat2", L"image/zerg/unit/mutalisk/mutaliskStat2.bmp", 33, 34);
+
+	//scourge
+	_loading->loadImage(L"ZU-scourgeStat1", L"image/zerg/unit/scourge/scourgeStat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZU-scourgeStat2", L"image/zerg/unit/scourge/scourgeStat2.bmp", 33, 34);
+
+	//queen
+	_loading->loadImage(L"ZU-queenStat1", L"image/zerg/unit/queen/queenStat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZU-queenStat2", L"image/zerg/unit/queen/queenStat2.bmp", 33, 34);
+
+	//cocoon
+	_loading->loadImage(L"ZU-cocoonStat1", L"image/zerg/unit/cocoon/cocoonStat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZU-cocoonStat2", L"image/zerg/unit/cocoon/cocoonStat2.bmp", 33, 34);
+
+	//guadian
+	_loading->loadImage(L"ZU-guadianStat1", L"image/zerg/unit/guadian/guadianStat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZU-guadianStat2", L"image/zerg/unit/guadian/guadianStat2.bmp", 33, 34);
+
+	//devourer
+	_loading->loadImage(L"ZU-devourerStat1", L"image/zerg/unit/devourer/devourerStat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZU-devourerStat2", L"image/zerg/unit/devourer/devourerStat2.bmp", 33, 34);
+
 
 }
 
+void sceneInit::initImageZergBuildings(void)
+{
+	_loading->loadFrameImage(L"ZB-MutatingBody1", L"image/zerg/build/morphing/zbuild1.bmp", 1760, 192, 11, 1, true, RGB(0, 255, 255));
+	_loading->loadFrameImage(L"ZB-MutatingBody2", L"image/zerg/build/morphing/zbuild2.bmp", 1760, 192, 11, 1, true, RGB(0, 255, 255));
+	_loading->loadFrameImage(L"ZB-MutatingBody3", L"image/zerg/build/morphing/zbuild3.bmp", 1760, 192, 11, 1, true, RGB(0, 255, 255));
+
+	//hatchery
+	_loading->loadFrameImage(L"ZB-hatcheryBody", L"image/zerg/build/hatchery/hatcheryBody.bmp", 192, 960, 1, 6, true, RGB(0, 255, 255)); //6, 5 타일이미지이고 실제 크기는 4,3 임
+	_loading->loadImage(L"ZB-hatcheryStat1", L"image/zerg/build/hatchery/hatcheryStat1.bmp", 89, 96, true, RGB(255, 0, 255));
+
+
+	//lair
+	_loading->loadImage(L"ZB-lairStat1", L"image/zerg/build/lair/lairStat1.bmp", 89, 96, true, RGB(255, 0, 255));
+
+	//hive
+	_loading->loadImage(L"ZB-hiveStat1", L"image/zerg/build/hive/hiveStat1.bmp", 89, 96, true, RGB(255, 0, 255));
+
+	//creepcolony
+	_loading->loadImage(L"ZB-creepcolonyStat1", L"image/zerg/build/creepcolony/creepcolonyStat1.bmp", 89, 96, true, RGB(255, 0, 255));
+
+	//sunkencolony
+	_loading->loadImage(L"ZB-sunkencolonyStat1", L"image/zerg/build/sunkencolony/sunkencolonyStat1.bmp", 89, 96, true, RGB(255, 0, 255));
+
+	//sporecolony
+	_loading->loadImage(L"ZB-sporecolonyStat1", L"image/zerg/build/sporecolony/sporecolonyStat1.bmp", 89, 96, true, RGB(255, 0, 255));
+
+	//extractor
+	_loading->loadImage(L"ZB-extractorStat1", L"image/zerg/build/extractor/extractorStat1.bmp", 89, 96, true, RGB(255, 0, 255));
+
+	//spawningpool
+	_loading->loadImage(L"ZB-spawningpoolStat1", L"image/zerg/build/spawningpool/spawningpoolStat1.bmp", 89, 96, true, RGB(255, 0, 255));
+
+	//evolutionchamber
+	_loading->loadImage(L"ZB-evolutionchamberStat1", L"image/zerg/build/evolutionchamber/evolutionchamberStat1.bmp", 89, 96, true, RGB(255, 0, 255));
+
+	//hydraliskden
+	_loading->loadImage(L"ZB-hydraliskdenStat1", L"image/zerg/build/hydraliskden/hydraliskdenStat1.bmp", 89, 96, true, RGB(255, 0, 255));
+
+	//spire
+	_loading->loadImage(L"ZB-spireStat1", L"image/zerg/build/spire/spireStat1.bmp", 89, 96, true, RGB(255, 0, 255));
+
+	//greaterspire
+	_loading->loadImage(L"ZB-greaterspireStat1", L"image/zerg/build/greaterspire/greaterspireStat1.bmp", 89, 96, true, RGB(255, 0, 255));
+
+	//queensnest
+	_loading->loadImage(L"ZB-queensnestStat1", L"image/zerg/build/queensnest/queensnestStat1.bmp", 89, 96, true, RGB(255, 0, 255));
+
+	//nyduscanal
+	_loading->loadImage(L"ZB-nyduscanalStat1", L"image/zerg/build/nyduscanal/nyduscanalStat1.bmp", 89, 96, true, RGB(255, 0, 255));
+
+	//ultraliskcavern
+	_loading->loadImage(L"ZB-ultraliskcavernStat1", L"image/zerg/build/ultraliskcavern/ultraliskcavernStat1.bmp", 89, 96, true, RGB(255, 0, 255));
+
+	//defilermound
+	_loading->loadImage(L"ZB-defilermoundStat1", L"image/zerg/build/defilermound/defilermoundStat1.bmp", 89, 96, true, RGB(255, 0, 255));
+
+	//infestedcommandcenter
+
+}

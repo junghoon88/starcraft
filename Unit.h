@@ -1,5 +1,5 @@
 #pragma once
-#include "gameNode.h"
+#include "gameObject.h"
 #include "zergUpgrade.h"
 
 #include "aStar.h"
@@ -8,13 +8,6 @@
 class Building;
 class Unit;
 
-enum UNITSTATE
-{
-	UNITSTATE_STOP,
-	UNITSTATE_MOVE,
-	UNITSTATE_ATTACK,
-	//UNITSTATE_ATTACK
-};
 
 struct tagUnitBaseStatus
 {
@@ -123,33 +116,16 @@ struct tagUnitBattleStatus
 
 };
 
-class Unit : public gameNode
+class Unit : public gameObject
 {
 	//전역변수처럼 Unit 정보들을 담아놓고 원할때 자식클래스에서 받아오도록 한다.
 private:
-	static POINT		_zuBodySize[UNITNUM_ZERG_MAX];
+	//static POINT		_zuBodySize[UNITNUM_ZERG_MAX];
 
-
-protected:
-	//유닛 고유 번호를 입력받는다. 
-	//셋 중 하나는 값이 있어야하며
-	//셋 다 -1 값이 -1이면 에러
-	UNITNUM_ZERG		_unitNumZ;
-	UNITNUM_TERRAN		_unitNumT;
-	UNITNUM_PROTOSS		_unitNumP;
-
-	//기본속성과 실시간속성으로 나누자!
-	tagUnitBaseStatus	_baseStatus;
-	tagUnitBattleStatus	_battleStatus;
-	
-	zergUpgrade*		_zergUpgrade;
-
-	aStar*				_aStar;
-	vTile				_vCloseList;	//A* 에서 계산되서 받은 타일들
 
 
 public:
-	Unit(bool initUnitInfo);
+	//Unit(bool initUnitInfo);
 	Unit();
 	~Unit();
 
@@ -165,12 +141,8 @@ public:
 
 
 	//커맨드를 처리한다.
-	void procCommands(void);
+	virtual void procCommands(void);
 
-	void receiveCommand(COMMAND cmd);
-	void receiveCommand(COMMAND cmd, POINT pt);
-	void receiveCommand(COMMAND cmd, Unit* unit);
-	void receiveCommand(COMMAND cmd, Building* building);
 
 	void moveGround(void);
 	void moveAir(void);
@@ -185,28 +157,15 @@ public:
 
 
 public:
-	inline void setLinkAdressZergUpgrade(zergUpgrade* zergUpgrade) { _zergUpgrade = zergUpgrade; }
-	inline void setLinkAdressAstar(aStar* astar) { _aStar = astar; }
 
 
-	inline UNITNUM_ZERG		getUnitnumZerg(void) { return _unitNumZ; }
-	inline UNITNUM_TERRAN	getUnitnumTerran(void) { return _unitNumT; }
-	inline UNITNUM_PROTOSS	getUnitnumProtoss(void) { return _unitNumP; }
 
 
-	inline POINT getZuBodySize(UNITNUM_ZERG num) { return _zuBodySize[num]; }
-
-	inline tagUnitBaseStatus getBaseStatus(void) { return _baseStatus; }
-	inline tagUnitBattleStatus getBattleStatus(void) { return _battleStatus; }
-
-	//A* 관련
-	inline BOOL getIsBusy(void) { return _battleStatus.isBusy; }
-	inline void setIsBusy(BOOL busy) { _battleStatus.isBusy = busy; }
-	inline void setCalcAstar(BOOL calc) { _battleStatus.calcAstar = calc; }
-	inline void setVCloseList(vTile list) { _vCloseList = list; }
+	//inline POINT getZuBodySize(UNITNUM_ZERG num) { return _zuBodySize[num]; }
 
 
-	inline void setClicked(BOOL clicked) { _battleStatus.clicked = clicked; }
+
+
 
 };
 typedef vector<Unit*>					vUnits;

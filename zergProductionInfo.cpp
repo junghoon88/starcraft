@@ -1,10 +1,10 @@
 #include "stdafx.h"
-#include "zergProduction.h"
+#include "zergProductionInfo.h"
 
-tagProduction zergProduction::_zuProduction[UNITNUM_ZERG_MAX];
-tagProduction zergProduction::_zbProduction[BUILDINGNUM_ZERG_MAX];
+tagProduction zergProductionInfo::_zuProduction[UNITNUM_ZERG_MAX];
+tagProduction zergProductionInfo::_zbProduction[BUILDINGNUM_ZERG_MAX];
 
-zergProduction::zergProduction(bool initInfo)
+zergProductionInfo::zergProductionInfo(bool initInfo)
 {
 	if (!initInfo) return;
 
@@ -21,7 +21,6 @@ zergProduction::zergProduction(bool initInfo)
 				_zuProduction[i].costGas = 0;			//소모 가스
 				_zuProduction[i].control = 1.0f;		//인구수
 				_zuProduction[i].buildTime = 20.0f;		//빌드시간
-				_zuProduction[i].hotKey = 'D';			//단축키
 				break;
 			case UNITNUM_ZERG_ZERGLING: 
 				break;
@@ -62,6 +61,10 @@ zergProduction::zergProduction(bool initInfo)
 		{
 			//BUILD1
 			case BUILDINGNUM_ZERG_HATCHERY:
+				_zbProduction[i].costMinerals = 300;		//소모 미네랄
+				_zbProduction[i].costGas = 0;			//소모 가스
+				_zbProduction[i].control = 0.0f;		//인구수
+				_zbProduction[i].buildTime = 120.0f;		//빌드시간
 				break;
 			case BUILDINGNUM_ZERG_LAIR:
 				break;
@@ -106,18 +109,14 @@ zergProduction::zergProduction(bool initInfo)
 }
 
 
-zergProduction::zergProduction()
+zergProductionInfo::zergProductionInfo()
 {
 }
 
 
-zergProduction::~zergProduction()
+zergProductionInfo::~zergProductionInfo()
 {
 
 }
 
 
-//tagProduction zergProduction::getZUProduction(UNITNUM_ZERG num)
-//{
-//	return _zuProduction[num]; 
-//}

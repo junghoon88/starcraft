@@ -30,10 +30,6 @@ void Unit::procCommands(void)
 		break;
 	case COMMAND_RETURNCARGO:
 		break;
-	case COMMAND_BUILD1:
-		break;
-	case COMMAND_BUILD2:
-		break;
 	case COMMAND_BURROW:
 		break;
 	case COMMAND_UNBURROW:
@@ -52,6 +48,74 @@ void Unit::procCommands(void)
 		break;
 	case COMMAND_PLAGUE:
 		break;
+
+		//드론에서 처리함--------
+		//BUILD1
+	//case COMMAND_BUILD_HATCHERY:
+	//case COMMAND_BUILD_LAIR:
+	//case COMMAND_BUILD_HIVE:
+	//case COMMAND_BUILD_CREEPCOLONY:
+	//case COMMAND_BUILD_SUNKENCOLONY:
+	//case COMMAND_BUILD_SPORECOLONY:
+	//case COMMAND_BUILD_EXTRACTOR:
+	//case COMMAND_BUILD_SPAWNINGPOOL:
+	//case COMMAND_BUILD_EVOLUTIONCHAMBER:
+	//case COMMAND_BUILD_HYDRALISKDEN:
+		//BUILD2
+	//case COMMAND_BUILD_SPIRE:
+	//case COMMAND_BUILD_GREATERSPIRE:
+	//case COMMAND_BUILD_QUEENSNEST:
+	//case COMMAND_BUILD_NYDUSCANAL:
+	//case COMMAND_BUILD_ULTRALISKCAVERN:
+	//case COMMAND_BUILD_DEFILERMOUND:
+	//	break;
+		//--------드론에서 처리함
+
+		//UNIT
+		//라바에서 처리함--------
+	//case COMMAND_UNIT_DRONE:
+	//case COMMAND_UNIT_ZERGLING:
+	//case COMMAND_UNIT_OVERLORD:
+	//case COMMAND_UNIT_HYDRALISK:
+	//case COMMAND_UNIT_MUTALISK:
+	//case COMMAND_UNIT_SCOURGE:
+	//case COMMAND_UNIT_QUEEN:
+	//case COMMAND_UNIT_ULTRALISK:
+	//case COMMAND_UNIT_DEFILER:
+	//--------라바에서 처리함
+
+		//UNIT2
+	case COMMAND_UNIT_LURKER:
+	case COMMAND_UNIT_GUADIAN:
+	case COMMAND_UNIT_DEVOURER:
+	case COMMAND_UNIT_INFESTEDTERRAN:
+
+		//UPGRADE
+	case COMMAND_UPGRADE_ZERG_MELEEATTACKS:		//저그 지상유닛 근접 공격
+	case COMMAND_UPGRADE_ZERG_MISSILEATTACKS:	//저그 지상유닛 원거리 공격
+	case COMMAND_UPGRADE_ZERG_CARAPACE:			//저그 지상유닛 방어력
+	case COMMAND_UPGRADE_ZERG_FLYERATTACKS:		//저그 공중유닛 공격
+	case COMMAND_UPGRADE_ZERG_FLYERCARAPACE:		//저그 공중유닛 방어력
+
+												//EVOLUTION
+	case COMMAND_EVOLUTION_ZERG_EVOLVE_BURROW:			//저그 버러우 업글
+	case COMMAND_EVOLUTION_ZERG_METABOLICK_BOOST:		//저글링 이속업
+	case COMMAND_EVOLUTION_ZERG_ADRENAL_GLANDS:			//저글링 아드레날린
+	case COMMAND_EVOLUTION_ZERG_VECTRAL_SACS:			//오버로드 수송업
+	case COMMAND_EVOLUTION_ZERG_ANTENNAE:				//오버로드 시야업
+	case COMMAND_EVOLUTION_ZERG_PNEUMATIZED_CARAPACE:	//오버로드 이속업
+	case COMMAND_EVOLUTION_ZERG_MUSCULAR_AUGMENTS:		//히드라 이속업
+	case COMMAND_EVOLUTION_ZERG_GROOVED_SPINES:			//히드라 사정거리업
+	case COMMAND_EVOLUTION_ZERG_EVOLVE_LURKER_ASPECT:	//럴커 업글
+	case COMMAND_EVOLUTION_ZERG_EVOLVE_SPAWN_BROODLING:	//퀸 브루드링 업글
+	case COMMAND_EVOLUTION_ZERG_EVOLVE_ENSNARE:			//퀸 인스테어 업글
+	case COMMAND_EVOLUTION_ZERG_GAMETE_MEIOSIS:			//퀸 마나업
+	case COMMAND_EVOLUTION_ZERG_ANABOLIC_SYNTHESIS:		//울트라 이송업
+	case COMMAND_EVOLUTION_ZERG_CHITINOUS_PLATING:		//울트라 방업(+2)
+	case COMMAND_EVOLUTION_ZERG_EVOLVE_PLAGUE:			//디파일러 플레이그
+	case COMMAND_EVOLUTION_ZERG_EVOLVE_CONSUME:			//디파일러 컨슘
+	case COMMAND_EVOLUTION_ZERG_METASYNAPTIC_NODE:		//디파일러 마나업
+
 	default:
 		break;
 	}
@@ -61,21 +125,17 @@ void Unit::procCommands(void)
 
 void Unit::moveGround(void)
 {
-	if (_battleStatus.unitTarget != NULL)
-	{
-
-	}
-	else if (_battleStatus.BuildingTarget != NULL)
+	if (_battleStatus.targetObject!= NULL)
 	{
 
 	}
 	else
 	{
 		POINT ptStartTile, ptEndTile;
-		ptStartTile.x = _battleStatus.pt.toPoint().x / GAMEMAP_TILESIZE;
-		ptStartTile.y = _battleStatus.pt.toPoint().y / GAMEMAP_TILESIZE;
-		ptEndTile.x = _battleStatus.ptTarget.x / GAMEMAP_TILESIZE;
-		ptEndTile.y = _battleStatus.ptTarget.y / GAMEMAP_TILESIZE;
+		ptStartTile.x = _battleStatus.pt.toPoint().x / TILESIZE;
+		ptStartTile.y = _battleStatus.pt.toPoint().y / TILESIZE;
+		ptEndTile.x = _battleStatus.ptTarget.x / TILESIZE;
+		ptEndTile.y = _battleStatus.ptTarget.y / TILESIZE;
 
 		//같은 타일에 있을때
 		if (_battleStatus.ptTile.x == ptEndTile.x && _battleStatus.ptTile.y == ptEndTile.y)
@@ -109,8 +169,8 @@ void Unit::moveGround(void)
 			{
 				tile* nextTile = _vCloseList[0];
 				POINT ptNext;
-				ptNext.x = (nextTile->getIdX() + 0.5f) * GAMEMAP_TILESIZE;
-				ptNext.y = (nextTile->getIdY() + 0.5f) * GAMEMAP_TILESIZE;
+				ptNext.x = (nextTile->getIdX() + 0.5f) * TILESIZE;
+				ptNext.y = (nextTile->getIdY() + 0.5f) * TILESIZE;
 
 				//실제 이동
 				moveToPoint(ptNext);
@@ -180,10 +240,6 @@ void Unit::moveComplete(void)
 	case COMMAND_GATHER:
 		break;
 	case COMMAND_RETURNCARGO:
-		break;
-	case COMMAND_BUILD1:
-		break;
-	case COMMAND_BUILD2:
 		break;
 	case COMMAND_BURROW:
 		break;

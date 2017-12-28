@@ -199,7 +199,12 @@ void button::render(void)
 {
 	renderImage();
 	renderText();
+}
 
+void button::ZRender(ZORDER zorder)
+{
+	renderImage(zorder);
+	renderText(zorder);
 }
 
 void button::setText(const TCHAR* text)
@@ -265,4 +270,59 @@ void button::renderText(void)
 	SelectObject(getMemDC(), oldFont);
 	DeleteObject(oldFont);
 	SetTextColor(getMemDC(), oldcolor);
+}
+
+void button::renderImage(ZORDER zorder)
+{
+	if (_image == NULL)
+	{
+		return;
+	}
+
+	if (_disable)
+	{
+		//Disable 상태일때
+		RENDERMANAGER->insertImgFrame(zorder, _image, _rc.left, _rc.top, _btnDisableFramePoint.x, _btnDisableFramePoint.y);
+	}
+	else if (_onlyUp)
+	{
+		//Up 이미지만 보여줄때
+		RENDERMANAGER->insertImgFrame(zorder, _image, _rc.left, _rc.top, _btnUpFramePoint.x, _btnUpFramePoint.y);
+	}
+	else if (_onlyDown)
+	{
+		//Down 이미지만 보여줄때
+		RENDERMANAGER->insertImgFrame(zorder, _image, _rc.left, _rc.top, _btnDownFramePoint.x, _btnDownFramePoint.y);
+	}
+	else
+	{
+		switch (_direction)
+		{
+		case BUTTONDIRECTION_NULL: case BUTTONDIRECTION_UP:
+			RENDERMANAGER->insertImgFrame(zorder, _image, _rc.left, _rc.top, _btnUpFramePoint.x, _btnUpFramePoint.y);
+			break;
+		case BUTTONDIRECTION_DOWN:
+			RENDERMANAGER->insertImgFrame(zorder, _image, _rc.left, _rc.top, _btnDownFramePoint.x, _btnDownFramePoint.y);
+			break;
+		}
+	}
+}
+void button::renderText(ZORDER zorder)
+{
+	//버튼 글자가 있을경우
+	if (_tcslen(_strText) == 0)
+	{
+		return;
+	}
+
+	//COLORREF oldcolor = GetTextColor(getMemDC());
+	//SetTextColor(getMemDC(), _color);
+	//SetBkMode(getMemDC(), TRANSPARENT);
+	//HFONT oldFont = (HFONT)SelectObject(getMemDC(), _gFont[_fontNum]);
+	//DrawText(getMemDC(), _strText, _tcslen(_strText), &_rc, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	//SelectObject(getMemDC(), oldFont);
+	//DeleteObject(oldFont);
+	//SetTextColor(getMemDC(), oldcolor);
+
+	RENDERMANAGER->insertText(zorder, _rc, _strText, _color);
 }

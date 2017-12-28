@@ -11,7 +11,7 @@ zbCreepColony::~zbCreepColony()
 {
 }
 
-HRESULT zbCreepColony::init(void)
+HRESULT zbCreepColony::init(POINT ptTIle)
 {
 
 	return S_OK;

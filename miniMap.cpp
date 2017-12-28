@@ -47,11 +47,12 @@ void miniMap::render(void)
 	if (_img == NULL)
 		return;
 
-	_img->render(getMemDC(), _rc.left, _rc.top);
+	//_img->render(getMemDC(), _rc.left, _rc.top);
+	RENDERMANAGER->insertImg(ZORDER_INTERFACE, _img, _rc.left, _rc.top);
 
 
-	int width = WINSIZEX / GAMEMAP_TILESIZE;
-	int height = WINSIZEY / GAMEMAP_TILESIZE;
+	int width = WINSIZEX / TILESIZE;
+	int height = WINSIZEY / TILESIZE;
 
 	image* _backBuffer3 = IMAGEMANAGER->addImage(L"backBuffer3", TILEX, TILEY);
 	HDC hDCtemp = _backBuffer3->getMemDC();
@@ -65,8 +66,8 @@ void miniMap::render(void)
 
 
 	GdiTransparentBlt(getMemDC(),		//복사될 DC영역
-		_rc.left + MAINCAMERA->getCameraX() / GAMEMAP_TILESIZE,
-		_rc.top + MAINCAMERA->getCameraY() / GAMEMAP_TILESIZE,
+		_rc.left + MAINCAMERA->getCameraX() / TILESIZE,
+		_rc.top + MAINCAMERA->getCameraY() / TILESIZE,
 		width, height,												//복사될 가로 세로 크기
 
 		hDCtemp,			//복사할 DC

@@ -24,7 +24,7 @@ private:
 	tile* _parentNode;
 
 
-	wstring _attribute;
+	DWORD _attribute;
 
 
 
@@ -46,8 +46,8 @@ public:
 	void setCenter(POINT center) { _center = center; }
 	POINT getCenter() { return _center; }
 
-	void setAttribute(wstring str) { _attribute = str; }
-	wstring getAttribute() { return _attribute; }
+	void setAttribute(DWORD attr) { _attribute = attr; }
+	DWORD getAttribute() { return _attribute; }
 
 	void setTotalCost(float totalCost) { _totalCost = totalCost; }
 	float getTotalCost() { return _totalCost; }

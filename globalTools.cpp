@@ -85,7 +85,10 @@ void globalTools::setPenAll(void)
 		case PENVERSION_UNITCLICK:
 			_gPen[i] = CreatePen(PS_SOLID, 2, RGB(36, 152, 36));
 			break;
-		case PENVERSION_BLUE:
+		case PENVERSION_BLUE1:
+			_gPen[i] = CreatePen(PS_SOLID, 1, RGB(0, 0, 255));
+			break;
+		case PENVERSION_BLUE2:
 			_gPen[i] = CreatePen(PS_SOLID, 2, RGB(0, 0, 255));
 			break;
 		case PENVERSION_MINIMAP:

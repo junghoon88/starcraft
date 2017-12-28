@@ -116,9 +116,13 @@ HRESULT loading::init()
 {
 	_background = IMAGEMANAGER->addImage(L"로딩백그라운드", L"image/loading/loadingBG.bmp", 640, 400);
 
+	IMAGEMANAGER->addImage(L"frontBarLoading", L"image/loading/progressbarF.bmp", 500, 30, true, RGB(255, 0, 255));
+	IMAGEMANAGER->addImage(L"backBarLoading", L"image/loading/progressbarB.bmp", 500, 30, true, RGB(255, 0, 255));
+
 	_loadingBar = new progressBar;
-	_loadingBar->init(L"progressbarT", L"progressbarB", WINSIZEX / 2, WINSIZEY - 70, 500, 30);
+	_loadingBar->init(L"Loading");
 	_loadingBar->setGauge(0, 0);
+	_loadingBar->setRect(RectMakeCenter(WINSIZEX / 2, WINSIZEY - 40, 500, 30));
 
 	_currentGauge = 0;
 
@@ -147,14 +151,14 @@ void loading::render()
 		if (_vLoadItem[_currentGauge]->getLoadingKind() <= LOAD_KIND_FRAMEIMAGE_1)
 		{
 			int x = _loadingBar->getRect().left;
-			int y = _loadingBar->getRect().top - 10;
+			int y = _loadingBar->getRect().top - 20;
 			TCHAR* name = _vLoadItem[_currentGauge-1]->getImageResource().fileName;
 			TextOut(getMemDC(), x, y, name, _tcslen(name));
 		}
 		else if (_vLoadItem[_currentGauge-1]->getLoadingKind() == LOAD_KIND_SOUND)
 		{
 			int x = _loadingBar->getRect().left;
-			int y = _loadingBar->getRect().top - 10;
+			int y = _loadingBar->getRect().top - 20;
 			TCHAR* name = _vLoadItem[_currentGauge-1]->getSoundResource().fileName;
 			TextOut(getMemDC(), x, y, name, _tcslen(name));
 		}

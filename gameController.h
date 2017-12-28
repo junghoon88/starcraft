@@ -3,13 +3,17 @@
 
 #include "Unit.h"
 #include "Building.h"
+#include "gameMap.h"
 
 #include "hotkeys.h"
 #include "miniMap.h"
 #include "button.h"
 
+
 //전방선언
 class player;
+
+#define SELECTUNIT_MAX	12
 
 enum CURSORSTATE
 {
@@ -37,24 +41,12 @@ enum CURSORSTATE
 
 };
 
-enum TARGETTYPE
-{
-	TARGETTYPE_GROUND,
-	TARGETTYPE_UNIT,
-	TARGETTYPE_BUILDING,
-};
-
 struct tagSelectInfo
 {
 	BOOL			isSelected;
 
-	BOOL			isMyTeam;		//내 유닛인지..ㅠㅠ
-
-	BOOL			isBuilding;
-
-	UINT			unitNum;
-	Unit*			unit[12];
-	Building*		building;
+	UINT			num;
+	gameObject*		object[SELECTUNIT_MAX];
 };
 
 struct tagUnitCommands
@@ -71,6 +63,13 @@ struct tagCommandSet
 	RECT	rc;
 	TCHAR	hotkey;
 	button* button;
+};
+
+enum BUILDSTATE
+{
+	BUILDSTATE_NONE,		//
+	BUILDSTATE_PLACEABLE,	//건물 설치할 수 있음
+	BUILDSTATE_OVERLAP,		//건물 설치불가(겹침)
 };
 
 
@@ -92,8 +91,15 @@ private:
 	BOOL				_isDraging;						//드래그 상태인지
 	POINT				_ptDragStart;					//드래그 시작 위치
 	BOOL				_findTarget;					//타겟 정보를 받는 중일때
-	BOOL				_findLocation;
-	POINT				_buildingSize;
+	BOOL				_findLocation;					//건물 위치 정할때
+	POINT				_buildingSize;					//건물 크기
+	BUILDSTATE			_buildingPlaceable[OBJECTSIZE_MAX_X][OBJECTSIZE_MAX_Y];				//건물 배치 가능여부(타일별로)
+	BOOL				_buildable;						//건물 지을수 있는지
+
+	//마우스 관련
+	POINT				_cursorPt;						//카메라 위치 적용된 마우스 위치
+	POINT				_cursorTile;					//카메라 위치 적용된 마우스 위치의 타일 번호
+
 
 
 	//커맨드 관련
@@ -114,6 +120,7 @@ private:
 	hotkeys*			_hotkeys;		//단축키 클래스
 	miniMap*			_miniMap;		//미니맵 클래스
 
+	gameMap*			_gameMap;
 
 private:
 	player*			_myPlayer;
@@ -131,6 +138,7 @@ public:
 private:
 	void initCommandSet(void);
 
+	void calcMouseRealPosition(void);
 	BOOL actionHotkeys(void);
 	void actionMouseMap(void);
 	void actionMouseMiniMap(void);
@@ -139,27 +147,44 @@ private:
 
 
 	void setImageCursor(void);
+	BOOL checkBuildable(void);
+
+
 
 	void actionCommand(void);
 	void setCommandSet(void);
+	void matchingCommandHotkey(void);
 	void matchingCommandImage(void);
 
-	void renderCursor(void);
 
 	void renderInterface(void);
+	void renderSelectInfo(void);
 	void renderCommands(void);
+
+	void renderBuildImage(void);
+	void renderCursor(void);
+
 
 	TEAM searchObject();
 	TEAM clickObject();
 	TEAM dragObjects(RECT rcDrag);
 
-	void* getTargetInfo(TARGETTYPE &target, PLAYER &playerNum);
+	gameObject* getTargetInfo(void);
+
+
+
+public:
+	//현재 선택한 정보를 다음 오브젝트로 변경해주는 함수 (예:드론->해처리)
+	void changeSelectInfoToNextObect(gameObject* object);
+	//라바를 선택하는 함수(해처리, 레어, 하이브 3개 다 써야되서 void* 로 함.)
+	void changeSelectInfoToLarva(void* hatchery, BUILDINGNUM_ZERG buildingNum); 
 
 
 
 public:
 	inline void setLinkAdressMyPlayer(player* player) { _myPlayer = player; };
 	inline void setLinkAdressPlayers(player* player, PLAYER playerNum) { _player[playerNum] = player; }
+	inline void setLinkAdressGameMap(gameMap* map) { _gameMap = map; }
 
 	//button callback function
 	inline static void cbCommandFunc0(void* obj) { gameController* gc = (gameController*)obj; gc->actionMouseCommandSet(0); }

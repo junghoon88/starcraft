@@ -98,6 +98,8 @@
     <ClInclude Include="gameInterface.h" />
     <ClInclude Include="gameMap.h" />
     <ClInclude Include="gameNode.h" />
+    <ClInclude Include="gameObject.h" />
+    <ClInclude Include="gameObjectPool.h" />
     <ClInclude Include="globalMacroVariables.h" />
     <ClInclude Include="globalTools.h" />
     <ClInclude Include="hotkeys.h" />
@@ -141,6 +143,7 @@
     <ClInclude Include="zbHive.h" />
     <ClInclude Include="zbHydraliskDen.h" />
     <ClInclude Include="zbLair.h" />
+    <ClInclude Include="zbMutating.h" />
     <ClInclude Include="zbNydusCanal.h" />
     <ClInclude Include="zbQueensNest.h" />
     <ClInclude Include="zbSpawningPool.h" />
@@ -148,8 +151,9 @@
     <ClInclude Include="zbSporeColony.h" />
     <ClInclude Include="zbSunkenColony.h" />
     <ClInclude Include="zbUltraliskCavern.h" />
+    <ClInclude Include="zergDefine.h" />
     <ClInclude Include="zergHeader.h" />
-    <ClInclude Include="zergProduction.h" />
+    <ClInclude Include="zergProductionInfo.h" />
     <ClInclude Include="zergUpgrade.h" />
     <ClInclude Include="zuBroodling.h" />
     <ClInclude Include="zuCocoon.h" />
@@ -187,6 +191,8 @@
     <ClCompile Include="gameInterface.cpp" />
     <ClCompile Include="gameMap.cpp" />
     <ClCompile Include="gameNode.cpp" />
+    <ClCompile Include="gameObject.cpp" />
+    <ClCompile Include="gameObjectPool.cpp" />
     <ClCompile Include="globalTools.cpp" />
     <ClCompile Include="hotkeys.cpp" />
     <ClCompile Include="image.cpp" />
@@ -229,6 +235,7 @@
     <ClCompile Include="zbHive.cpp" />
     <ClCompile Include="zbHydraliskDen.cpp" />
     <ClCompile Include="zbLair.cpp" />
+    <ClCompile Include="zbMutating.cpp" />
     <ClCompile Include="zbNydusCanal.cpp" />
     <ClCompile Include="zbQueensNest.cpp" />
     <ClCompile Include="zbSpawningPool.cpp" />
@@ -236,7 +243,7 @@
     <ClCompile Include="zbSporeColony.cpp" />
     <ClCompile Include="zbSunkenColony.cpp" />
     <ClCompile Include="zbUltraliskCavern.cpp" />
-    <ClCompile Include="zergProduction.cpp" />
+    <ClCompile Include="zergProductionInfo.cpp" />
     <ClCompile Include="zergUpgrade.cpp" />
     <ClCompile Include="zuBroodling.cpp" />
     <ClCompile Include="zuCocoon.cpp" />

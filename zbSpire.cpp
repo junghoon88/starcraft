@@ -11,7 +11,7 @@ zbSpire::~zbSpire()
 {
 }
 
-HRESULT zbSpire::init(void)
+HRESULT zbSpire::init(POINT ptTIle)
 {
 
 	return S_OK;

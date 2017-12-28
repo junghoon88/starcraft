@@ -246,9 +246,6 @@
     <ClInclude Include="zuInfestedTerran.h">
       <Filter>MainGame\RACES\Zerg\Unit%28Ground%29</Filter>
     </ClInclude>
-    <ClInclude Include="zuLarva.h">
-      <Filter>MainGame\RACES\Zerg\Unit%28Ground%29</Filter>
-    </ClInclude>
     <ClInclude Include="zuLerkerEgg.h">
       <Filter>MainGame\RACES\Zerg\Unit%28Ground%29</Filter>
     </ClInclude>
@@ -256,9 +253,6 @@
       <Filter>MainGame\RACES\Zerg\Unit%28Ground%29</Filter>
     </ClInclude>
     <ClInclude Include="zuUltralisk.h">
-      <Filter>MainGame\RACES\Zerg\Unit%28Ground%29</Filter>
-    </ClInclude>
-    <ClInclude Include="zuZergEgg.h">
       <Filter>MainGame\RACES\Zerg\Unit%28Ground%29</Filter>
     </ClInclude>
     <ClInclude Include="zuZergling.h">
@@ -300,9 +294,6 @@
     <ClInclude Include="zbGreaterSpire.h">
       <Filter>MainGame\RACES\Zerg\Building</Filter>
     </ClInclude>
-    <ClInclude Include="zbHatchery.h">
-      <Filter>MainGame\RACES\Zerg\Building</Filter>
-    </ClInclude>
     <ClInclude Include="zbHive.h">
       <Filter>MainGame\RACES\Zerg\Building</Filter>
     </ClInclude>
@@ -342,9 +333,6 @@
     <ClInclude Include="zergHeader.h">
       <Filter>MainGame\RACES\Zerg</Filter>
     </ClInclude>
-    <ClInclude Include="zergProduction.h">
-      <Filter>MainGame\RACES\Zerg</Filter>
-    </ClInclude>
     <ClInclude Include="zergUpgrade.h">
       <Filter>MainGame\RACES\Zerg</Filter>
     </ClInclude>
@@ -374,6 +362,30 @@
     </ClInclude>
     <ClInclude Include="nrGas.h">
       <Filter>MainGame\sceneBattle\gameMap</Filter>
+    </ClInclude>
+    <ClInclude Include="gameObject.h">
+      <Filter>MainGame\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="gameObjectPool.h">
+      <Filter>MainGame\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="zergDefine.h">
+      <Filter>MainGame\RACES\Zerg</Filter>
+    </ClInclude>
+    <ClInclude Include="zbHatchery.h">
+      <Filter>MainGame\RACES\Zerg</Filter>
+    </ClInclude>
+    <ClInclude Include="zbMutating.h">
+      <Filter>MainGame\RACES\Zerg</Filter>
+    </ClInclude>
+    <ClInclude Include="zergProductionInfo.h">
+      <Filter>MainGame\RACES\Zerg</Filter>
+    </ClInclude>
+    <ClInclude Include="zuZergEgg.h">
+      <Filter>MainGame\RACES\Zerg</Filter>
+    </ClInclude>
+    <ClInclude Include="zuLarva.h">
+      <Filter>MainGame\RACES\Zerg</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -491,9 +503,6 @@
     <ClCompile Include="zuInfestedTerran.cpp">
       <Filter>MainGame\RACES\Zerg\Unit%28Ground%29</Filter>
     </ClCompile>
-    <ClCompile Include="zuLarva.cpp">
-      <Filter>MainGame\RACES\Zerg\Unit%28Ground%29</Filter>
-    </ClCompile>
     <ClCompile Include="zuLerkerEgg.cpp">
       <Filter>MainGame\RACES\Zerg\Unit%28Ground%29</Filter>
     </ClCompile>
@@ -501,9 +510,6 @@
       <Filter>MainGame\RACES\Zerg\Unit%28Ground%29</Filter>
     </ClCompile>
     <ClCompile Include="zuUltralisk.cpp">
-      <Filter>MainGame\RACES\Zerg\Unit%28Ground%29</Filter>
-    </ClCompile>
-    <ClCompile Include="zuZergEgg.cpp">
       <Filter>MainGame\RACES\Zerg\Unit%28Ground%29</Filter>
     </ClCompile>
     <ClCompile Include="zuZergling.cpp">
@@ -545,9 +551,6 @@
     <ClCompile Include="zbGreaterSpire.cpp">
       <Filter>MainGame\RACES\Zerg\Building</Filter>
     </ClCompile>
-    <ClCompile Include="zbHatchery.cpp">
-      <Filter>MainGame\RACES\Zerg\Building</Filter>
-    </ClCompile>
     <ClCompile Include="zbHive.cpp">
       <Filter>MainGame\RACES\Zerg\Building</Filter>
     </ClCompile>
@@ -584,9 +587,6 @@
     <ClCompile Include="sceneBattle.cpp">
       <Filter>MainGame\sceneBattle</Filter>
     </ClCompile>
-    <ClCompile Include="zergProduction.cpp">
-      <Filter>MainGame\RACES\Zerg</Filter>
-    </ClCompile>
     <ClCompile Include="zergUpgrade.cpp">
       <Filter>MainGame\RACES\Zerg</Filter>
     </ClCompile>
@@ -622,6 +622,27 @@
     </ClCompile>
     <ClCompile Include="nrMineral.cpp">
       <Filter>MainGame\sceneBattle\gameMap</Filter>
+    </ClCompile>
+    <ClCompile Include="gameObjectPool.cpp">
+      <Filter>MainGame\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="gameObject.cpp">
+      <Filter>MainGame\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="zbHatchery.cpp">
+      <Filter>MainGame\RACES\Zerg</Filter>
+    </ClCompile>
+    <ClCompile Include="zbMutating.cpp">
+      <Filter>MainGame\RACES\Zerg</Filter>
+    </ClCompile>
+    <ClCompile Include="zergProductionInfo.cpp">
+      <Filter>MainGame\RACES\Zerg</Filter>
+    </ClCompile>
+    <ClCompile Include="zuZergEgg.cpp">
+      <Filter>MainGame\RACES\Zerg</Filter>
+    </ClCompile>
+    <ClCompile Include="zuLarva.cpp">
+      <Filter>MainGame\RACES\Zerg</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

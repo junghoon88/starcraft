@@ -80,7 +80,7 @@ void effect::render(ZORDER zorder)
 {
 	if (!_isRunning) return;
 
-	RENDERMANAGER->insertImgAni(zorder, _effectImage, getMemDC(), _x, _y, _effectAnimation);
+	RENDERMANAGER->insertImgAni(zorder, _effectImage, _x, _y, _effectAnimation);
 }
 
 void effect::startEffect(int x, int y)

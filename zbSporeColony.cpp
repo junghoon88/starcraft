@@ -11,7 +11,7 @@ zbSporeColony::~zbSporeColony()
 {
 }
 
-HRESULT zbSporeColony::init(void)
+HRESULT zbSporeColony::init(POINT ptTIle)
 {
 
 	return S_OK;

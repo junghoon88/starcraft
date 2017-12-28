@@ -9,24 +9,24 @@ struct tagProduction
 	UINT				costGas;		//소모 가스
 	FLOAT				control;		//인구수
 	FLOAT				buildTime;		//빌드시간
-	TCHAR				hotKey;			//단축키
 };
 
 
-class zergProduction
+class zergProductionInfo
 {
 private:
 	static tagProduction _zuProduction[UNITNUM_ZERG_MAX];
 	static tagProduction _zbProduction[BUILDINGNUM_ZERG_MAX];
 
 public:
-	zergProduction(bool initInfo);
-	zergProduction();
-	~zergProduction();
+	zergProductionInfo(bool initInfo);
+	zergProductionInfo();
+	~zergProductionInfo();
 
 
 public:
-	tagProduction getZUProduction(UNITNUM_ZERG num);
+	tagProduction getZUProductionInfo(UNITNUM_ZERG num) { return _zuProduction[num]; }
+	tagProduction getZBProductionInfo(BUILDINGNUM_ZERG num) { return _zbProduction[num]; }
 
 
 };

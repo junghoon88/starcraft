@@ -35,6 +35,7 @@ HRESULT image::init(int width, int height, BOOL blend)
 	_imageInfo->width = width;
 	_imageInfo->height = height;
 
+
 	_fileName = NULL;
 
 	_trans = FALSE;

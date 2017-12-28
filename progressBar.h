@@ -4,32 +4,39 @@
 class progressBar : public gameNode
 {
 private:
-	POINT _pt;
-	float _width;
+	float _gaugeWidth;
 	RECT _rcProgress;
 
 	image* _progressBarTop;
 	image* _progressBarBottom;
 
+	int _imgWidth;
+	int _imgHeight;
+
 public:
 	progressBar();
 	~progressBar();
 
-	HRESULT init(TCHAR* name, int x, int y, int width, int height);
-	HRESULT init(TCHAR* topImage, TCHAR* bottomImage, float x, float y, int width, int height);
-	HRESULT init(TCHAR* topImage, TCHAR* bottomImage, float x, float y, int width, int height, TCHAR* foldername);
+	HRESULT init(TCHAR* name);
+	HRESULT init(TCHAR* topImage, TCHAR* bottomImage);
+	
 	void release(void);
 	void update(void);
-	void render(TCHAR* name);
 	void render(void);
+	void ZRender(ZORDER zorder);
 
 	void setGauge(float currentGauge, float maxGauge);
 
 public:
-	inline void setX(int x) { _pt.x = x; }
-	inline void setY(int y) { _pt.y = y; }
-
-	inline float getWidth(void) { return _width; }
+	inline float getGaugeWidth(void) { return _gaugeWidth; }
 	inline RECT getRect(void) { return _rcProgress; }
+	inline void setRect(RECT rc) { _rcProgress = rc; }
+
+	inline void setPointLT(POINT pt) { _rcProgress = RectMake(pt.x, pt.y, _imgWidth, _imgHeight); }
+	inline void setPointCC(POINT pt) { _rcProgress = RectMakeCenter(pt.x, pt.y, _imgWidth, _imgHeight); }
+
+	inline void setPointLT(int x, int y) { _rcProgress = RectMake(x, y, _imgWidth, _imgHeight); }
+	inline void setPointCC(int x, int y) { _rcProgress = RectMakeCenter(x, y, _imgWidth, _imgHeight); }
+
 };
 

@@ -12,7 +12,7 @@ zbUltraliskCavern::~zbUltraliskCavern()
 
 }
 
-HRESULT zbUltraliskCavern::init(void)
+HRESULT zbUltraliskCavern::init(POINT ptTIle)
 {
 
 	return S_OK;

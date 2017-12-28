@@ -17,6 +17,8 @@
 #include "zuOverload.h"
 #include "zuQueen.h"
 #include "zuScourge.h"
+
+#include "zbMutating.h"
 #include "zbCreepColony.h"
 #include "zbDefilerMound.h"
 #include "zbEvolutionChamber.h"
@@ -33,3 +35,5 @@
 #include "zbSporeColony.h"
 #include "zbSunkenColony.h"
 #include "zbUltraliskCavern.h"
+
+#include "zergDefine.h"

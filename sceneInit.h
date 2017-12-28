@@ -11,6 +11,7 @@ private:
 	void initImage(void);
 	void initSound(void);
 
+
 	void initImageNeutralResource(void);
 	void initImageMaptoolTiles(void);
 	void initImageGamemapTiles(void);

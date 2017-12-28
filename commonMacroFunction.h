@@ -90,6 +90,12 @@ inline void EllipseMake(HDC hdc, int x, int y, int width, int height)
 	Ellipse(hdc, x, y, x + width, y + height);
 }
 
+inline void EllipseMake(HDC hdc, RECT rc)
+{
+	Ellipse(hdc, rc.left, rc.top, rc.right, rc.bottom);
+}
+
+
 //중점좌표로 부터 가로 세로 크기 형태로 동그라미
 inline void EllipseMakeCenter(HDC hdc, int x, int y, int width, int height)
 {

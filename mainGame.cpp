@@ -15,7 +15,6 @@ mainGame::mainGame()
 	_FPS = 60.0f;
 
 	//Unit클래스 내에 static변수를 초기화하기 위해
-	_unit = new Unit(true);
 
 	_gameStart = FALSE;
 }
@@ -23,7 +22,6 @@ mainGame::mainGame()
 
 mainGame::~mainGame()
 {
-	SAFE_DELETE(_unit);
 }
 
 
@@ -70,10 +68,8 @@ void mainGame::update(void)
 	controlFPS();
 	//playBGM();
 
-	if (KEYMANAGER->isOnceKeyDown(VK_F1))
-	{
-		//SCENEMANAGER->changeScene(L"선택씬");
-	}
+
+
 
 	MAINCAMERA->update();
 
@@ -90,7 +86,6 @@ void mainGame::render(void)
 	SCENEMANAGER->render();
 
 
-	RENDERMANAGER->render();
 
 	TIMEMANAGER->render(getMemDC());
 	MAINCAMERA->render(getMemDC());

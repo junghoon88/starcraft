@@ -11,7 +11,7 @@ zbEvolutionChamber::~zbEvolutionChamber()
 {
 }
 
-HRESULT zbEvolutionChamber::init(void)
+HRESULT zbEvolutionChamber::init(POINT ptTIle)
 {
 
 	return S_OK;

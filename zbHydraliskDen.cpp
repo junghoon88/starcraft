@@ -11,7 +11,7 @@ zbHydraliskDen::~zbHydraliskDen()
 {
 }
 
-HRESULT zbHydraliskDen::init(void)
+HRESULT zbHydraliskDen::init(POINT ptTIle)
 {
 
 	return S_OK;

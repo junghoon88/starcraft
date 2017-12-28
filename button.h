@@ -71,10 +71,13 @@ public:
 	void release(void);
 	void update(void);
 	void render(void);
+	void ZRender(ZORDER zorder);
 
 private:
 	void renderImage(void);
 	void renderText(void);
+	void renderImage(ZORDER zorder);
+	void renderText(ZORDER zorder);
 
 
 

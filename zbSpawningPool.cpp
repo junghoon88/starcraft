@@ -11,7 +11,7 @@ zbSpawningPool::~zbSpawningPool()
 {
 }
 
-HRESULT zbSpawningPool::init(void)
+HRESULT zbSpawningPool::init(POINT ptTIle)
 {
 
 	return S_OK;
