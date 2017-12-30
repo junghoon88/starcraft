@@ -171,6 +171,11 @@ private:
 
 	gameObject* getTargetInfo(void);
 
+	void clearSelectInfo(void);
+	void clearSelectInfo(gameObject* object);
+	void checkSelectInfo(void);
+	void refreshSelectInfo(void);
+
 
 
 public:

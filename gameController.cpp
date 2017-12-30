@@ -125,6 +125,7 @@ void gameController::update(void)
 
 	actionCommand();
 	setCommandSet();
+	refreshSelectInfo();
 	setImageCursor();
 }
 
@@ -755,7 +756,7 @@ void gameController::renderBuildImage(void)
 	{
 		//IMAGEMANAGER->frameRender(L"ZB-hatchery", getMemDC(), (ptTileMouseReal.x * TILESIZE) - TILESIZE - MAINCAMERA->getCameraX(), (ptTileMouseReal.y * TILESIZE) - TILESIZE - MAINCAMERA->getCameraY(), 0, 0);
 		TCHAR strKey[100];
-		_stprintf(strKey, L"ZB-hatcheryBody%d", _playerNum);
+		_stprintf(strKey, L"ZB-hatchery-Body%d", _playerNum);
 		image* imgHatchery = IMAGEMANAGER->findImage(strKey);
 		RENDERMANAGER->insertImgFrame(ZORDER_GAMEMOUSEDRAG, imgHatchery, (ptTileMouseReal.x * TILESIZE) - TILESIZE - MAINCAMERA->getCameraX(), (ptTileMouseReal.y * TILESIZE) - TILESIZE - MAINCAMERA->getCameraY(), 0, 0);
 		
@@ -1032,6 +1033,8 @@ TEAM gameController::clickObject(void)
 			{
 				if (i == PLAYER1)
 				{
+					clearSelectInfo();
+
 					vUnitsInCamera[j]->setClicked(true);
 
 					_selectInfo.isSelected = true;
@@ -1042,6 +1045,28 @@ TEAM gameController::clickObject(void)
 				}
 			}
 		}
+
+		//유닛없으면 건물 체크
+		for (int j = 0; j < vBuildingsInCamera.size(); j++)
+		{
+			RECT rcBody = vBuildingsInCamera[j]->getBattleStatus().rcBody;
+			if (PtInRect(&rcBody, ptMouseReal))
+			{
+				if (i == PLAYER1)
+				{
+					clearSelectInfo();
+
+					vBuildingsInCamera[j]->setClicked(true);
+
+					_selectInfo.isSelected = true;
+					_selectInfo.num = 1;
+					_selectInfo.object[0] = vBuildingsInCamera[j];
+
+					return TEAM_MYTEAM;
+				}
+			}
+		}
+
 	}
 
 	return TEAM_NONE;
@@ -1050,6 +1075,7 @@ TEAM gameController::clickObject(void)
 
 TEAM gameController::dragObjects(RECT rcDrag)
 {
+
 	rcDrag.left   += MAINCAMERA->getCameraX();
 	rcDrag.right  += MAINCAMERA->getCameraX();
 	rcDrag.top    += MAINCAMERA->getCameraY();
@@ -1071,7 +1097,9 @@ TEAM gameController::dragObjects(RECT rcDrag)
 
 	RECT temp;
 
-	UINT unitNum = 0;
+	bool find = false;
+	UINT findNum = 0;
+
 	for (int i = 0; i < PLAYER_NUM; i++)
 	{
 		player* player = _player[i];
@@ -1084,31 +1112,79 @@ TEAM gameController::dragObjects(RECT rcDrag)
 			RECT rcBody = vUnitsInCamera[j]->getBattleStatus().rcBody;
 			if (IntersectRect(&temp, &rcBody, &rcDrag))
 			{
+				if (find == false)
+				{
+					find = true;
+					clearSelectInfo();
+				}
+
 				if (i == PLAYER1)
 				{
 					vUnitsInCamera[j]->setClicked(true);
 
 					_selectInfo.isSelected = true;
-					_selectInfo.object[unitNum] = vUnitsInCamera[j];
+					_selectInfo.object[findNum] = vUnitsInCamera[j];
+					findNum++;
 
-					unitNum++;
-
-					if (unitNum == SELECTUNIT_MAX) break;
+					if (_selectInfo.num == SELECTUNIT_MAX) break;
 				}
 			}
 		}
 
-		if (unitNum > 0)
+		if (find)
 		{
-			_selectInfo.num = unitNum;
-			return TEAM_MYTEAM;
+			_selectInfo.num = findNum;
+
+			if (_player[i] == _myPlayer)
+			{
+				return TEAM_MYTEAM;
+			}
+			else
+			{
+				return TEAM_ENEMY;
+			}
 		}
 
+		//유닛먼저 체크
+		for (int j = 0; j < vBuildingsInCamera.size(); j++)
+		{
+			RECT rcBody = vBuildingsInCamera[j]->getBattleStatus().rcBody;
+			if (IntersectRect(&temp, &rcBody, &rcDrag))
+			{
+				if (find == false)
+				{
+					find = true;
+					clearSelectInfo();
+				}
 
+				if (i == PLAYER1)
+				{
+					vBuildingsInCamera[j]->setClicked(true);
+
+					_selectInfo.isSelected = true;
+					_selectInfo.object[findNum] = vBuildingsInCamera[j];
+					findNum = 1;
+					break;
+				}
+			}
+		}
+
+		if (find)
+		{
+			_selectInfo.num = findNum;
+
+			if (_player[i] == _myPlayer)
+			{
+				return TEAM_MYTEAM;
+			}
+			else
+			{
+				return TEAM_ENEMY;
+			}
+		}
 	}
 
 	return TEAM_NONE;
-
 }
 
 
@@ -1135,200 +1211,69 @@ gameObject* gameController::getTargetInfo(void)
 		}
 
 		//유닛 체크 안되면 건물 체크
-		//for (int j = 0; j < vBuildingsInCamera.size(); j++)
-		//{
-		//	if (PtInRect(&(vBuildingsInCamera[j]->getBattleStatus().rcBody), ptMouseReal))
-		//	{
-		//		if (i == PLAYER1)
-		//		{
-		//			return TEAM_MYTEAM;
-		//		}
-		//	}
-		//}
-
+		for (int j = 0; j < vBuildingsInCamera.size(); j++)
+		{
+			RECT rcBody = vBuildingsInCamera[j]->getBattleStatus().rcBody;
+			if (PtInRect(&rcBody, ptMouseReal))
+			{
+				return vBuildingsInCamera[j];
+			}
+		}
 	}
 	return NULL;
 }
 
-
-void gameController::actionCommand(void)
+void gameController::clearSelectInfo(void)
 {
-	switch (_curCommand)
+	_selectInfo.isSelected = false;
+	_selectInfo.num = 0;
+	for (int i = 0; i < SELECTUNIT_MAX; i++)
 	{
-	case COMMAND_NONE:
-		break;
-	case COMMAND_ESC:
-		break;
-	case COMMAND_MOVE:
-	case COMMAND_ATTACK:
-	case COMMAND_PATROL:
-	case COMMAND_GATHER:
-		_findTarget = true;
-		break;
-	case COMMAND_STOP:
-	case COMMAND_HOLD:
-	case COMMAND_RETURNCARGO:
-	case COMMAND_BURROW:
-	case COMMAND_UNBURROW:
-		for (int i = 0; i < SELECTUNIT_MAX; i++)
-		{
-			if (_selectInfo.object[i] == NULL) continue;
-			_selectInfo.object[i]->receiveCommand(_curCommand);
-		}
-		_curCommand = COMMAND_NONE;
-		break;
-	case COMMAND_BUILD1:
-		break;
-	case COMMAND_BUILD2:
-		break;
-	case COMMAND_SELECT_LARVA:
-		if (_selectInfo.object[0]->getBuildingNumZerg() == BUILDINGNUM_ZERG_HATCHERY)
-		{
-			zbHatchery* hatchery = (zbHatchery*)_selectInfo.object[0];
-			vector<zuLarva*> larvas = hatchery->getLarvas();
-			if (larvas.size() > 0)
-			{
-				_selectInfo.object[0]->setClicked(false);
-				_selectInfo.object[0] = NULL;
-				_selectInfo.num = 0;
+		if (_selectInfo.object[i] == NULL) continue;
 
-				for (int i = 0; i < larvas.size(); i++)
-				{
-					larvas[i]->setClicked(true);
-					_selectInfo.object[i] = larvas[i];
-					_selectInfo.num++;
-				}
-			}
-		}
-		else if (_selectInfo.object[0]->getBuildingNumZerg() == BUILDINGNUM_ZERG_LAIR)
-		{
-			zbLair* lair = (zbLair*)_selectInfo.object[0];
-			vector<zuLarva*> larvas = lair->getLarvas();
-			if (larvas.size() > 0)
-			{
-				_selectInfo.object[0]->setClicked(false);
-				_selectInfo.object[0] = NULL;
-				_selectInfo.num = 0;
-
-				for (int i = 0; i < larvas.size(); i++)
-				{
-					larvas[i]->setClicked(true);
-					_selectInfo.object[i] = larvas[i];
-					_selectInfo.num++;
-				}
-			}
-		}
-		else if (_selectInfo.object[0]->getBuildingNumZerg() == BUILDINGNUM_ZERG_HIVE)
-		{
-			zbHive* hive = (zbHive*)_selectInfo.object[0];
-			vector<zuLarva*> larvas = hive->getLarvas();
-			if (larvas.size() > 0)
-			{
-				_selectInfo.object[0]->setClicked(false);
-				_selectInfo.object[0] = NULL;
-				_selectInfo.num = 0;
-
-				for (int i = 0; i < larvas.size(); i++)
-				{
-					larvas[i]->setClicked(true);
-					_selectInfo.object[i] = larvas[i];
-					_selectInfo.num++;
-				}
-			}
-		}
-		_curCommand = COMMAND_NONE;
-		break;
-	case COMMAND_SETRALLYPOINT:
-		break;
-
-
-		//ZERG
-	case COMMAND_INFEST:					_findTarget = true;		break;
-	case COMMAND_PARASITE:					_findTarget = true;		break;
-	case COMMAND_BROODRING:					_findTarget = true;		break;
-	case COMMAND_ENSNARE:					_findTarget = true;		break;
-	case COMMAND_CONSUME:					_findTarget = true;		break;
-	case COMMAND_DARKSWARM:					_findTarget = true;		break;
-	case COMMAND_PLAGUE:					_findTarget = true;		break;
-
-		//BUILD1
-	case COMMAND_BUILD_HATCHERY:			_findLocation = true;	_buildingSize = BUILDSIZE_HATCHERY			;	_buildable = false; break;
-	case COMMAND_BUILD_LAIR:				break;
-	case COMMAND_BUILD_HIVE:				break;
-	case COMMAND_BUILD_CREEPCOLONY:			_findLocation = true;	_buildingSize = BUILDSIZE_CREEPCOLONY		;	_buildable = false; break;
-	case COMMAND_BUILD_SUNKENCOLONY:		break;
-	case COMMAND_BUILD_SPORECOLONY:			break;
-	case COMMAND_BUILD_EXTRACTOR:			_findLocation = true;	_buildingSize = BUILDSIZE_EXTRACTOR			;	_buildable = false; break;
-	case COMMAND_BUILD_SPAWNINGPOOL:		_findLocation = true;	_buildingSize = BUILDSIZE_SPAWNINGPOOL		;	_buildable = false; break;
-	case COMMAND_BUILD_EVOLUTIONCHAMBER:	_findLocation = true;	_buildingSize = BUILDSIZE_EVOLUTIONCHAMBER	;	_buildable = false; break;
-	case COMMAND_BUILD_HYDRALISKDEN:		_findLocation = true;	_buildingSize = BUILDSIZE_HYDRALISKDEN		;	_buildable = false; break;
-		//BUILD2
-	case COMMAND_BUILD_SPIRE:				_findLocation = true;	_buildingSize = BUILDSIZE_SPIRE				;	_buildable = false; break;
-	case COMMAND_BUILD_GREATERSPIRE:		break;
-	case COMMAND_BUILD_QUEENSNEST:			_findLocation = true;	_buildingSize = BUILDSIZE_QUEENSNEST		;	_buildable = false; break;
-	case COMMAND_BUILD_NYDUSCANAL:			_findLocation = true;	_buildingSize = BUILDSIZE_NYDUSCANAL		;	_buildable = false; break;
-	case COMMAND_BUILD_ULTRALISKCAVERN:		_findLocation = true;	_buildingSize = BUILDSIZE_ULTRALISKCAVERN	;	_buildable = false; break;
-	case COMMAND_BUILD_DEFILERMOUND:		_findLocation = true;	_buildingSize = BUILDSIZE_DEFILERMOUND		;	_buildable = false; break;
-
-		//UNIT
-	case COMMAND_UNIT_DRONE:
-		for (int i = 0; i < SELECTUNIT_MAX; i++)
-		{
-			if (_selectInfo.object[i] == NULL) continue;
-			_selectInfo.object[i]->receiveCommand(_curCommand);
-		}
-		_curCommand = COMMAND_NONE;
-		break;
-
-	case COMMAND_UNIT_ZERGLING:				break;
-	case COMMAND_UNIT_OVERLORD:				break;
-	case COMMAND_UNIT_HYDRALISK:			break;
-	case COMMAND_UNIT_MUTALISK:				break;
-	case COMMAND_UNIT_SCOURGE:				break;
-	case COMMAND_UNIT_QUEEN:				break;
-	case COMMAND_UNIT_ULTRALISK:			break;
-	case COMMAND_UNIT_DEFILER:				break;
-		//UNIT2
-	case COMMAND_UNIT_LURKER:				break;
-	case COMMAND_UNIT_GUADIAN:				break;
-	case COMMAND_UNIT_DEVOURER:				break;
-	case COMMAND_UNIT_INFESTEDTERRAN:		break;
-
-		//UPGRADE
-	case COMMAND_UPGRADE_ZERG_MELEEATTACKS:				break; //저그 지상유닛 근접 공격
-	case COMMAND_UPGRADE_ZERG_MISSILEATTACKS:			break; //저그 지상유닛 원거리 공격
-	case COMMAND_UPGRADE_ZERG_CARAPACE:					break; //저그 지상유닛 방어력
-	case COMMAND_UPGRADE_ZERG_FLYERATTACKS:				break; //저그 공중유닛 공격
-	case COMMAND_UPGRADE_ZERG_FLYERCARAPACE:			break; //저그 공중유닛 방어력
-
-		//EVOLUTION
-	case COMMAND_EVOLUTION_ZERG_BURROW:			break; //저그 버러우 업글
-	case COMMAND_EVOLUTION_ZERG_METABOLICK_BOOST:		break; //저글링 이속업
-	case COMMAND_EVOLUTION_ZERG_ADRENAL_GLANDS:			break; //저글링 아드레날린
-	case COMMAND_EVOLUTION_ZERG_VECTRAL_SACS:			break; //오버로드 수송업
-	case COMMAND_EVOLUTION_ZERG_ANTENNAE:				break; //오버로드 시야업
-	case COMMAND_EVOLUTION_ZERG_PNEUMATIZED_CARAPACE:	break; //오버로드 이속업
-	case COMMAND_EVOLUTION_ZERG_MUSCULAR_AUGMENTS:		break; //히드라 이속업
-	case COMMAND_EVOLUTION_ZERG_GROOVED_SPINES:			break; //히드라 사정거리업
-	case COMMAND_EVOLUTION_ZERG_LURKER_ASPECT:	break; //럴커 업글
-	case COMMAND_EVOLUTION_ZERG_SPAWN_BROODLING:	break; //퀸 브루드링 업글
-	case COMMAND_EVOLUTION_ZERG_ENSNARE:			break; //퀸 인스테어 업글
-	case COMMAND_EVOLUTION_ZERG_GAMETE_MEIOSIS:			break; //퀸 마나업
-	case COMMAND_EVOLUTION_ZERG_ANABOLIC_SYNTHESIS:		break; //울트라 이송업
-	case COMMAND_EVOLUTION_ZERG_CHITINOUS_PLATING:		break; //울트라 방업(+2)
-	case COMMAND_EVOLUTION_ZERG_PLAGUE:			break; //디파일러 플레이그
-	case COMMAND_EVOLUTION_ZERG_CONSUME:			break; //디파일러 컨슘
-	case COMMAND_EVOLUTION_ZERG_METASYNAPTIC_NODE:		break; //디파일러 마나업
-
+		_selectInfo.object[i]->setClicked(false);
+		_selectInfo.object[i] = NULL;
 	}
-
 }
 
-void gameController::setCommandSet(void)
+void gameController::clearSelectInfo(gameObject* object)
 {
-	if (_selectInfo.isSelected == FALSE)
+	if (object == NULL)
 		return;
 
+	for (int i = 0; i < SELECTUNIT_MAX; i++)
+	{
+		if (_selectInfo.object[i] == object)
+		{
+			object->setClicked(false);
+			_selectInfo.object[i] = NULL;
+			_selectInfo.num--;
+		}
+	}
+
+	checkSelectInfo();
+}
+
+void gameController::checkSelectInfo(void)
+{
+	UINT num = 0;
+	for (int i = 0; i < SELECTUNIT_MAX; i++)
+	{
+		if (_selectInfo.object[i] == NULL) continue;
+
+		num++;
+	}
+
+	_selectInfo.num = num;
+
+	if (num == 0)
+	{
+		_selectInfo.isSelected = false;
+	}
+}
+
+void gameController::refreshSelectInfo(void)
+{
 	//선택 되었어도 죽어서 없어졌는지 다시 체크
 	int realUnitNum = 0;
 
@@ -1348,72 +1293,80 @@ void gameController::setCommandSet(void)
 	}
 	_selectInfo.num = realUnitNum;
 
-	//유닛에게 커맨드 상태, 커맨드셋 받아오기
-	if (realUnitNum == 1)
+	//정렬
+	for (int i = 0; i < _selectInfo.num; i++)
 	{
-		_unitCommandInfo = _selectInfo.object[0]->getBattleStatus().curCommand;
-		memcpy(_commandSetUnit, _selectInfo.object[0]->getBaseStatus().commands, sizeof(COMMAND)*COMMAND_MAX);
-	}
-	else
-	{
-		//유닛이 복수일 경우
-		//0. 라바, 에그, 일반유닛 구분
-		//1. 모두 같은 유닛인지 체크 (->TRUE : 커맨드 모두 그대로 감 (드론은 빌드 제외))
-		//2. 다른 유닛일 경우 모두 지상유닛인지 체크 (->TRUE : 버러우 가능한 유닛이 있으면 버러우 커맨드 추가)
-		//3. 공격 불가능한 유닛들만 있는지 체크 (-> 공격 커맨드 빼야됨)
-		//4. 
-
-	}
-
-
-
-
-
-
-	//debug
-	switch (_curCommand)
-	{
-	case COMMAND_BUILD1:
-		for (int i = 0; i < COMMAND_MAX; i++)
+		if (_selectInfo.object[i] == NULL)
 		{
-			_commandSet[i].command = _commandSetBuild1[i];
-		}
-		break;
-	case COMMAND_BUILD2:
-		for (int i = 0; i < COMMAND_MAX; i++)
-		{
-			_commandSet[i].command = _commandSetBuild2[i];
-		}
-		break;
-	default:
-		if (_findTarget || _findLocation)
-		{
-			for (int i = 0; i < COMMAND_MAX; i++)
+			for (int j = i + 1; j < SELECTUNIT_MAX; j++)
 			{
-				_commandSet[i].command = _commandSetEsc[i];
+				_selectInfo.object[i] = _selectInfo.object[j];
+				_selectInfo.object[j] = NULL;
+				printf("");
 			}
 		}
-		else
-		{
-			for (int i = 0; i < COMMAND_MAX; i++)
-			{
-				_commandSet[i].command = _commandSetUnit[i];
-			}
-		}
-		break;
 	}
-
-	//커맨드 핫키 매칭
-	matchingCommandHotkey();
-	//커맨드 이미지 매칭
-	matchingCommandImage();
 }
 
-void gameController::matchingCommandHotkey(void)
+
+void gameController::changeSelectInfoToNextObect(gameObject* object)
 {
-	for (int i = 0; i < COMMAND_MAX; i++)
+	if (_selectInfo.isSelected == false)
+		return;
+
+	for (int i = 0; i < SELECTUNIT_MAX; i++)
 	{
-		_commandSet[i].hotkey = _hotkeys->getHotkey(_commandSet[i].command);
+		//선택한 오브젝트를 찾아서
+		if (_selectInfo.object[i] == object)
+		{
+			if (object->getNextObject() == NULL)
+			{
+				clearSelectInfo(_selectInfo.object[i]);
+			}
+			else
+			{
+				bool clicked = _selectInfo.object[i]->getClicked();
+
+				//유닛에서 건물로 바뀔경우
+				if (_selectInfo.object[i]->getIsBuilding() == false && object->getNextObject()->getIsBuilding() == true)
+				{
+					//드론 하나만 선택되어 있을때만
+					if (_selectInfo.object[i]->getUnitnumZerg() == UNITNUM_ZERG_DRONE && _selectInfo.num == 1)
+					{
+						//다음 오브젝트의 클릭상태를 업뎃해주고
+						object->getNextObject()->setClicked(clicked);
+						//다음 오브젝트를 받는다.
+						_selectInfo.object[i] = object->getNextObject();
+					}
+				}
+				else
+				{
+					//다음 오브젝트의 클릭상태를 업뎃해주고
+					object->getNextObject()->setClicked(clicked);
+					//다음 오브젝트를 받는다.
+					_selectInfo.object[i] = object->getNextObject();
+				}
+			}
+
+
+
+			if (_selectInfo.object[i] == NULL)
+			{
+				//다음 오브젝트가 없으면 선택한 숫자를 줄여주고,
+				_selectInfo.num--;
+				if (_selectInfo.num <= 0)
+				{
+					//선택한 숫자가 0이면 선택을 취소한다.
+					_selectInfo.num = 0;
+					_selectInfo.isSelected = false;
+				}
+			}
+			else
+			{
+				_selectInfo.object[i]->setClicked(true);
+			}
+			return;
+		}
 	}
 }
 
@@ -2285,33 +2238,255 @@ void gameController::matchingCommandImage(void)
 
 		}
 	}
+
 }
 
-void gameController::changeSelectInfoToNextObect(gameObject* object)
+
+void gameController::actionCommand(void)
 {
-	if (_selectInfo.isSelected == false)
-		return;
-
-	for (int i = 0; i < SELECTUNIT_MAX; i++)
+	switch (_curCommand)
 	{
-		//선택한 오브젝트를 찾아서
-		if (_selectInfo.object[i] == object)
+	case COMMAND_NONE:
+		break;
+	case COMMAND_ESC:
+		break;
+	case COMMAND_MOVE:
+	case COMMAND_ATTACK:
+	case COMMAND_PATROL:
+	case COMMAND_GATHER:
+		_findTarget = true;
+		break;
+	case COMMAND_STOP:
+	case COMMAND_HOLD:
+	case COMMAND_RETURNCARGO:
+	case COMMAND_BURROW:
+	case COMMAND_UNBURROW:
+		for (int i = 0; i < SELECTUNIT_MAX; i++)
 		{
-			//다음 오브젝트를 받는다.
-			_selectInfo.object[i] = object->getNextObject();
-
-			if (_selectInfo.object[i] == NULL)
+			if (_selectInfo.object[i] == NULL) continue;
+			_selectInfo.object[i]->receiveCommand(_curCommand);
+		}
+		_curCommand = COMMAND_NONE;
+		break;
+	case COMMAND_BUILD1:
+		break;
+	case COMMAND_BUILD2:
+		break;
+	case COMMAND_SELECT_LARVA:
+		if (_selectInfo.object[0]->getBuildingNumZerg() == BUILDINGNUM_ZERG_HATCHERY)
+		{
+			zbHatchery* hatchery = (zbHatchery*)_selectInfo.object[0];
+			vector<zuLarva*> larvas = hatchery->getLarvas();
+			if (larvas.size() > 0)
 			{
-				//다음 오브젝트가 없으면 선택한 숫자를 줄여주고,
-				_selectInfo.num--;
-				if (_selectInfo.num <= 0)
+				_selectInfo.object[0]->setClicked(false);
+				_selectInfo.object[0] = NULL;
+				_selectInfo.num = 0;
+
+				for (int i = 0; i < larvas.size(); i++)
 				{
-					//선택한 숫자가 0이면 선택을 취소한다.
-					_selectInfo.num = 0;
-					_selectInfo.isSelected = false;
+					larvas[i]->setClicked(true);
+					_selectInfo.object[i] = larvas[i];
+					_selectInfo.num++;
 				}
 			}
-			return;
 		}
+		else if (_selectInfo.object[0]->getBuildingNumZerg() == BUILDINGNUM_ZERG_LAIR)
+		{
+			zbLair* lair = (zbLair*)_selectInfo.object[0];
+			vector<zuLarva*> larvas = lair->getLarvas();
+			if (larvas.size() > 0)
+			{
+				_selectInfo.object[0]->setClicked(false);
+				_selectInfo.object[0] = NULL;
+				_selectInfo.num = 0;
+
+				for (int i = 0; i < larvas.size(); i++)
+				{
+					larvas[i]->setClicked(true);
+					_selectInfo.object[i] = larvas[i];
+					_selectInfo.num++;
+				}
+			}
+		}
+		else if (_selectInfo.object[0]->getBuildingNumZerg() == BUILDINGNUM_ZERG_HIVE)
+		{
+			zbHive* hive = (zbHive*)_selectInfo.object[0];
+			vector<zuLarva*> larvas = hive->getLarvas();
+			if (larvas.size() > 0)
+			{
+				_selectInfo.object[0]->setClicked(false);
+				_selectInfo.object[0] = NULL;
+				_selectInfo.num = 0;
+
+				for (int i = 0; i < larvas.size(); i++)
+				{
+					larvas[i]->setClicked(true);
+					_selectInfo.object[i] = larvas[i];
+					_selectInfo.num++;
+				}
+			}
+		}
+		_curCommand = COMMAND_NONE;
+		break;
+	case COMMAND_SETRALLYPOINT:
+		break;
+
+
+		//ZERG
+	case COMMAND_INFEST:					_findTarget = true;		break;
+	case COMMAND_PARASITE:					_findTarget = true;		break;
+	case COMMAND_BROODRING:					_findTarget = true;		break;
+	case COMMAND_ENSNARE:					_findTarget = true;		break;
+	case COMMAND_CONSUME:					_findTarget = true;		break;
+	case COMMAND_DARKSWARM:					_findTarget = true;		break;
+	case COMMAND_PLAGUE:					_findTarget = true;		break;
+
+		//BUILD1
+	case COMMAND_BUILD_HATCHERY:			_findLocation = true;	_buildingSize = BUILDSIZE_HATCHERY			;	_buildable = false; break;
+	case COMMAND_BUILD_LAIR:				break;
+	case COMMAND_BUILD_HIVE:				break;
+	case COMMAND_BUILD_CREEPCOLONY:			_findLocation = true;	_buildingSize = BUILDSIZE_CREEPCOLONY		;	_buildable = false; break;
+	case COMMAND_BUILD_SUNKENCOLONY:		break;
+	case COMMAND_BUILD_SPORECOLONY:			break;
+	case COMMAND_BUILD_EXTRACTOR:			_findLocation = true;	_buildingSize = BUILDSIZE_EXTRACTOR			;	_buildable = false; break;
+	case COMMAND_BUILD_SPAWNINGPOOL:		_findLocation = true;	_buildingSize = BUILDSIZE_SPAWNINGPOOL		;	_buildable = false; break;
+	case COMMAND_BUILD_EVOLUTIONCHAMBER:	_findLocation = true;	_buildingSize = BUILDSIZE_EVOLUTIONCHAMBER	;	_buildable = false; break;
+	case COMMAND_BUILD_HYDRALISKDEN:		_findLocation = true;	_buildingSize = BUILDSIZE_HYDRALISKDEN		;	_buildable = false; break;
+		//BUILD2
+	case COMMAND_BUILD_SPIRE:				_findLocation = true;	_buildingSize = BUILDSIZE_SPIRE				;	_buildable = false; break;
+	case COMMAND_BUILD_GREATERSPIRE:		break;
+	case COMMAND_BUILD_QUEENSNEST:			_findLocation = true;	_buildingSize = BUILDSIZE_QUEENSNEST		;	_buildable = false; break;
+	case COMMAND_BUILD_NYDUSCANAL:			_findLocation = true;	_buildingSize = BUILDSIZE_NYDUSCANAL		;	_buildable = false; break;
+	case COMMAND_BUILD_ULTRALISKCAVERN:		_findLocation = true;	_buildingSize = BUILDSIZE_ULTRALISKCAVERN	;	_buildable = false; break;
+	case COMMAND_BUILD_DEFILERMOUND:		_findLocation = true;	_buildingSize = BUILDSIZE_DEFILERMOUND		;	_buildable = false; break;
+
+		//UNIT
+	case COMMAND_UNIT_DRONE:
+		for (int i = 0; i < SELECTUNIT_MAX; i++)
+		{
+			if (_selectInfo.object[i] == NULL) continue;
+			_selectInfo.object[i]->receiveCommand(_curCommand);
+		}
+		_curCommand = COMMAND_NONE;
+		break;
+
+	case COMMAND_UNIT_ZERGLING:				break;
+	case COMMAND_UNIT_OVERLORD:				break;
+	case COMMAND_UNIT_HYDRALISK:			break;
+	case COMMAND_UNIT_MUTALISK:				break;
+	case COMMAND_UNIT_SCOURGE:				break;
+	case COMMAND_UNIT_QUEEN:				break;
+	case COMMAND_UNIT_ULTRALISK:			break;
+	case COMMAND_UNIT_DEFILER:				break;
+		//UNIT2
+	case COMMAND_UNIT_LURKER:				break;
+	case COMMAND_UNIT_GUADIAN:				break;
+	case COMMAND_UNIT_DEVOURER:				break;
+	case COMMAND_UNIT_INFESTEDTERRAN:		break;
+
+		//UPGRADE
+	case COMMAND_UPGRADE_ZERG_MELEEATTACKS:				break; //저그 지상유닛 근접 공격
+	case COMMAND_UPGRADE_ZERG_MISSILEATTACKS:			break; //저그 지상유닛 원거리 공격
+	case COMMAND_UPGRADE_ZERG_CARAPACE:					break; //저그 지상유닛 방어력
+	case COMMAND_UPGRADE_ZERG_FLYERATTACKS:				break; //저그 공중유닛 공격
+	case COMMAND_UPGRADE_ZERG_FLYERCARAPACE:			break; //저그 공중유닛 방어력
+
+		//EVOLUTION
+	case COMMAND_EVOLUTION_ZERG_BURROW:			break; //저그 버러우 업글
+	case COMMAND_EVOLUTION_ZERG_METABOLICK_BOOST:		break; //저글링 이속업
+	case COMMAND_EVOLUTION_ZERG_ADRENAL_GLANDS:			break; //저글링 아드레날린
+	case COMMAND_EVOLUTION_ZERG_VECTRAL_SACS:			break; //오버로드 수송업
+	case COMMAND_EVOLUTION_ZERG_ANTENNAE:				break; //오버로드 시야업
+	case COMMAND_EVOLUTION_ZERG_PNEUMATIZED_CARAPACE:	break; //오버로드 이속업
+	case COMMAND_EVOLUTION_ZERG_MUSCULAR_AUGMENTS:		break; //히드라 이속업
+	case COMMAND_EVOLUTION_ZERG_GROOVED_SPINES:			break; //히드라 사정거리업
+	case COMMAND_EVOLUTION_ZERG_LURKER_ASPECT:	break; //럴커 업글
+	case COMMAND_EVOLUTION_ZERG_SPAWN_BROODLING:	break; //퀸 브루드링 업글
+	case COMMAND_EVOLUTION_ZERG_ENSNARE:			break; //퀸 인스테어 업글
+	case COMMAND_EVOLUTION_ZERG_GAMETE_MEIOSIS:			break; //퀸 마나업
+	case COMMAND_EVOLUTION_ZERG_ANABOLIC_SYNTHESIS:		break; //울트라 이송업
+	case COMMAND_EVOLUTION_ZERG_CHITINOUS_PLATING:		break; //울트라 방업(+2)
+	case COMMAND_EVOLUTION_ZERG_PLAGUE:			break; //디파일러 플레이그
+	case COMMAND_EVOLUTION_ZERG_CONSUME:			break; //디파일러 컨슘
+	case COMMAND_EVOLUTION_ZERG_METASYNAPTIC_NODE:		break; //디파일러 마나업
+
+	}
+
+}
+
+void gameController::setCommandSet(void)
+{
+	if (_selectInfo.isSelected == FALSE)
+		return;
+
+	
+
+	//유닛에게 커맨드 상태, 커맨드셋 받아오기
+	if (_selectInfo.num == 1)
+	{
+		_unitCommandInfo = _selectInfo.object[0]->getBattleStatus().curCommand;
+		memcpy(_commandSetUnit, _selectInfo.object[0]->getBaseStatus().commands, sizeof(COMMAND)*COMMAND_MAX);
+	}
+	else
+	{
+		//유닛이 복수일 경우
+		//0. 라바, 에그, 일반유닛 구분
+		//1. 모두 같은 유닛인지 체크 (->TRUE : 커맨드 모두 그대로 감 (드론은 빌드 제외))
+		//2. 다른 유닛일 경우 모두 지상유닛인지 체크 (->TRUE : 버러우 가능한 유닛이 있으면 버러우 커맨드 추가)
+		//3. 공격 불가능한 유닛들만 있는지 체크 (-> 공격 커맨드 빼야됨)
+		//4. 
+
+	}
+
+
+
+
+
+
+	//debug
+	switch (_curCommand)
+	{
+	case COMMAND_BUILD1:
+		for (int i = 0; i < COMMAND_MAX; i++)
+		{
+			_commandSet[i].command = _commandSetBuild1[i];
+		}
+		break;
+	case COMMAND_BUILD2:
+		for (int i = 0; i < COMMAND_MAX; i++)
+		{
+			_commandSet[i].command = _commandSetBuild2[i];
+		}
+		break;
+	default:
+		if (_findTarget || _findLocation)
+		{
+			for (int i = 0; i < COMMAND_MAX; i++)
+			{
+				_commandSet[i].command = _commandSetEsc[i];
+			}
+		}
+		else
+		{
+			for (int i = 0; i < COMMAND_MAX; i++)
+			{
+				_commandSet[i].command = _commandSetUnit[i];
+			}
+		}
+		break;
+	}
+
+	//커맨드 핫키 매칭
+	matchingCommandHotkey();
+	//커맨드 이미지 매칭
+	matchingCommandImage();
+}
+
+void gameController::matchingCommandHotkey(void)
+{
+	for (int i = 0; i < COMMAND_MAX; i++)
+	{
+		_commandSet[i].hotkey = _hotkeys->getHotkey(_commandSet[i].command);
 	}
 }

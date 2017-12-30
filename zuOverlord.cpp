@@ -49,11 +49,11 @@ void zuOverlord::initBaseStatus(void)
 	_stprintf(_baseStatus.name, L"Zerg Overlord");
 
 	TCHAR strKey[100];
-	_stprintf(strKey, L"ZU-overlordBody%d", _playerNum);
+	_stprintf(strKey, L"ZU-overlord-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);
 	_baseStatus.imgFace = NULL;
-	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-overlordStat1");
-	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-overlordStat2");
+	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-overlord-Stat1");
+	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-overlord-Stat2");
 
 	_baseStatus.unitControl = 0.0f;
 	_baseStatus.publicControl = 8.0f;

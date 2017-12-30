@@ -41,10 +41,10 @@ void zbQueensNest::initBaseStatus(void)
 	_stprintf(_baseStatus.name, L"Zerg Queen's Nest");
 
 	TCHAR strKey[100];
-	_stprintf(strKey, L"ZB-queensnestBody%d", _playerNum);
+	_stprintf(strKey, L"ZB-queensnest-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);
 	_baseStatus.imgFace = NULL;
-	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZB-queensnestStat1");
+	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZB-queensnest-Stat1");
 	_baseStatus.imgStat2 = NULL;
 
 	_baseStatus.maxHP = 850.0f;

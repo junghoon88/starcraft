@@ -277,7 +277,11 @@ BOOL loading::loadingImageDone()
 		case LOAD_KIND_SOUND:
 		{
 			tagSoundResource sound = item->getSoundResource();
-			SOUNDMANAGER->addSound(sound.keyName, sound.fileName, sound.bgm, sound.loop);
+			bool res = SOUNDMANAGER->addSound(sound.keyName, sound.fileName, sound.bgm, sound.loop);
+			if (res == false)
+			{
+				printf("");
+			}
 		}
 		break;
 	}

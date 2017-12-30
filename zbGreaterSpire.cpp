@@ -41,10 +41,10 @@ void zbGreaterSpire::initBaseStatus(void)
 	_stprintf(_baseStatus.name, L"Zerg Greater Spire");
 
 	TCHAR strKey[100];
-	_stprintf(strKey, L"ZB-greaterspireBody%d", _playerNum);
+	_stprintf(strKey, L"ZB-greaterspire-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);
 	_baseStatus.imgFace = NULL;
-	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZB-greaterspireStat1");
+	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZB-greaterspire-Stat1");
 	_baseStatus.imgStat2 = NULL;
 
 	_baseStatus.maxHP = 1000.0f;

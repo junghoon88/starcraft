@@ -49,11 +49,11 @@ void zuZergling::initBaseStatus(void)
 	_stprintf(_baseStatus.name, L"Zerg Zergling");
 
 	TCHAR strKey[100];
-	_stprintf(strKey, L"ZU-zerglingBody%d", _playerNum);
+	_stprintf(strKey, L"ZU-zergling-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);				
 	_baseStatus.imgFace = NULL;											
-	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-zerglingStat1");	
-	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-zerglingStat2");	
+	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-zergling-Stat1");	
+	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-zergling-Stat2");	
 
 	_baseStatus.unitControl = 0.5f;
 

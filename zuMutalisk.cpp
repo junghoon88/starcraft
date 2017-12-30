@@ -50,11 +50,11 @@ void zuMutalisk::initBaseStatus(void)
 	_stprintf(_baseStatus.name, L"Zerg Mutalisk");
 
 	TCHAR strKey[100];
-	_stprintf(strKey, L"ZU-mutaliskBody%d", _playerNum);
+	_stprintf(strKey, L"ZU-mutalisk-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);
 	_baseStatus.imgFace = NULL;
-	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-mutaliskStat1");
-	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-mutaliskStat2");
+	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-mutalisk-Stat1");
+	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-mutalisk-Stat2");
 
 	_baseStatus.unitControl = 2.0f;
 

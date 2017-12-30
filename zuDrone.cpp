@@ -80,11 +80,11 @@ void zuDrone::initBaseStatus(void)
 	_stprintf(_baseStatus.name, L"Zerg Drone");	//이름
 												//BaseStatus
 	TCHAR strKey[100];
-	_stprintf(strKey, L"ZU-droneBody%d", _playerNum);
+	_stprintf(strKey, L"ZU-drone-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);				//이미지-몸체
 	_baseStatus.imgFace = NULL;											//이미지-얼굴(우측하단)
-	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-droneStat1");	//이미지-스탯상태(1마리클릭했을때)
-	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-droneStat2");	//이미지-스탯상태(복수클릭했을때)
+	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-drone-Stat1");	//이미지-스탯상태(1마리클릭했을때)
+	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-drone-Stat2");	//이미지-스탯상태(복수클릭했을때)
 
 	_baseStatus.unitControl = 1.0f;
 
@@ -229,9 +229,6 @@ void zuDrone::procCommands(void)
 				hatchery->setLinkAdressAstar(_aStar);
 				hatchery->setLinkAdressPlayer(_player);
 				hatchery->init(_battleStatus.ptTileTarget);
-
-				this->setClicked(false);
-				if (_battleStatus.clicked)	hatchery->setClicked(true);
 
 				_player->addBuilding(hatchery);
 

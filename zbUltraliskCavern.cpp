@@ -40,13 +40,13 @@ HRESULT zbUltraliskCavern::init(POINT ptTile)
 void zbUltraliskCavern::initBaseStatus(void)
 {
 	//Properties
-	_stprintf(_baseStatus.name, L"Zerg UltraliskCavern");
+	_stprintf(_baseStatus.name, L"Zerg Ultralisk Cavern");
 
 	TCHAR strKey[100];
-	_stprintf(strKey, L"ZB-ultraliskCavernBody%d", _playerNum);
+	_stprintf(strKey, L"ZB-ultraliskcavern-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);
 	_baseStatus.imgFace = NULL;
-	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZB-ultraliskCavernStat1");
+	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZB-ultraliskcavern-Stat1");
 	_baseStatus.imgStat2 = NULL;
 
 	_baseStatus.maxHP = 600.0f;

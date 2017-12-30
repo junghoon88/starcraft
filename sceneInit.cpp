@@ -268,19 +268,88 @@ void sceneInit::initImageZergUnits(void)
 	for (int i = 0; i < PLAYER_NUM; i++)
 	{
 		//larva
-		_stprintf(strKey, L"ZU-larvaBody%d", i);
+		_stprintf(strKey, L"ZU-larva-Body%d", i);
 		_stprintf(strFile, L"image/zerg/unit/larva/Body%d.bmp", i);
 		_loading->loadFrameImage(strKey, strFile, 288, 36, 8, 1, true, RGB(0, 255, 255));
 
 		//zergegg
-		_stprintf(strKey, L"ZU-zergeggBody%d", i);
+		_stprintf(strKey, L"ZU-zergegg-Body%d", i);
 		_stprintf(strFile, L"image/zerg/unit/zergegg/Body%d.bmp", i);
 		_loading->loadFrameImage(strKey, strFile, 960, 96, 10, 1, true, RGB(0, 255, 255));
 
 		//drone
-		_stprintf(strKey, L"ZU-droneBody%d", i);
+		_stprintf(strKey, L"ZU-drone-Body%d", i);
 		_stprintf(strFile, L"image/zerg/unit/drone/Body%d.bmp", i);
-		_loading->loadFrameImage(strKey, strFile, 576, 1008, 8, 14, true, RGB(255, 0, 255));
+		//_loading->loadFrameImage(strKey, strFile, 576, 1008, 8, 14, true, RGB(255, 0, 255));
+		_loading->loadFrameImage(strKey, strFile, 1024, 128, 8, 1, true, RGB(0, 255, 255));
+
+		//zergling
+		_stprintf(strKey, L"ZU-zergling-Body%d", i);
+		_stprintf(strFile, L"image/zerg/unit/zergling/Body%d.bmp", i);
+		_loading->loadFrameImage(strKey, strFile, 1024, 128, 8, 1, true, RGB(0, 255, 255));
+
+		//hydralisk
+		_stprintf(strKey, L"ZU-hydralisk-Body%d", i);
+		_stprintf(strFile, L"image/zerg/unit/hydralisk/Body%d.bmp", i);
+		_loading->loadFrameImage(strKey, strFile, 1024, 128, 8, 1, true, RGB(0, 255, 255));
+
+
+		//lurker
+
+		//lurkeregg
+		_stprintf(strKey, L"ZU-lurkeregg-Body%d", i);
+		_stprintf(strFile, L"image/zerg/unit/lurkeregg/Body%d.bmp", i);
+		_loading->loadFrameImage(strKey, strFile, 960, 96, 10, 1, true, RGB(0, 255, 255));
+
+		//ultralisk
+		_stprintf(strKey, L"ZU-ultralisk-Body%d", i);
+		_stprintf(strFile, L"image/zerg/unit/ultralisk/Body%d.bmp", i);
+		_loading->loadFrameImage(strKey, strFile, 1024, 128, 8, 1, true, RGB(0, 255, 255));
+
+		//broodling
+		_stprintf(strKey, L"ZU-broodling-Body%d", i);
+		_stprintf(strFile, L"image/zerg/unit/broodling/Body%d.bmp", i);
+		_loading->loadFrameImage(strKey, strFile, 384, 48, 8, 1, true, RGB(0, 255, 255));
+
+		//defiler
+		_stprintf(strKey, L"ZU-defiler-Body%d", i);
+		_stprintf(strFile, L"image/zerg/unit/defiler/Body%d.bmp", i);
+		_loading->loadFrameImage(strKey, strFile, 640, 80, 8, 1, true, RGB(0, 255, 255));
+
+		//infestedterran
+		_stprintf(strKey, L"ZU-infestedterran-Body%d", i);
+		_stprintf(strFile, L"image/zerg/unit/infestedterran/Body%d.bmp", i);
+		_loading->loadFrameImage(strKey, strFile, 512, 64, 8, 1, true, RGB(0, 255, 255));
+
+		//overlord
+		_stprintf(strKey, L"ZU-overlord-Body%d", i);
+		_stprintf(strFile, L"image/zerg/unit/overlord/Body%d.bmp", i);
+		_loading->loadFrameImage(strKey, strFile, 672, 84, 8, 1, true, RGB(0, 255, 255));
+
+
+		//mutalisk
+		_stprintf(strKey, L"ZU-mutalisk-Body%d", i);
+		_stprintf(strFile, L"image/zerg/unit/mutalisk/Body%d.bmp", i);
+		_loading->loadFrameImage(strKey, strFile, 1024, 128, 8, 1, true, RGB(0, 255, 255));
+
+		//scourge
+		_stprintf(strKey, L"ZU-scourge-Body%d", i);
+		_stprintf(strFile, L"image/zerg/unit/scourge/Body%d.bmp", i);
+		_loading->loadFrameImage(strKey, strFile, 384, 48, 8, 1, true, RGB(0, 255, 255));
+
+		//queen
+		_stprintf(strKey, L"ZU-queen-Body%d", i);
+		_stprintf(strFile, L"image/zerg/unit/queen/Body%d.bmp", i);
+		_loading->loadFrameImage(strKey, strFile, 1024, 128, 8, 1, true, RGB(0, 255, 255));
+
+		//cocoon
+
+		//guadian
+		_stprintf(strKey, L"ZU-guadian-Body%d", i);
+		_stprintf(strFile, L"image/zerg/unit/guadian/Body%d.bmp", i);
+		_loading->loadFrameImage(strKey, strFile, 768, 96, 8, 1, true, RGB(0, 255, 255));
+
+		//devourer
 
 	}
 
@@ -288,76 +357,76 @@ void sceneInit::initImageZergUnits(void)
 
 	//Stat---------------------------------------------------------------------------------------------------------------------------------
 	//larva
-	_loading->loadImage(L"ZU-larvaStat1", L"image/zerg/unit/larva/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
-	_loading->loadImage(L"ZU-larvaStat2", L"image/zerg/unit/larva/Stat2.bmp", 33, 34);
+	_loading->loadImage(L"ZU-larva-Stat1", L"image/zerg/unit/larva/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZU-larva-Stat2", L"image/zerg/unit/larva/Stat2.bmp", 33, 34);
 
 	//zergegg
-	_loading->loadImage(L"ZU-zergeggStat1", L"image/zerg/unit/zergegg/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
-	_loading->loadImage(L"ZU-zergeggStat2", L"image/zerg/unit/zergegg/Stat2.bmp", 33, 34);
+	_loading->loadImage(L"ZU-zergegg-Stat1", L"image/zerg/unit/zergegg/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZU-zergegg-Stat2", L"image/zerg/unit/zergegg/Stat2.bmp", 33, 34);
 
 
 	//drone
-	_loading->loadImage(L"ZU-droneStat1", L"image/zerg/unit/drone/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
-	_loading->loadImage(L"ZU-droneStat2", L"image/zerg/unit/drone/Stat2.bmp", 33, 34);
+	_loading->loadImage(L"ZU-drone-Stat1", L"image/zerg/unit/drone/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZU-drone-Stat2", L"image/zerg/unit/drone/Stat2.bmp", 33, 34);
 
 	//zergling
-	_loading->loadImage(L"ZU-zerglingStat1", L"image/zerg/unit/zergling/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
-	_loading->loadImage(L"ZU-zerglingStat2", L"image/zerg/unit/zergling/Stat2.bmp", 33, 34);
+	_loading->loadImage(L"ZU-zergling-Stat1", L"image/zerg/unit/zergling/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZU-zergling-Stat2", L"image/zerg/unit/zergling/Stat2.bmp", 33, 34);
 
 	//hydralisk
-	_loading->loadImage(L"ZU-hydraliskStat1", L"image/zerg/unit/hydralisk/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
-	_loading->loadImage(L"ZU-hydraliskStat2", L"image/zerg/unit/hydralisk/Stat2.bmp", 33, 34);
+	_loading->loadImage(L"ZU-hydralisk-Stat1", L"image/zerg/unit/hydralisk/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZU-hydralisk-Stat2", L"image/zerg/unit/hydralisk/Stat2.bmp", 33, 34);
 
 
 	//lurker
-	_loading->loadImage(L"ZU-lurkerStat1", L"image/zerg/unit/lurker/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
-	_loading->loadImage(L"ZU-lurkerStat2", L"image/zerg/unit/lurker/Stat2.bmp", 33, 34);
+	_loading->loadImage(L"ZU-lurker-Stat1", L"image/zerg/unit/lurker/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZU-lurker-Stat2", L"image/zerg/unit/lurker/Stat2.bmp", 33, 34);
 
 	//lurkeregg
-	_loading->loadImage(L"ZU-lurkereggStat1", L"image/zerg/unit/lurkeregg/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
-	_loading->loadImage(L"ZU-lurkereggStat2", L"image/zerg/unit/lurkeregg/Stat2.bmp", 33, 34);
+	_loading->loadImage(L"ZU-lurkeregg-Stat1", L"image/zerg/unit/lurkeregg/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZU-lurkeregg-Stat2", L"image/zerg/unit/lurkeregg/Stat2.bmp", 33, 34);
 
 	//ultralisk
-	_loading->loadImage(L"ZU-ultraliskStat1", L"image/zerg/unit/ultralisk/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
-	_loading->loadImage(L"ZU-ultraliskStat2", L"image/zerg/unit/ultralisk/Stat2.bmp", 33, 34);
+	_loading->loadImage(L"ZU-ultralisk-Stat1", L"image/zerg/unit/ultralisk/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZU-ultralisk-Stat2", L"image/zerg/unit/ultralisk/Stat2.bmp", 33, 34);
 
 	//broodling
-	_loading->loadImage(L"ZU-broodlingStat1", L"image/zerg/unit/broodling/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
-	_loading->loadImage(L"ZU-broodlingStat2", L"image/zerg/unit/broodling/Stat2.bmp", 33, 34);
+	_loading->loadImage(L"ZU-broodling-Stat1", L"image/zerg/unit/broodling/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZU-broodling-Stat2", L"image/zerg/unit/broodling/Stat2.bmp", 33, 34);
 
 	//defiler
-	_loading->loadImage(L"ZU-defilerStat1", L"image/zerg/unit/defiler/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
-	_loading->loadImage(L"ZU-defilerStat2", L"image/zerg/unit/defiler/Stat2.bmp", 33, 34);
+	_loading->loadImage(L"ZU-defiler-Stat1", L"image/zerg/unit/defiler/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZU-defiler-Stat2", L"image/zerg/unit/defiler/Stat2.bmp", 33, 34);
 
 	//infestedterran
 
 	//overlord
-	_loading->loadImage(L"ZU-overlordStat1", L"image/zerg/unit/overlord/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
-	_loading->loadImage(L"ZU-overlordStat2", L"image/zerg/unit/overlord/Stat2.bmp", 33, 34);
+	_loading->loadImage(L"ZU-overlord-Stat1", L"image/zerg/unit/overlord/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZU-overlord-Stat2", L"image/zerg/unit/overlord/Stat2.bmp", 33, 34);
 
 	//mutalisk
-	_loading->loadImage(L"ZU-mutaliskStat1", L"image/zerg/unit/mutalisk/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
-	_loading->loadImage(L"ZU-mutaliskStat2", L"image/zerg/unit/mutalisk/Stat2.bmp", 33, 34);
+	_loading->loadImage(L"ZU-mutalisk-Stat1", L"image/zerg/unit/mutalisk/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZU-mutalisk-Stat2", L"image/zerg/unit/mutalisk/Stat2.bmp", 33, 34);
 
 	//scourge
-	_loading->loadImage(L"ZU-scourgeStat1", L"image/zerg/unit/scourge/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
-	_loading->loadImage(L"ZU-scourgeStat2", L"image/zerg/unit/scourge/Stat2.bmp", 33, 34);
+	_loading->loadImage(L"ZU-scourge-Stat1", L"image/zerg/unit/scourge/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZU-scourge-Stat2", L"image/zerg/unit/scourge/Stat2.bmp", 33, 34);
 
 	//queen
-	_loading->loadImage(L"ZU-queenStat1", L"image/zerg/unit/queen/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
-	_loading->loadImage(L"ZU-queenStat2", L"image/zerg/unit/queen/Stat2.bmp", 33, 34);
+	_loading->loadImage(L"ZU-queen-Stat1", L"image/zerg/unit/queen/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZU-queen-Stat2", L"image/zerg/unit/queen/Stat2.bmp", 33, 34);
 
 	//cocoon
-	_loading->loadImage(L"ZU-cocoonStat1", L"image/zerg/unit/cocoon/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
-	_loading->loadImage(L"ZU-cocoonStat2", L"image/zerg/unit/cocoon/Stat2.bmp", 33, 34);
+	_loading->loadImage(L"ZU-cocoon-Stat1", L"image/zerg/unit/cocoon/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZU-cocoon-Stat2", L"image/zerg/unit/cocoon/Stat2.bmp", 33, 34);
 
 	//guadian
-	_loading->loadImage(L"ZU-guadianStat1", L"image/zerg/unit/guadian/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
-	_loading->loadImage(L"ZU-guadianStat2", L"image/zerg/unit/guadian/Stat2.bmp", 33, 34);
+	_loading->loadImage(L"ZU-guadian-Stat1", L"image/zerg/unit/guadian/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZU-guadian-Stat2", L"image/zerg/unit/guadian/Stat2.bmp", 33, 34);
 
 	//devourer
-	_loading->loadImage(L"ZU-devourerStat1", L"image/zerg/unit/devourer/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
-	_loading->loadImage(L"ZU-devourerStat2", L"image/zerg/unit/devourer/Stat2.bmp", 33, 34);
+	_loading->loadImage(L"ZU-devourer-Stat1", L"image/zerg/unit/devourer/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZU-devourer-Stat2", L"image/zerg/unit/devourer/Stat2.bmp", 33, 34);
 
 
 }
@@ -375,76 +444,76 @@ void sceneInit::initImageZergBuildings(void)
 	for (int i = 0; i < PLAYER_NUM; i++)
 	{
 		//hatchery
-		_stprintf(strKey, L"ZB-hatcheryBody%d", i);
+		_stprintf(strKey, L"ZB-hatchery-Body%d", i);
 		_stprintf(strFile, L"image/zerg/build/hatchery/Body%d.bmp", i);
 		_loading->loadFrameImage(strKey, strFile, 192, 960, 1, 6, true, RGB(0, 255, 255)); //6, 5 타일이미지이고 실제 크기는 4,3 임
 
 		//lair
-		_stprintf(strKey, L"ZB-lairBody%d", i);
+		_stprintf(strKey, L"ZB-lair-Body%d", i);
 		_stprintf(strFile, L"image/zerg/build/lair/Body%d.bmp", i);
 		_loading->loadFrameImage(strKey, strFile, 960, 160, 5, 1, true, RGB(0, 255, 255));
 
 		//hive
-		_stprintf(strKey, L"ZB-hiveBody%d", i);
+		_stprintf(strKey, L"ZB-hive-Body%d", i);
 		_stprintf(strFile, L"image/zerg/build/hive/Body%d.bmp", i);
 		_loading->loadFrameImage(strKey, strFile, 960, 224, 5, 1, true, RGB(0, 255, 255));
 
 		//creepcolony
-		_stprintf(strKey, L"ZB-creepcolonyBody%d", i);
+		_stprintf(strKey, L"ZB-creepcolony-Body%d", i);
 		_stprintf(strFile, L"image/zerg/build/creepcolony/Body%d.bmp", i);
 		_loading->loadFrameImage(strKey, strFile, 512, 64, 4, 1, true, RGB(0, 255, 255));
 
 		//sunkencolony
 
 		//sporecolony
-		_stprintf(strKey, L"ZB-sporecolonyBody%d", i);
+		_stprintf(strKey, L"ZB-sporecolony-Body%d", i);
 		_stprintf(strFile, L"image/zerg/build/sporecolony/Body%d.bmp", i);
 		_loading->loadFrameImage(strKey, strFile, 512, 128, 4, 1, true, RGB(0, 255, 255));
 
 		//extractor
-		_stprintf(strKey, L"ZB-extractorBody%d", i);
+		_stprintf(strKey, L"ZB-extractor-Body%d", i);
 		_stprintf(strFile, L"image/zerg/build/extractor/Body%d.bmp", i);
 		_loading->loadFrameImage(strKey, strFile, 128, 768, 1, 4, true, RGB(0, 255, 255));
 
 		//spawningpool
-		_stprintf(strKey, L"ZB-spawningpoolBody%d", i);
+		_stprintf(strKey, L"ZB-spawningpool-Body%d", i);
 		_stprintf(strFile, L"image/zerg/build/spawningpool/Body%d.bmp", i);
 		_loading->loadFrameImage(strKey, strFile, 384, 128, 4, 1, true, RGB(0, 255, 255));
 
 		//evolutionchamber
-		_stprintf(strKey, L"ZB-evolutionchamberBody%d", i);
+		_stprintf(strKey, L"ZB-evolutionchamber-Body%d", i);
 		_stprintf(strFile, L"image/zerg/build/evolutionchamber/Body%d.bmp", i);
 		_loading->loadFrameImage(strKey, strFile, 288, 128, 3, 1, true, RGB(0, 255, 255));
 
 		//hydraliskden
-		_stprintf(strKey, L"ZB-hydraliskdenBody%d", i);
+		_stprintf(strKey, L"ZB-hydraliskden-Body%d", i);
 		_stprintf(strFile, L"image/zerg/build/hydraliskden/Body%d.bmp", i);
 		_loading->loadFrameImage(strKey, strFile, 480, 128, 3, 1, true, RGB(0, 255, 255));
 
 		//spire
 
 		//greaterspire
-		_stprintf(strKey, L"ZB-greaterspireBody%d", i);
+		_stprintf(strKey, L"ZB-greaterspire-Body%d", i);
 		_stprintf(strFile, L"image/zerg/build/greaterspire/Body%d.bmp", i);
 		_loading->loadFrameImage(strKey, strFile, 128, 768, 1, 4, true, RGB(0, 255, 255));
 
 		//queensnest
-		_stprintf(strKey, L"ZB-queensnestBody%d", i);
+		_stprintf(strKey, L"ZB-queensnest-Body%d", i);
 		_stprintf(strFile, L"image/zerg/build/queensnest/Body%d.bmp", i);
 		_loading->loadFrameImage(strKey, strFile, 384, 128, 4, 1, true, RGB(0, 255, 255));
 
 		//nyduscanal
-		_stprintf(strKey, L"ZB-nyduscanalBody%d", i);
+		_stprintf(strKey, L"ZB-nyduscanal-Body%d", i);
 		_stprintf(strFile, L"image/zerg/build/nyduscanal/Body%d.bmp", i);
 		_loading->loadFrameImage(strKey, strFile, 640, 128, 5, 1, true, RGB(0, 255, 255));
 
 		//ultraliskcavern
-		_stprintf(strKey, L"ZB-ultraliskcavernBody%d", i);
+		_stprintf(strKey, L"ZB-ultraliskcavern-Body%d", i);
 		_stprintf(strFile, L"image/zerg/build/ultraliskcavern/Body%d.bmp", i);
 		_loading->loadFrameImage(strKey, strFile, 480, 128, 3, 1, true, RGB(0, 255, 255));
 
 		//defilermound
-		_stprintf(strKey, L"ZB-defilermoundBody%d", i);
+		_stprintf(strKey, L"ZB-defilermound-Body%d", i);
 		_stprintf(strFile, L"image/zerg/build/defilermound/Body%d.bmp", i);
 		_loading->loadFrameImage(strKey, strFile, 512, 128, 4, 1, true, RGB(0, 255, 255));
 
@@ -454,53 +523,53 @@ void sceneInit::initImageZergBuildings(void)
 
 
 	//hatchery
-	_loading->loadImage(L"ZB-hatcheryStat1", L"image/zerg/build/hatchery/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZB-hatchery-Stat1", L"image/zerg/build/hatchery/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
 
 
 	//lair
-	_loading->loadImage(L"ZB-lairStat1", L"image/zerg/build/lair/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZB-lair-Stat1", L"image/zerg/build/lair/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
 
 	//hive
-	_loading->loadImage(L"ZB-hiveStat1", L"image/zerg/build/hive/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZB-hive-Stat1", L"image/zerg/build/hive/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
 
 	//creepcolony
-	_loading->loadImage(L"ZB-creepcolonyStat1", L"image/zerg/build/creepcolony/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZB-creepcolony-Stat1", L"image/zerg/build/creepcolony/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
 
 	//sunkencolony
-	_loading->loadImage(L"ZB-sunkencolonyStat1", L"image/zerg/build/sunkencolony/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZB-sunkencolony-Stat1", L"image/zerg/build/sunkencolony/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
 
 	//sporecolony
-	_loading->loadImage(L"ZB-sporecolonyStat1", L"image/zerg/build/sporecolony/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZB-sporecolony-Stat1", L"image/zerg/build/sporecolony/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
 
 	//extractor
-	_loading->loadImage(L"ZB-extractorStat1", L"image/zerg/build/extractor/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZB-extractor-Stat1", L"image/zerg/build/extractor/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
 
 	//spawningpool
-	_loading->loadImage(L"ZB-spawningpoolStat1", L"image/zerg/build/spawningpool/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZB-spawningpool-Stat1", L"image/zerg/build/spawningpool/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
 
 	//evolutionchamber
-	_loading->loadImage(L"ZB-evolutionchamberStat1", L"image/zerg/build/evolutionchamber/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZB-evolutionchamber-Stat1", L"image/zerg/build/evolutionchamber/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
 
 	//hydraliskden
-	_loading->loadImage(L"ZB-hydraliskdenStat1", L"image/zerg/build/hydraliskden/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZB-hydraliskden-Stat1", L"image/zerg/build/hydraliskden/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
 
 	//spire
-	_loading->loadImage(L"ZB-spireStat1", L"image/zerg/build/spire/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZB-spire-Stat1", L"image/zerg/build/spire/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
 
 	//greaterspire
-	_loading->loadImage(L"ZB-greaterspireStat1", L"image/zerg/build/greaterspire/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZB-greaterspire-Stat1", L"image/zerg/build/greaterspire/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
 
 	//queensnest
-	_loading->loadImage(L"ZB-queensnestStat1", L"image/zerg/build/queensnest/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZB-queensnest-Stat1", L"image/zerg/build/queensnest/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
 
 	//nyduscanal
-	_loading->loadImage(L"ZB-nyduscanalStat1", L"image/zerg/build/nyduscanal/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZB-nyduscanal-Stat1", L"image/zerg/build/nyduscanal/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
 
 	//ultraliskcavern
-	_loading->loadImage(L"ZB-ultraliskcavernStat1", L"image/zerg/build/ultraliskcavern/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZB-ultraliskcavern-Stat1", L"image/zerg/build/ultraliskcavern/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
 
 	//defilermound
-	_loading->loadImage(L"ZB-defilermoundStat1", L"image/zerg/build/defilermound/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
+	_loading->loadImage(L"ZB-defilermound-Stat1", L"image/zerg/build/defilermound/Stat1.bmp", 89, 96, true, RGB(255, 0, 255));
 
 	//infestedcommandcenter
 

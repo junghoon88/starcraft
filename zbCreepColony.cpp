@@ -41,10 +41,10 @@ void zbCreepColony::initBaseStatus(void)
 	_stprintf(_baseStatus.name, L"Zerg Creep Colony");
 
 	TCHAR strKey[100];
-	_stprintf(strKey, L"ZB-creepcolonyBody%d", _playerNum);
+	_stprintf(strKey, L"ZB-creepcolony-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);
 	_baseStatus.imgFace = NULL;
-	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZB-creepcolonyStat1");
+	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZB-creepcolony-Stat1");
 	_baseStatus.imgStat2 = NULL;
 
 	_baseStatus.maxHP = 400.0f;

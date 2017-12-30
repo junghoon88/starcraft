@@ -49,11 +49,11 @@ void zuInfestedTerran::initBaseStatus(void)
 	_stprintf(_baseStatus.name, L"Zerg InfestedTerran");
 
 	TCHAR strKey[100]; 
-	_stprintf(strKey, L"ZU-infestedTerranBody%d", _playerNum);
+	_stprintf(strKey, L"ZU-infestedTerran-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);
 	_baseStatus.imgFace = NULL;
-	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-infestedTerranStat1");
-	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-infestedTerranStat2");
+	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-infestedTerran-Stat1");
+	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-infestedTerran-Stat2");
 
 	_baseStatus.unitControl = 1.0f;
 

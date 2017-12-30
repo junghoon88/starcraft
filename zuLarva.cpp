@@ -52,11 +52,11 @@ void zuLarva::initBaseStatus(void)
 	_stprintf(_baseStatus.name, L"Zerg Larva");	
 												
 	TCHAR strKey[100];
-	_stprintf(strKey, L"ZU-larvaBody%d", _playerNum);
+	_stprintf(strKey, L"ZU-larva-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);				
 	_baseStatus.imgFace = NULL;											
-	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-larvaStat1");	
-	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-larvaStat2");
+	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-larva-Stat1");	
+	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-larva-Stat2");
 
 	_baseStatus.maxHP = 25.0f;					
 
@@ -167,10 +167,6 @@ void zuLarva::procCommands(void)
 				egg->setLinkAdressPlayer(_player);
 				egg->init(_battleStatus.pt.toPoint());
 				
-				this->setClicked(false);
-				if (_battleStatus.clicked)	egg->setClicked(true);
-
-
 				_nextObject = egg;
 				_valid = false;
 

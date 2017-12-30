@@ -4,7 +4,7 @@
 class gameInterface : public gameNode
 {
 private:
-	image*		_imgInterface;
+	image*				_imgInterface;
 
 
 

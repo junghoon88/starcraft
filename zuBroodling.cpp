@@ -53,11 +53,11 @@ void zuBroodling::initBaseStatus(void)
 	_stprintf(_baseStatus.name, L"Zerg Broodling");
 
 	TCHAR strKey[100];
-	_stprintf(strKey, L"ZU-broodlingBody%d", _playerNum);
+	_stprintf(strKey, L"ZU-broodling-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);
 	_baseStatus.imgFace = NULL;
-	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-broodlingStat1");
-	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-broodlingStat2");
+	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-broodling-Stat1");
+	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-broodling-Stat2");
 
 	_baseStatus.unitControl = 0.0f;
 

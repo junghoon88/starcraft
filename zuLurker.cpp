@@ -48,11 +48,11 @@ void zuLurker::initBaseStatus(void)
 	_stprintf(_baseStatus.name, L"Zerg Lurker");
 
 	TCHAR strKey[100];
-	_stprintf(strKey, L"ZU-lurkerBody%d", _playerNum);
+	_stprintf(strKey, L"ZU-lurker-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);
 	_baseStatus.imgFace = NULL;
-	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-lurkerStat1");
-	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-lurkerStat2");
+	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-lurker-Stat1");
+	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-lurker-Stat2");
 
 	_baseStatus.unitControl = 2.0f;
 

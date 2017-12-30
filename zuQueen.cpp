@@ -49,11 +49,11 @@ void zuQueen::initBaseStatus(void)
 	_stprintf(_baseStatus.name, L"Zerg Queen");
 
 	TCHAR strKey[100];
-	_stprintf(strKey, L"ZU-queenBody%d", _playerNum);
+	_stprintf(strKey, L"ZU-queen-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);
 	_baseStatus.imgFace = NULL;
-	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-queenStat1");
-	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-queenStat2");
+	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-queen-Stat1");
+	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-queen-Stat2");
 
 	_baseStatus.unitControl = 2.0f;
 

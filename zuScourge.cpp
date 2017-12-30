@@ -48,11 +48,11 @@ void zuScourge::initBaseStatus(void)
 	_stprintf(_baseStatus.name, L"Zerg Scourge");
 
 	TCHAR strKey[100];
-	_stprintf(strKey, L"ZU-scourgeBody%d", _playerNum);
+	_stprintf(strKey, L"ZU-scourge-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);
 	_baseStatus.imgFace = NULL;
-	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-scourgeStat1");
-	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-scourgeStat2");
+	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-scourge-Stat1");
+	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-scourge-Stat2");
 
 	_baseStatus.unitControl = 0.5f;
 

@@ -128,11 +128,11 @@ void zuZergEgg::initBaseStatus(void)
 	_stprintf(_baseStatus.name, L"Zerg Egg");	
 												
 	TCHAR strKey[100];
-	_stprintf(strKey, L"ZU-zergeggBody%d", _playerNum);
+	_stprintf(strKey, L"ZU-zergegg-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);				
 	_baseStatus.imgFace = NULL;											
-	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-zergeggStat1");	
-	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-zergeggStat2");	
+	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-zergegg-Stat1");	
+	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-zergegg-Stat2");	
 	
 	_baseStatus.unitControl = _nextUnit->getBaseStatus().unitControl;
 

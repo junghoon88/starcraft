@@ -49,11 +49,11 @@ void zuCocoon::initBaseStatus(void)
 	_stprintf(_baseStatus.name, L"Zerg Cocoon");
 
 	TCHAR strKey[100];
-	_stprintf(strKey, L"ZU-cocoonBody%d", _playerNum);
+	_stprintf(strKey, L"ZU-cocoon-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);
 	_baseStatus.imgFace = NULL;
-	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-cocoonStat1");
-	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-cocoonStat2");
+	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-cocoon-Stat1");
+	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-cocoon-Stat2");
 
 	_baseStatus.unitControl = 2.0f;
 

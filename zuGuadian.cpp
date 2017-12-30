@@ -48,11 +48,11 @@ void zuGuadian::initBaseStatus(void)
 	_stprintf(_baseStatus.name, L"Zerg Guadian");
 
 	TCHAR strKey[100];
-	_stprintf(strKey, L"ZU-guadianBody%d", _playerNum);
+	_stprintf(strKey, L"ZU-guadian-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);
 	_baseStatus.imgFace = NULL;
-	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-guadianStat1");
-	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-guadianStat2");
+	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-guadian-Stat1");
+	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-guadian-Stat2");
 
 	_baseStatus.unitControl = 2.0f;
 

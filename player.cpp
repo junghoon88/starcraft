@@ -215,8 +215,8 @@ void player::render(fog* fog)
 
 void player::checkInCamera(void)
 {
-	_vBuildingsInCamera.clear();	//카메라에 보여주는 건물들
 	_vUnitsInCamera.clear();		//카메라에 보여주는 유닛들
+	_vBuildingsInCamera.clear();	//카메라에 보여주는 건물들
 
 	RECT temp;
 	RECT rcCamera = MAINCAMERA->getRectCamera();
@@ -227,6 +227,15 @@ void player::checkInCamera(void)
 		if (IntersectRect(&temp, &rcCamera, &rcBody))
 		{
 			_vUnitsInCamera.push_back(_vUnits[i]);
+		}
+	}
+
+	for (UINT i = 0; i < _vBuildings.size(); i++)
+	{
+		RECT rcBody = _vBuildings[i]->getBattleStatus().rcBody;
+		if (IntersectRect(&temp, &rcCamera, &rcBody))
+		{
+			_vBuildingsInCamera.push_back(_vBuildings[i]);
 		}
 	}
 }

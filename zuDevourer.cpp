@@ -48,11 +48,11 @@ void zuDevourer::initBaseStatus(void)
 	_stprintf(_baseStatus.name, L"Zerg Devourer");
 
 	TCHAR strKey[100];
-	_stprintf(strKey, L"ZU-devourerBody%d", _playerNum);
+	_stprintf(strKey, L"ZU-devourer-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);
 	_baseStatus.imgFace = NULL;
-	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-devourerStat1");
-	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-devourerStat2");
+	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-devourer-Stat1");
+	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-devourer-Stat2");
 
 	_baseStatus.unitControl = 2.0f;
 

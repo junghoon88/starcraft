@@ -49,11 +49,11 @@ void zuUltralisk::initBaseStatus(void)
 	_stprintf(_baseStatus.name, L"Zerg Ultralisk");
 
 	TCHAR strKey[100];
-	_stprintf(strKey, L"ZU-ultraliskBody%d", _playerNum);
+	_stprintf(strKey, L"ZU-ultralisk-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);
 	_baseStatus.imgFace = NULL;
-	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-ultraliskStat1");
-	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-ultraliskStat2");
+	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-ultralisk-Stat1");
+	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-ultralisk-Stat2");
 
 	_baseStatus.unitControl = 4.0f;
 

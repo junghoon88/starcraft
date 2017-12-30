@@ -242,6 +242,7 @@ public:
 
 	//battleStatus 중 일부만 받을때
 	inline void setClicked(BOOL clicked) { _battleStatus.clicked = clicked; }
+	inline BOOL getClicked(void) { return _battleStatus.clicked; }
 
 };
 

@@ -48,11 +48,11 @@ void zuHydralisk::initBaseStatus(void)
 	_stprintf(_baseStatus.name, L"Zerg Hydralisk");
 
 	TCHAR strKey[100];
-	_stprintf(strKey, L"ZU-hydraliskBody%d", _playerNum);
+	_stprintf(strKey, L"ZU-hydralisk-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);
 	_baseStatus.imgFace = NULL;
-	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-hydraliskStat1");
-	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-hydraliskStat2");
+	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-hydralisk-Stat1");
+	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-hydralisk-Stat2");
 
 	_baseStatus.unitControl = 1.0f;
 
