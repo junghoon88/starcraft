@@ -101,8 +101,8 @@ player::~player()
 
 HRESULT player::init(PLAYER playerNum, RACES races)
 {
-	_myMineral = 500;
-	_myGas = 100;
+	_myMineral = 5000;
+	_myGas = 1000;
 	_myControl = _myControlMax = 0;
 
 	_playerNum = playerNum;
@@ -133,7 +133,7 @@ HRESULT player::init(PLAYER playerNum, RACES races)
 
 
 	//debug
-	zuDrone* drone = new zuDrone(playerNum);
+	zuDrone* drone = new zuDrone(_playerNum);
 	drone->setLinkAdressZergUpgrade(_zergUpgrade);
 	drone->setLinkAdressAstar(_aStar);
 	drone->setLinkAdressPlayer(this);

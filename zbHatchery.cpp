@@ -53,7 +53,7 @@ void zbHatchery::initBaseStatus(void)
 	_stprintf(_baseStatus.name, L"Zerg Hatchery");
 											
 	TCHAR strKey[100];
-	_stprintf(strKey, L"ZB-hatcheryBody");
+	_stprintf(strKey, L"ZB-hatcheryBody%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);				
 	_baseStatus.imgFace = NULL;											
 	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZB-hatcheryStat1");
@@ -84,7 +84,7 @@ void zbHatchery::initBaseStatus(void)
 
 	_baseStatus.commands[0] = COMMAND_SELECT_LARVA;
 	_baseStatus.commands[1] = COMMAND_SETRALLYPOINT;
-	_baseStatus.commands[2] = COMMAND_EVOLUTION_ZERG_EVOLVE_BURROW;
+	_baseStatus.commands[2] = COMMAND_EVOLUTION_ZERG_BURROW;
 	_baseStatus.commands[3] = COMMAND_NONE;
 	_baseStatus.commands[4] = COMMAND_NONE;
 	_baseStatus.commands[5] = COMMAND_NONE;

@@ -754,7 +754,9 @@ void gameController::renderBuildImage(void)
 	if (_cursorState == CURSORSTATE_BUILD_HATCHERY)
 	{
 		//IMAGEMANAGER->frameRender(L"ZB-hatchery", getMemDC(), (ptTileMouseReal.x * TILESIZE) - TILESIZE - MAINCAMERA->getCameraX(), (ptTileMouseReal.y * TILESIZE) - TILESIZE - MAINCAMERA->getCameraY(), 0, 0);
-		image* imgHatchery = IMAGEMANAGER->findImage(L"ZB-hatcheryBody");
+		TCHAR strKey[100];
+		_stprintf(strKey, L"ZB-hatcheryBody%d", _playerNum);
+		image* imgHatchery = IMAGEMANAGER->findImage(strKey);
 		RENDERMANAGER->insertImgFrame(ZORDER_GAMEMOUSEDRAG, imgHatchery, (ptTileMouseReal.x * TILESIZE) - TILESIZE - MAINCAMERA->getCameraX(), (ptTileMouseReal.y * TILESIZE) - TILESIZE - MAINCAMERA->getCameraY(), 0, 0);
 		
 	}
@@ -1300,7 +1302,7 @@ void gameController::actionCommand(void)
 	case COMMAND_UPGRADE_ZERG_FLYERCARAPACE:			break; //저그 공중유닛 방어력
 
 		//EVOLUTION
-	case COMMAND_EVOLUTION_ZERG_EVOLVE_BURROW:			break; //저그 버러우 업글
+	case COMMAND_EVOLUTION_ZERG_BURROW:			break; //저그 버러우 업글
 	case COMMAND_EVOLUTION_ZERG_METABOLICK_BOOST:		break; //저글링 이속업
 	case COMMAND_EVOLUTION_ZERG_ADRENAL_GLANDS:			break; //저글링 아드레날린
 	case COMMAND_EVOLUTION_ZERG_VECTRAL_SACS:			break; //오버로드 수송업
@@ -1308,14 +1310,14 @@ void gameController::actionCommand(void)
 	case COMMAND_EVOLUTION_ZERG_PNEUMATIZED_CARAPACE:	break; //오버로드 이속업
 	case COMMAND_EVOLUTION_ZERG_MUSCULAR_AUGMENTS:		break; //히드라 이속업
 	case COMMAND_EVOLUTION_ZERG_GROOVED_SPINES:			break; //히드라 사정거리업
-	case COMMAND_EVOLUTION_ZERG_EVOLVE_LURKER_ASPECT:	break; //럴커 업글
-	case COMMAND_EVOLUTION_ZERG_EVOLVE_SPAWN_BROODLING:	break; //퀸 브루드링 업글
-	case COMMAND_EVOLUTION_ZERG_EVOLVE_ENSNARE:			break; //퀸 인스테어 업글
+	case COMMAND_EVOLUTION_ZERG_LURKER_ASPECT:	break; //럴커 업글
+	case COMMAND_EVOLUTION_ZERG_SPAWN_BROODLING:	break; //퀸 브루드링 업글
+	case COMMAND_EVOLUTION_ZERG_ENSNARE:			break; //퀸 인스테어 업글
 	case COMMAND_EVOLUTION_ZERG_GAMETE_MEIOSIS:			break; //퀸 마나업
 	case COMMAND_EVOLUTION_ZERG_ANABOLIC_SYNTHESIS:		break; //울트라 이송업
 	case COMMAND_EVOLUTION_ZERG_CHITINOUS_PLATING:		break; //울트라 방업(+2)
-	case COMMAND_EVOLUTION_ZERG_EVOLVE_PLAGUE:			break; //디파일러 플레이그
-	case COMMAND_EVOLUTION_ZERG_EVOLVE_CONSUME:			break; //디파일러 컨슘
+	case COMMAND_EVOLUTION_ZERG_PLAGUE:			break; //디파일러 플레이그
+	case COMMAND_EVOLUTION_ZERG_CONSUME:			break; //디파일러 컨슘
 	case COMMAND_EVOLUTION_ZERG_METASYNAPTIC_NODE:		break; //디파일러 마나업
 
 	}
@@ -2120,7 +2122,7 @@ void gameController::matchingCommandImage(void)
 			}
 
 			//EVOLUTION
-			case COMMAND_EVOLUTION_ZERG_EVOLVE_BURROW:			//저그 버러우 업글
+			case COMMAND_EVOLUTION_ZERG_BURROW:			//저그 버러우 업글
 			{
 				_commandSet[i].button->setImage(L"command-evolution_zerg_evolve_burrow");
 
@@ -2195,7 +2197,7 @@ void gameController::matchingCommandImage(void)
 				_commandSet[i].button->setOnlyDown(false);
 				break;
 			}
-			case COMMAND_EVOLUTION_ZERG_EVOLVE_LURKER_ASPECT:	//럴커 업글
+			case COMMAND_EVOLUTION_ZERG_LURKER_ASPECT:	//럴커 업글
 			{
 				_commandSet[i].button->setImage(L"command-evolution_zerg_evolve_lurker_aspect");
 
@@ -2208,7 +2210,7 @@ void gameController::matchingCommandImage(void)
 				_commandSet[i].button->setOnlyDown(false);
 				break;
 			}
-			case COMMAND_EVOLUTION_ZERG_EVOLVE_SPAWN_BROODLING:	//퀸 브루드링 업글
+			case COMMAND_EVOLUTION_ZERG_SPAWN_BROODLING:	//퀸 브루드링 업글
 			{
 				_commandSet[i].button->setImage(L"command-evolution_zerg_evolve_spawn_broodling");
 
@@ -2217,7 +2219,7 @@ void gameController::matchingCommandImage(void)
 				_commandSet[i].button->setOnlyDown(false);
 				break;
 			}
-			case COMMAND_EVOLUTION_ZERG_EVOLVE_ENSNARE:			//퀸 인스테어 업글
+			case COMMAND_EVOLUTION_ZERG_ENSNARE:			//퀸 인스테어 업글
 			{
 				_commandSet[i].button->setImage(L"command-evolution_zerg_evolve_ensnare");
 
@@ -2253,7 +2255,7 @@ void gameController::matchingCommandImage(void)
 				_commandSet[i].button->setOnlyDown(false);
 				break;
 			}
-			case COMMAND_EVOLUTION_ZERG_EVOLVE_PLAGUE:			//디파일러 플레이그
+			case COMMAND_EVOLUTION_ZERG_PLAGUE:			//디파일러 플레이그
 			{
 				_commandSet[i].button->setImage(L"command-evolution_zerg_evolve_plague");
 
@@ -2262,7 +2264,7 @@ void gameController::matchingCommandImage(void)
 				_commandSet[i].button->setOnlyDown(false);
 				break;
 			}
-			case COMMAND_EVOLUTION_ZERG_EVOLVE_CONSUME:			//디파일러 컨슘
+			case COMMAND_EVOLUTION_ZERG_CONSUME:			//디파일러 컨슘
 			{
 				_commandSet[i].button->setImage(L"command-evolution_zerg_evolve_consume");
 
@@ -2292,9 +2294,23 @@ void gameController::changeSelectInfoToNextObect(gameObject* object)
 
 	for (int i = 0; i < SELECTUNIT_MAX; i++)
 	{
+		//선택한 오브젝트를 찾아서
 		if (_selectInfo.object[i] == object)
 		{
+			//다음 오브젝트를 받는다.
 			_selectInfo.object[i] = object->getNextObject();
+
+			if (_selectInfo.object[i] == NULL)
+			{
+				//다음 오브젝트가 없으면 선택한 숫자를 줄여주고,
+				_selectInfo.num--;
+				if (_selectInfo.num <= 0)
+				{
+					//선택한 숫자가 0이면 선택을 취소한다.
+					_selectInfo.num = 0;
+					_selectInfo.isSelected = false;
+				}
+			}
 			return;
 		}
 	}

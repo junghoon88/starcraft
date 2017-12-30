@@ -55,7 +55,14 @@ void Building::render(int imgOffsetX, int imgOffsetY)
 		_battleStatus.bodyFrame.x, _battleStatus.bodyFrame.y);
 
 	//debug
-	RENDERMANAGER->insertLineRectangle(ZORDER_INTERFACE2, _battleStatus.rcBody, PENVERSION_BLUE1);
+	{
+		RECT temp = _battleStatus.rcBody;
+		temp.left -= MAINCAMERA->getCameraX();
+		temp.right -= MAINCAMERA->getCameraX();
+		temp.top -= MAINCAMERA->getCameraY();
+		temp.bottom -= MAINCAMERA->getCameraY();
+		RENDERMANAGER->insertLineRectangle(ZORDER_INTERFACE2, temp, PENVERSION_BLUE1);
+	}
 }
 
 void Building::updateBattleStatus(void)

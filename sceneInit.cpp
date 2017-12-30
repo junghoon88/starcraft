@@ -368,8 +368,53 @@ void sceneInit::initImageZergBuildings(void)
 	_loading->loadFrameImage(L"ZB-MutatingBody2", L"image/zerg/build/morphing/zbuild2.bmp", 1760, 192, 11, 1, true, RGB(0, 255, 255));
 	_loading->loadFrameImage(L"ZB-MutatingBody3", L"image/zerg/build/morphing/zbuild3.bmp", 1760, 192, 11, 1, true, RGB(0, 255, 255));
 
+	TCHAR strKey[100];
+	TCHAR strFile[100];
+
+	//Body---------------------------------------------------------------------------------------------------------------------------------
+	for (int i = 0; i < PLAYER_NUM; i++)
+	{
+		//hatchery
+		_stprintf(strKey, L"ZB-hatcheryBody%d", i);
+		_stprintf(strFile, L"image/zerg/build/hatchery/hatcheryBody%d.bmp", i);
+		_loading->loadFrameImage(strKey, strFile, 192, 960, 1, 6, true, RGB(0, 255, 255)); //6, 5 타일이미지이고 실제 크기는 4,3 임
+
+		//lair
+
+		//hive
+
+		//creepcolony
+
+		//sunkencolony
+
+		//sporecolony
+
+		//extractor
+
+		//spawningpool
+
+		//evolutionchamber
+
+		//hydraliskden
+
+		//spire
+
+		//greaterspire
+
+		//queensnest
+
+		//nyduscanal
+
+		//ultraliskcavern
+
+		//defilermound
+
+		//infestedcommandcenter
+
+	}
+
+
 	//hatchery
-	_loading->loadFrameImage(L"ZB-hatcheryBody", L"image/zerg/build/hatchery/hatcheryBody.bmp", 192, 960, 1, 6, true, RGB(0, 255, 255)); //6, 5 타일이미지이고 실제 크기는 4,3 임
 	_loading->loadImage(L"ZB-hatcheryStat1", L"image/zerg/build/hatchery/hatcheryStat1.bmp", 89, 96, true, RGB(255, 0, 255));
 
 

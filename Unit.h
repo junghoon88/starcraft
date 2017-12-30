@@ -129,7 +129,7 @@ public:
 	Unit();
 	~Unit();
 
-	virtual HRESULT init(void);
+	virtual HRESULT init(POINT pt);
 	virtual void release(void);
 	virtual void update(void);
 	virtual void render(void);

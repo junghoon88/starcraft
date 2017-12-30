@@ -1,7 +1,19 @@
 #include "stdafx.h"
 #include "zuZergEgg.h"
 
+#include "player.h"
 
+#include "zuDrone.h"
+#include "zuZergling.h"
+#include "zuOverlord.h"
+#include "zuHydralisk.h"
+#include "zuMutalisk.h"
+#include "zuScourge.h"
+#include "zuQueen.h"
+#include "zuUltralisk.h"
+#include "zuDefiler.h"
+
+#include <assert.h>
 
 zuZergEgg::zuZergEgg(PLAYER playerNum, UNITNUM_ZERG nextUnitNum)
 {
@@ -21,9 +33,16 @@ zuZergEgg::zuZergEgg(PLAYER playerNum, UNITNUM_ZERG nextUnitNum)
 
 	_nextUnitNum = nextUnitNum;
 
+
+	_buildTime = _buildTimeMax = 0.0f;
+
 	_complete = false;
 
 	_zergProductionInfo = new zergProductionInfo;
+
+	_nextUnit = NULL;
+
+	_progressBar = NULL;
 }
 
 
@@ -33,6 +52,7 @@ zuZergEgg::~zuZergEgg()
 
 HRESULT zuZergEgg::init(POINT pt)
 {
+	initNextUnit(pt);
 	initBaseStatus();
 	initBattleStatus(pt);
 
@@ -43,45 +63,102 @@ HRESULT zuZergEgg::init(POINT pt)
 	updateBattleStatus();
 
 
+	_buildTimeMax = _zergProductionInfo->getZUProductionInfo(_nextUnitNum).buildTime;
+
+
+
+	_progressBar = new progressBar;
+	_progressBar->init(L"Mutating");
+	_progressBar->setPointLT(263, 427);
+
+
+
 	return S_OK;
+}
+
+void zuZergEgg::initNextUnit(POINT pt)
+{
+	switch (_nextUnitNum)
+	{
+	case UNITNUM_ZERG_DRONE:
+		_nextUnit = new zuDrone(_playerNum);
+		break;
+	case UNITNUM_ZERG_ZERGLING:
+		_nextUnit = new zuZergling(_playerNum);
+		break;
+	case UNITNUM_ZERG_OVERLORD:
+		_nextUnit = new zuOverlord(_playerNum);
+		break;
+	case UNITNUM_ZERG_HYDRALISK:
+		_nextUnit = new zuHydralisk(_playerNum);
+		break;
+	case UNITNUM_ZERG_MUTALISK:
+		_nextUnit = new zuMutalisk(_playerNum);
+		break;
+	case UNITNUM_ZERG_SCOURGE:
+		_nextUnit = new zuScourge(_playerNum);
+		break;
+	case UNITNUM_ZERG_QUEEN:
+		_nextUnit = new zuQueen(_playerNum);
+		break;
+	case UNITNUM_ZERG_ULTRALISK:
+		_nextUnit = new zuUltralisk(_playerNum);
+		break;
+	case UNITNUM_ZERG_DEFILER:
+		_nextUnit = new zuDefiler(_playerNum);
+		break;
+	}
+
+	if (_nextUnit == NULL)
+	{
+		assert(L"egg->nextUnit 에러");
+		return;
+	}
+
+	_nextUnit->setLinkAdressZergUpgrade(_zergUpgrade);
+	_nextUnit->setLinkAdressAstar(_aStar);
+	_nextUnit->setLinkAdressPlayer(_player);
+	_nextUnit->init(pt);
+
 }
 
 
 void zuZergEgg::initBaseStatus(void)
 {
-	//Properties
-	_stprintf(_baseStatus.name, L"Zerg Egg");	//이름
-												//BaseStatus
+	_stprintf(_baseStatus.name, L"Zerg Egg");	
+												
 	TCHAR strKey[100];
 	_stprintf(strKey, L"ZU-zergeggBody%d", _playerNum);
-	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);				//이미지-몸체
-	_baseStatus.imgFace = NULL;											//이미지-얼굴(우측하단)
-	_baseStatus.imgStat1 = NULL;//IMAGEMANAGER->findImage(L"ZU-droneStat1");	//이미지-스탯상태(1마리클릭했을때)
-	_baseStatus.imgStat2 = NULL;//IMAGEMANAGER->findImage(L"ZU-droneStat2");	//이미지-스탯상태(복수클릭했을때)
+	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);				
+	_baseStatus.imgFace = NULL;											
+	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-zergeggStat1");	
+	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-zergeggStat2");	
+	
+	_baseStatus.unitControl = _nextUnit->getBaseStatus().unitControl;
 
-	_baseStatus.maxHP = 200.0f;					//HP
+	_baseStatus.maxHP = 200.0f;					
 
-	_baseStatus.useSH = FALSE;					//실드여부
-	_baseStatus.maxSH = 0.0f;					//실드
+	_baseStatus.useSH = FALSE;					
+	_baseStatus.maxSH = 0.0f;					
 
-	_baseStatus.useMP = FALSE;					//에너지여부
-	_baseStatus.maxMP = 0.0f;					//에너지
+	_baseStatus.useMP = FALSE;					
+	_baseStatus.maxMP = 0.0f;					
 
-	_baseStatus.sight = 5.0f;					//시야
-	_baseStatus.detector = FALSE;				//디텍터(오버로드, 스포어콜로니)
+	_baseStatus.sight = 5.0f;					
+	_baseStatus.detector = FALSE;				
 
-	_baseStatus.isAir = FALSE;					//공중유닛인지
-	_baseStatus.moveSpeed = 0.0f;				//이동속도
+	_baseStatus.isAir = FALSE;					
+	_baseStatus.moveSpeed = 0.0f;				
 
-	_baseStatus.unitSize = UNITSIZE_SMALL;		//유닛사이즈
-	_baseStatus.transportslots = 0;				//수송 슬롯칸 수
-	_baseStatus.armor = 10;						//방어력
-	_baseStatus.armorPlus = 1;					//추가 방어력
+	_baseStatus.unitSize = UNITSIZE_SMALL;		
+	_baseStatus.transportslots = 0;				
+	_baseStatus.armor = 10;						
+	_baseStatus.armorPlus = 1;					
 
-												//combat
-	_baseStatus.sameGWAW = FALSE;						//지상공격, 공중공격이 같은지
-	_baseStatus.GWable = FALSE;							//지상공격 가능여부
-	_baseStatus.AWable = FALSE;							//공중공격 가능여부
+												
+	_baseStatus.sameGWAW = FALSE;				
+	_baseStatus.GWable = FALSE;					
+	_baseStatus.AWable = FALSE;					
 
 	_baseStatus.commands[0] = COMMAND_NONE;
 	_baseStatus.commands[1] = COMMAND_NONE;
@@ -109,11 +186,18 @@ void zuZergEgg::initBattleStatus(POINT pt)
 
 void zuZergEgg::release(void)
 {
+	SAFE_RELEASEDELETE(_nextUnit);
+	SAFE_RELEASEDELETE(_progressBar);
 	SAFE_DELETE(_zergProductionInfo);
 }
 
 void zuZergEgg::update(void)
 {
+	Unit::update();
+
+	updateProgressBar();
+
+
 	if (_battleStatus.bodyFrame.x < 4)
 	{
 		_battleStatus.bodyFrame.x++;
@@ -139,23 +223,101 @@ void zuZergEgg::update(void)
 
 void zuZergEgg::render(void)
 {
+	Unit::render();
+
+	_progressBar->ZRender(ZORDER_INTERFACE2);
 
 }
 
 void zuZergEgg::updateBattleStatus(void)
 {
+	POINT pt = _battleStatus.pt.toPoint();
+	_battleStatus.ptTile = { pt.x / TILESIZE, pt.y / TILESIZE };			//현재위치한 타일
 
+	POINT unitsize = UNITSIZE_ZERG_ZERGEGG;
+
+	_battleStatus.rcBody = RectMakeCenter(pt.x, pt.y, unitsize.x, unitsize.y);			//유닛 몸체
+	_battleStatus.rcEllipse = _battleStatus.rcBody;		//클릭했을때 보여주는 타원
+	_battleStatus.rcEllipse.top += unitsize.y / 4;
+	_battleStatus.rcEllipse.bottom -= unitsize.y / 4;
 }
 void zuZergEgg::updatePosition(void)
 {
+	Unit::updateBattleStatus();
 
 }
 void zuZergEgg::updateImageFrame(void)
 {
+	if (!_complete)
+	{
+		//처음
+		if (_battleStatus.bodyFrame.x < 4)
+		{
+			_battleStatus.bodyFrame.x++;
+		}
+		else
+		{
+			//중간 반복
+			_battleStatus.bodyFrameTime += TIMEMANAGER->getElapsedTime();
+			if (_battleStatus.bodyFrameTime >= UNIT_BODY_FPS_TIME)
+			{
+				_battleStatus.bodyFrameTime -= UNIT_BODY_FPS_TIME;
+				_battleStatus.bodyFrame.x = (_battleStatus.bodyFrame.x == 6) ? 4 : _battleStatus.bodyFrame.x + 1;
+			}
+		}
+	}
+	else
+	{
+		//마지막
+		if (_battleStatus.bodyFrame.x < 9)
+		{
+			_battleStatus.bodyFrame.x++;
+		}
+		else
+		{
+			//tagBattleStatus temp = _battleStatus;
+			//temp.bodyFrame.x = 0;
+			//temp.bodyFrame.y = 0;
+			//temp.curCommand = COMMAND_STOP;
+			//_nextUnit->setBattleStatus(temp);
+			_player->addUnit(_nextUnit);
+
+			_nextObject = _nextUnit;
+			_valid = false;
+		}
+	}
+
+}
+
+void zuZergEgg::updateProgressBar(void)
+{
+	float tick = TIMEMANAGER->getElapsedTime() * BUILDSPEEDMULTIPLY;
+
+	if (_complete == false)
+	{
+		_buildTime += tick;
+
+		if (_buildTime >= _buildTimeMax)
+		{
+			_buildTime = _buildTimeMax;
+
+			_complete = true;
+			_battleStatus.bodyFrame.x = 7;
+		}
+	}
+
+	_progressBar->setGauge(_buildTime, _buildTimeMax);
 
 }
 
 void zuZergEgg::procCommands(void)
 {
+	if (_battleStatus.curCommand == COMMAND_ESC)
+	{
 
+	}
+	else
+	{
+		_battleStatus.curCommand = COMMAND_NONE;
+	}
 }

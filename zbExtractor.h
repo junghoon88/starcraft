@@ -2,14 +2,18 @@
 #include "Building.h"
 class zbExtractor : public Building
 {
+private:
+	void initBaseStatus(void);
+	void initBattleStatus(POINT ptTile);
+
 public:
-	zbExtractor();
+	zbExtractor(PLAYER playerNum);
 	~zbExtractor();
 
-	HRESULT init(POINT ptTIle);
+	HRESULT init(POINT ptTile);
 	void release(void);
 	void update(void);
-	void render(void);
+	void render(int imgOffsetX = 0, int imgOffsetY = 0);
 
 };
 

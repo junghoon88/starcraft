@@ -5,7 +5,7 @@
 #include "zuHydralisk.h"
 #include "zuInfestedTerran.h"
 #include "zuLarva.h"
-#include "zuLerkerEgg.h"
+#include "zuLurkerEgg.h"
 #include "zuLurker.h"
 #include "zuUltralisk.h"
 #include "zuZergEgg.h"
@@ -14,7 +14,7 @@
 #include "zuDevourer.h"
 #include "zuGuadian.h"
 #include "zuMutalisk.h"
-#include "zuOverload.h"
+#include "zuOverlord.h"
 #include "zuQueen.h"
 #include "zuScourge.h"
 

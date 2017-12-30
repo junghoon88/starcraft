@@ -34,8 +34,6 @@ gameObject::gameObject()
 	//BattleStatus
 	ZeroMemory(&_battleStatus, sizeof(tagBattleStatus));
 
-	//유닛마다 가지고 있는 고유 속성들의 집합
-	ZeroMemory(&_unionSpecialStatus, sizeof(unionSpecialStatus));;
 
 	_zergUpgrade = NULL;
 

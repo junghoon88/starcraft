@@ -23,7 +23,7 @@ Unit::~Unit()
 {
 }
 
-HRESULT Unit::init(void)
+HRESULT Unit::init(POINT pt)
 {
 
 
@@ -57,7 +57,14 @@ void Unit::render(void)
 	RENDERMANAGER->insertImgFrameCC(ZORDER_GAMEOBJECT, _baseStatus.imgBody, _battleStatus.pt.x - MAINCAMERA->getCameraX(), _battleStatus.pt.y - MAINCAMERA->getCameraY(), _battleStatus.bodyFrame.x, _battleStatus.bodyFrame.y);
 
 	//debug
-	RENDERMANAGER->insertLineRectangle(ZORDER_INTERFACE2, _battleStatus.rcBody, PENVERSION_BLUE1);
+	{
+		RECT temp = _battleStatus.rcBody;
+		temp.left -= MAINCAMERA->getCameraX();
+		temp.right -= MAINCAMERA->getCameraX();
+		temp.top -= MAINCAMERA->getCameraY();
+		temp.bottom -= MAINCAMERA->getCameraY();
+		RENDERMANAGER->insertLineRectangle(ZORDER_INTERFACE2, temp, PENVERSION_BLUE1);
+	}
 }
 
 void Unit::updateBattleStatus(void)

@@ -47,6 +47,9 @@ struct tagBaseStatus
 	image*				imgStat1;		//이미지-스탯상태(1마리클릭했을때)
 	image*				imgStat2;		//이미지-스탯상태(복수클릭했을때)
 
+	FLOAT				unitControl;	//유닛이 차지하는 인구수
+	FLOAT				publicControl;	//공급해주는 인구수
+
 	FLOAT				maxHP;			//HP
 
 	BOOL				useSH;			//실드여부
@@ -144,21 +147,6 @@ struct tagBattleStatus
 
 };
 
-//SpecialStatus
-struct tagZergUnitDrone
-{
-	WORKSTATE	_workState;
-	UINT		_hangingMineral;	//0이면 안들고 있는 것.
-	UINT		_hangingGas;		//0이면 안들고 있는 것.
-};
-
-//union 안에는 각각 유닛들의 고유 struct 를 담는다.
-union unionSpecialStatus
-{
-	tagZergUnitDrone drone;
-};
-
-
 class gameObject : public gameNode
 {
 protected:
@@ -193,9 +181,6 @@ protected:
 	tagBaseStatus			_baseStatus;
 	tagBattleStatus			_battleStatus;
 	
-	//유닛마다 가지고 있는 고유 속성들의 집합
-	unionSpecialStatus		_unionSpecialStatus;
-
 	zergUpgrade*			_zergUpgrade;
 
 	aStar*					_aStar;
@@ -246,7 +231,6 @@ public:
 	inline tagBaseStatus getBaseStatus(void) { return _baseStatus; }
 	inline tagBattleStatus getBattleStatus(void) { return _battleStatus; }
 	inline void setBattleStatus(tagBattleStatus status) { _battleStatus = status; }
-	inline unionSpecialStatus getSpecialStatus(void) { return _unionSpecialStatus; }
 
 	//A* 관련
 	inline BOOL getIsBusy(void) { return _battleStatus.isBusy; }

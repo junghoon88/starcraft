@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "zuLarva.h"
 #include "zergDefine.h"
+#include "player.h"
 
 #include "zuZergEgg.h"
 
@@ -65,7 +66,7 @@ void zuLarva::initBaseStatus(void)
 	_baseStatus.useMP = FALSE;					
 	_baseStatus.maxMP = 0.0f;					
 
-	_baseStatus.sight = 2.0f;					
+	_baseStatus.sight = 4.0f;					
 	_baseStatus.detector = FALSE;				
 
 	_baseStatus.isAir = FALSE;					
@@ -150,7 +151,7 @@ void zuLarva::updateBattleStatus(void)
 
 void zuLarva::updateImageFrame(void)
 {
-	Unit::updateImageFrame();
+	Unit::setImageFrameForAngle();
 }
 
 
@@ -159,8 +160,26 @@ void zuLarva::procCommands(void)
 	switch (_battleStatus.curCommand)
 	{
 		case COMMAND_UNIT_DRONE:
-			printf("");
-			_battleStatus.curCommand = COMMAND_NONE;
+			{
+				zuZergEgg* egg = new zuZergEgg(_playerNum, UNITNUM_ZERG_DRONE);
+				egg->setLinkAdressZergUpgrade(_zergUpgrade);
+				egg->setLinkAdressAstar(_aStar);
+				egg->setLinkAdressPlayer(_player);
+				egg->init(_battleStatus.pt.toPoint());
+				
+				this->setClicked(false);
+				if (_battleStatus.clicked)	egg->setClicked(true);
+
+
+				_nextObject = egg;
+				_valid = false;
+
+				_player->addUnit(egg);
+
+
+				_battleStatus.curCommand = COMMAND_NONE;
+
+			}
 			break;
 		case COMMAND_UNIT_ZERGLING:
 		case COMMAND_UNIT_OVERLORD:

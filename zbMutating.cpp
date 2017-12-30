@@ -407,11 +407,12 @@ void zbMutating::updateProgressBar(void)
 
 void zbMutating::procCommands(void)
 {
-	switch (_battleStatus.curCommand)
+	if (_battleStatus.curCommand == COMMAND_ESC)
 	{
-	case COMMAND_ESC:
 		//SAFE_RELEASEDELETE(_nextBuilding);
-
-		break;
+	}
+	else
+	{
+		_battleStatus.curCommand = COMMAND_NONE;
 	}
 }

@@ -2,14 +2,18 @@
 #include "Building.h"
 class zbSpire : public Building
 {
+private:
+	void initBaseStatus(void);
+	void initBattleStatus(POINT ptTile);
+
 public:
-	zbSpire();
+	zbSpire(PLAYER playerNum);
 	~zbSpire();
 
-	HRESULT init(POINT ptTIle);
+	HRESULT init(POINT ptTile);
 	void release(void);
 	void update(void);
-	void render(void);
+	void render(int imgOffsetX = 0, int imgOffsetY = 0);
 
 };
 

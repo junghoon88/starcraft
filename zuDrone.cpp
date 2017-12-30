@@ -86,6 +86,8 @@ void zuDrone::initBaseStatus(void)
 	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-droneStat1");	//이미지-스탯상태(1마리클릭했을때)
 	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-droneStat2");	//이미지-스탯상태(복수클릭했을때)
 
+	_baseStatus.unitControl = 1.0f;
+
 	_baseStatus.maxHP = 40.0f;					//HP
 
 	_baseStatus.useSH = FALSE;					//실드여부
@@ -110,7 +112,7 @@ void zuDrone::initBaseStatus(void)
 
 	_baseStatus.GWable = TRUE;							//지상공격 가능여부
 	_baseStatus.GWAttackType = ATTACKTYPE_ZERG_WORKER;	//공격타입(업그레이드에 사용)
-	_stprintf(_baseStatus.GWname, L"가시뼈");			//공격이름
+	_stprintf(_baseStatus.GWname, L"Spines");			//공격이름
 	_baseStatus.GWdamage = 5;							//공격데미지
 	_baseStatus.GWdamagePlus = 0;						//공격보너스데미지
 	_baseStatus.GWmaxHit = 1;							//공격최대횟수(프레임당) 
@@ -193,7 +195,7 @@ void zuDrone::updateBattleStatus(void)
 
 void zuDrone::updateImageFrame(void)
 {
-	Unit::updateImageFrame();
+	Unit::setImageFrameForAngle();
 }
 
 void zuDrone::procCommands(void)
@@ -227,6 +229,8 @@ void zuDrone::procCommands(void)
 				hatchery->setLinkAdressAstar(_aStar);
 				hatchery->setLinkAdressPlayer(_player);
 				hatchery->init(_battleStatus.ptTileTarget);
+
+				this->setClicked(false);
 				if (_battleStatus.clicked)	hatchery->setClicked(true);
 
 				_player->addBuilding(hatchery);

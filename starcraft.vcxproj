@@ -164,10 +164,10 @@
     <ClInclude Include="zuHydralisk.h" />
     <ClInclude Include="zuInfestedTerran.h" />
     <ClInclude Include="zuLarva.h" />
-    <ClInclude Include="zuLerkerEgg.h" />
+    <ClInclude Include="zuLurkerEgg.h" />
     <ClInclude Include="zuLurker.h" />
     <ClInclude Include="zuMutalisk.h" />
-    <ClInclude Include="zuOverload.h" />
+    <ClInclude Include="zuOverlord.h" />
     <ClInclude Include="zuQueen.h" />
     <ClInclude Include="zuScourge.h" />
     <ClInclude Include="zuUltralisk.h" />
@@ -254,10 +254,10 @@
     <ClCompile Include="zuHydralisk.cpp" />
     <ClCompile Include="zuInfestedTerran.cpp" />
     <ClCompile Include="zuLarva.cpp" />
-    <ClCompile Include="zuLerkerEgg.cpp" />
+    <ClCompile Include="zuLurkerEgg.cpp" />
     <ClCompile Include="zuLurker.cpp" />
     <ClCompile Include="zuMutalisk.cpp" />
-    <ClCompile Include="zuOverload.cpp" />
+    <ClCompile Include="zuOverlord.cpp" />
     <ClCompile Include="zuQueen.cpp" />
     <ClCompile Include="zuScourge.cpp" />
     <ClCompile Include="zuUltralisk.cpp" />
