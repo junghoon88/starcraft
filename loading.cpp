@@ -237,25 +237,41 @@ BOOL loading::loadingImageDone()
 		case LOAD_KIND_IMAGE_1:
 		{
 			tagImageResource img = item->getImageResource();
-			IMAGEMANAGER->addImage(img.keyName, img.fileName, img.width, img.height, img.trans, img.transColor, img.blend);
+			image* res = IMAGEMANAGER->addImage(img.keyName, img.fileName, img.width, img.height, img.trans, img.transColor, img.blend);
+			if (res == NULL)
+			{
+				printf("");
+			}
 		}
 		break;
 		case LOAD_KIND_IMAGE_2:
 		{
 			tagImageResource img = item->getImageResource();
-			IMAGEMANAGER->addImage(img.keyName, img.fileName, img.x, img.y, img.width, img.height, img.trans, img.transColor, img.blend);
+			image* res = IMAGEMANAGER->addImage(img.keyName, img.fileName, img.x, img.y, img.width, img.height, img.trans, img.transColor, img.blend);
+			if (res == NULL)
+			{
+				printf("");
+			}
 		}
 		break;
 		case LOAD_KIND_FRAMEIMAGE_0:
 		{
 			tagImageResource img = item->getImageResource();
-			IMAGEMANAGER->addFrameImage(img.keyName, img.fileName, img.width, img.height, img.frameX, img.frameY, img.trans, img.transColor, img.blend);
+			image* res = IMAGEMANAGER->addFrameImage(img.keyName, img.fileName, img.width, img.height, img.frameX, img.frameY, img.trans, img.transColor, img.blend);
+			if (res == NULL)
+			{
+				printf("");
+			}
 		}
 		break;
 		case LOAD_KIND_FRAMEIMAGE_1:
 		{
 			tagImageResource img = item->getImageResource();
-			IMAGEMANAGER->addFrameImage(img.keyName, img.fileName, img.x, img.y, img.width, img.height, img.frameX, img.frameY, img.trans, img.transColor, img.blend);
+			image* res = IMAGEMANAGER->addFrameImage(img.keyName, img.fileName, img.x, img.y, img.width, img.height, img.frameX, img.frameY, img.trans, img.transColor, img.blend);
+			if (res == NULL)
+			{
+				printf("");
+			}
 		}
 		break;
 		case LOAD_KIND_SOUND:

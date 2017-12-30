@@ -198,27 +198,6 @@ void zuZergEgg::update(void)
 	updateProgressBar();
 
 
-	if (_battleStatus.bodyFrame.x < 4)
-	{
-		_battleStatus.bodyFrame.x++;
-	}
-	else
-	{
-		if (_complete == false)
-		{
-			_battleStatus.bodyFrameTime += TIMEMANAGER->getElapsedTime();
-			if (_battleStatus.bodyFrameTime >= UNIT_BODY_FPS_TIME)
-			{
-				_battleStatus.bodyFrameTime -= UNIT_BODY_FPS_TIME;
-				_battleStatus.bodyFrame.x = (_battleStatus.bodyFrame.x == 6) ? 4 : _battleStatus.bodyFrame.x + 1;
-			}
-		}
-		else
-		{
-
-		}
-	}
-
 }
 
 void zuZergEgg::render(void)
@@ -248,45 +227,40 @@ void zuZergEgg::updatePosition(void)
 }
 void zuZergEgg::updateImageFrame(void)
 {
-	if (!_complete)
+	//중간 반복
+	_battleStatus.bodyFrameTime += TIMEMANAGER->getElapsedTime();
+	if (_battleStatus.bodyFrameTime >= UNIT_BODY_FPS_TIME)
 	{
-		//처음
-		if (_battleStatus.bodyFrame.x < 4)
+		_battleStatus.bodyFrameTime -= UNIT_BODY_FPS_TIME;
+
+		if (!_complete)
 		{
-			_battleStatus.bodyFrame.x++;
-		}
-		else
-		{
-			//중간 반복
-			_battleStatus.bodyFrameTime += TIMEMANAGER->getElapsedTime();
-			if (_battleStatus.bodyFrameTime >= UNIT_BODY_FPS_TIME)
+			//처음
+			if (_battleStatus.bodyFrame.x < 4)
 			{
-				_battleStatus.bodyFrameTime -= UNIT_BODY_FPS_TIME;
+				_battleStatus.bodyFrame.x++;
+			}
+			else
+			{
 				_battleStatus.bodyFrame.x = (_battleStatus.bodyFrame.x == 6) ? 4 : _battleStatus.bodyFrame.x + 1;
 			}
 		}
-	}
-	else
-	{
-		//마지막
-		if (_battleStatus.bodyFrame.x < 9)
-		{
-			_battleStatus.bodyFrame.x++;
-		}
 		else
 		{
-			//tagBattleStatus temp = _battleStatus;
-			//temp.bodyFrame.x = 0;
-			//temp.bodyFrame.y = 0;
-			//temp.curCommand = COMMAND_STOP;
-			//_nextUnit->setBattleStatus(temp);
-			_player->addUnit(_nextUnit);
+			//마지막
+			if (_battleStatus.bodyFrame.x < 9)
+			{
+				_battleStatus.bodyFrame.x++;
+			}
+			else
+			{
+				_player->addUnit(_nextUnit);
 
-			_nextObject = _nextUnit;
-			_valid = false;
+				_nextObject = _nextUnit;
+				_valid = false;
+			}
 		}
 	}
-
 }
 
 void zuZergEgg::updateProgressBar(void)
