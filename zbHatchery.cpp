@@ -21,6 +21,8 @@ zbHatchery::zbHatchery(PLAYER playerNum)
 	//유닛 고유 번호
 	_buildingNumZ = BUILDINGNUM_ZERG_HATCHERY;
 
+	
+
 }
 
 
@@ -55,7 +57,7 @@ void zbHatchery::initBaseStatus(void)
 	TCHAR strKey[100];
 	_stprintf(strKey, L"ZB-hatchery-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);				
-	_baseStatus.imgFace = NULL;											
+	_baseStatus.imgFace = IMAGEMANAGER->findImage(L"ZB-Face");
 	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZB-hatchery-Stat1");
 	_baseStatus.imgStat2 = NULL;				
 
@@ -80,17 +82,9 @@ void zbHatchery::initBaseStatus(void)
 	//combat
 	_baseStatus.sameGWAW = FALSE;				
 	_baseStatus.GWable = FALSE;					
-	_baseStatus.AWable = FALSE;					
+	_baseStatus.AWable = FALSE;	
 
-	_baseStatus.commands[0] = COMMAND_SELECT_LARVA;
-	_baseStatus.commands[1] = COMMAND_SETRALLYPOINT;
-	_baseStatus.commands[2] = COMMAND_EVOLUTION_ZERG_BURROW;
-	_baseStatus.commands[3] = COMMAND_NONE;
-	_baseStatus.commands[4] = COMMAND_NONE;
-	_baseStatus.commands[5] = COMMAND_NONE;
-	_baseStatus.commands[6] = COMMAND_BUILD_LAIR;
-	_baseStatus.commands[7] = COMMAND_NONE;
-	_baseStatus.commands[8] = COMMAND_NONE;
+	ZeroMemory(&_baseStatus.commands, sizeof(COMMAND) * COMMAND_MAX);
 
 }
 void zbHatchery::initBattleStatus(POINT ptTile)
@@ -144,6 +138,133 @@ void zbHatchery::update(void)
 
 void zbHatchery::render(int imgOffsetX, int imgOffsetY)
 {
-	Building::render(-TILESIZE, -TILESIZE);
+	POINT imgOffset = BUILDIMAGEOFFSET_HATCHERY;
+	Building::render(imgOffset.x * TILESIZE, imgOffset.y * TILESIZE);
 }
 
+void zbHatchery::updateBattleStatus(void)
+{
+
+}
+void zbHatchery::updatePosition(void)
+{
+
+}
+
+void zbHatchery::updateImageFrame(void)
+{
+
+}
+
+void zbHatchery::updateProcessing(void)
+{
+	Building::updateProcessing();
+}
+
+void zbHatchery::updateCommandSet(void)
+{
+	_baseStatus.commands[0] = COMMAND_SELECT_LARVA;
+	_baseStatus.commands[1] = COMMAND_SETRALLYPOINT;
+
+	if (_processing.type == PROCESSING_EVOLVING)
+	{
+		//개발중일때
+		_baseStatus.commands[2] = COMMAND_NONE;
+		_baseStatus.commands[6] = COMMAND_NONE;
+		_baseStatus.commands[8] = COMMAND_ESC;
+	}
+	else
+	{
+		//버로우 개발 완료했는지
+		tagEvolution evoBurrow = _player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_BURROW];
+
+		if (evoBurrow.complete || evoBurrow.isProcessing)
+		{
+			_baseStatus.commands[2] = COMMAND_NONE;
+		}
+		else
+		{
+			_baseStatus.commands[2] = COMMAND_EVOLUTION_ZERG_BURROW;
+		}
+
+		_baseStatus.commands[6] = COMMAND_BUILD_LAIR;
+		_baseStatus.commands[8] = COMMAND_NONE;
+	}
+}
+
+void zbHatchery::procCommands(void)
+{
+	switch (_battleStatus.curCommand)
+	{
+		case COMMAND_SETRALLYPOINT:
+			break;
+		case COMMAND_EVOLUTION_ZERG_BURROW:
+		{
+			tagEvolution evolution = _player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_BURROW];
+
+			if (_player->useResource(evolution.cost.mineral, evolution.cost.gas))
+			{
+				//성공
+				_processing.type = PROCESSING_EVOLVING;
+				_processing.command = _battleStatus.curCommand;
+				_processing.img = IMAGEMANAGER->findImage(L"command-evolution_zerg_evolve_burrow");
+				_processing.curTime = 0.0f;
+				_processing.maxTime = evolution.cost.duration;
+				_processing.complete = false;
+
+				evolution.isProcessing = true;
+			}
+			else
+			{
+				//실패
+			}
+			_battleStatus.curCommand = COMMAND_NONE;
+		}
+		break;
+		case COMMAND_BUILD_LAIR:
+		{
+			tagProduction buildCost = _player->getZergProductionInfo()->getZBProductionInfo(BUILDINGNUM_ZERG_LAIR);
+
+			if (_player->useResource(buildCost.costMinerals, buildCost.costGas))
+			{
+				//성공
+				zbMutating* nextBuilding = new zbMutating(_playerNum, BUILDINGNUM_ZERG_LAIR, this);
+				nextBuilding->setLinkAdressZergUpgrade(_zergUpgrade);
+				nextBuilding->setLinkAdressAstar(_aStar);
+				nextBuilding->setLinkAdressPlayer(_player);
+				nextBuilding->init(_battleStatus.ptTile);
+
+				//HP 업데이트
+
+				_player->addBuilding(nextBuilding);
+
+				_nextObject = nextBuilding;
+				_valid = false;
+			}
+			else
+			{
+				//실패
+				_battleStatus.curCommand = COMMAND_NONE;
+			}
+		}
+		break;
+
+		case COMMAND_ESC:
+		{
+			if (_processing.command == COMMAND_EVOLUTION_ZERG_BURROW)
+			{
+				tagEvolution evolution = _player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_BURROW];
+
+				_player->addResource((UINT)(evolution.cost.mineral * CANCLE_RESOURCE), (UINT)(evolution.cost.gas * CANCLE_RESOURCE));
+				evolution.isProcessing = false;
+				evolution.complete = false;
+			}
+
+			ZeroMemory(&_processing, sizeof(tagProcessing));
+
+			_battleStatus.curCommand = COMMAND_NONE;
+		}
+		break;
+
+	}
+}

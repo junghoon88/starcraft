@@ -43,7 +43,7 @@ void zbHive::initBaseStatus(void)
 	TCHAR strKey[100];
 	_stprintf(strKey, L"ZB-hive-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);
-	_baseStatus.imgFace = NULL;
+	_baseStatus.imgFace = IMAGEMANAGER->findImage(L"ZB-Face");
 	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZB-hive-Stat1");
 	_baseStatus.imgStat2 = NULL;
 
@@ -70,15 +70,6 @@ void zbHive::initBaseStatus(void)
 	_baseStatus.GWable = FALSE;
 	_baseStatus.AWable = FALSE;
 
-	_baseStatus.commands[0] = COMMAND_SELECT_LARVA;
-	_baseStatus.commands[1] = COMMAND_SETRALLYPOINT;
-	_baseStatus.commands[2] = COMMAND_EVOLUTION_ZERG_BURROW;
-	_baseStatus.commands[3] = COMMAND_EVOLUTION_ZERG_VECTRAL_SACS;
-	_baseStatus.commands[4] = COMMAND_EVOLUTION_ZERG_ANTENNAE;
-	_baseStatus.commands[5] = COMMAND_EVOLUTION_ZERG_PNEUMATIZED_CARAPACE;
-	_baseStatus.commands[6] = COMMAND_NONE;
-	_baseStatus.commands[7] = COMMAND_NONE;
-	_baseStatus.commands[8] = COMMAND_NONE;
 
 }
 void zbHive::initBattleStatus(POINT ptTile)
@@ -111,7 +102,232 @@ void zbHive::update(void)
 
 void zbHive::render(int imgOffsetX, int imgOffsetY)
 {
-	Building::render();
+	POINT imgOffset = BUILDIMAGEOFFSET_HIVE;
+	Building::render(imgOffset.x * TILESIZE, imgOffset.y * TILESIZE);
 
 }
 
+void zbHive::updateBattleStatus(void)
+{
+
+}
+void zbHive::updatePosition(void)
+{
+
+}
+
+void zbHive::updateImageFrame(void)
+{
+
+}
+
+void zbHive::updateProcessing(void)
+{
+	Building::updateProcessing();
+
+}
+
+void zbHive::updateCommandSet(void)
+{
+	_baseStatus.commands[0] = COMMAND_SELECT_LARVA;
+	_baseStatus.commands[1] = COMMAND_SETRALLYPOINT;
+
+	if (_processing.type == PROCESSING_EVOLVING)
+	{
+		_baseStatus.commands[2] = COMMAND_NONE;
+		_baseStatus.commands[3] = COMMAND_NONE;
+		_baseStatus.commands[4] = COMMAND_NONE;
+		_baseStatus.commands[5] = COMMAND_NONE;
+		_baseStatus.commands[8] = COMMAND_ESC;
+	}
+	else
+	{
+		tagEvolution evoBurrow   = _player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_BURROW];
+		tagEvolution evoVectral  = _player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_VECTRAL_SACS];
+		tagEvolution evoAntennae = _player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_ANTENNAE];
+		tagEvolution evoPneumati = _player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_PNEUMATIZED_CARAPACE];
+
+		if (evoBurrow.complete || evoBurrow.isProcessing)
+		{
+			_baseStatus.commands[2] = COMMAND_NONE;
+		}
+		else
+		{
+			_baseStatus.commands[2] = COMMAND_EVOLUTION_ZERG_BURROW;
+		}
+
+		if (evoVectral.complete || evoVectral.isProcessing)
+		{
+			_baseStatus.commands[3] = COMMAND_NONE;
+		}
+		else
+		{
+			_baseStatus.commands[3] = COMMAND_EVOLUTION_ZERG_VECTRAL_SACS;
+		}
+
+		if (evoAntennae.complete || evoAntennae.isProcessing)
+		{
+			_baseStatus.commands[4] = COMMAND_NONE;
+		}
+		else
+		{
+			_baseStatus.commands[4] = COMMAND_EVOLUTION_ZERG_ANTENNAE;
+		}
+
+		if (evoPneumati.complete || evoPneumati.isProcessing)
+		{
+			_baseStatus.commands[5] = COMMAND_NONE;
+		}
+		else
+		{
+			_baseStatus.commands[5] = COMMAND_EVOLUTION_ZERG_PNEUMATIZED_CARAPACE;
+		}
+
+		_baseStatus.commands[8] = COMMAND_NONE;
+	}
+}
+
+
+void zbHive::procCommands(void)
+{
+	switch (_battleStatus.curCommand)
+	{
+		case COMMAND_EVOLUTION_ZERG_BURROW:
+		{
+			tagEvolution evolution = _player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_BURROW];
+
+			if (_player->useResource(evolution.cost.mineral, evolution.cost.gas))
+			{
+				//성공
+				_processing.type = PROCESSING_EVOLVING;
+				_processing.command = _battleStatus.curCommand;
+				_processing.img = IMAGEMANAGER->findImage(L"command-evolution_zerg_evolve_burrow");
+				_processing.curTime = 0.0f;
+				_processing.maxTime = evolution.cost.duration;
+				_processing.complete = false;
+
+				evolution.isProcessing = true;
+			}
+			else
+			{
+				//실패
+			}
+			_battleStatus.curCommand = COMMAND_NONE;
+		}
+		break;
+
+		case COMMAND_EVOLUTION_ZERG_VECTRAL_SACS:
+		{
+			tagEvolution evolution = _player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_VECTRAL_SACS];
+
+			if (_player->useResource(evolution.cost.mineral, evolution.cost.gas))
+			{
+				//성공
+				_processing.type = PROCESSING_EVOLVING;
+				_processing.command = _battleStatus.curCommand;
+				_processing.img = IMAGEMANAGER->findImage(L"command-evolution_zerg_vectral_sacs");
+				_processing.curTime = 0.0f;
+				_processing.maxTime = evolution.cost.duration;
+				_processing.complete = false;
+
+				evolution.isProcessing = true;
+			}
+			else
+			{
+				//실패
+			}
+			_battleStatus.curCommand = COMMAND_NONE;
+		}
+		break;
+
+		case COMMAND_EVOLUTION_ZERG_ANTENNAE:
+		{
+			tagEvolution evolution = _player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_ANTENNAE];
+
+			if (_player->useResource(evolution.cost.mineral, evolution.cost.gas))
+			{
+				//성공
+				_processing.type = PROCESSING_EVOLVING;
+				_processing.command = _battleStatus.curCommand;
+				_processing.img = IMAGEMANAGER->findImage(L"command-evolution_zerg_antennae");
+				_processing.curTime = 0.0f;
+				_processing.maxTime = evolution.cost.duration;
+				_processing.complete = false;
+
+				evolution.isProcessing = true;
+			}
+			else
+			{
+				//실패
+			}
+			_battleStatus.curCommand = COMMAND_NONE;
+		}
+		break;
+
+		case COMMAND_EVOLUTION_ZERG_PNEUMATIZED_CARAPACE:
+		{
+			tagEvolution evolution = _player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_PNEUMATIZED_CARAPACE];
+
+			if (_player->useResource(evolution.cost.mineral, evolution.cost.gas))
+			{
+				//성공
+				_processing.type = PROCESSING_EVOLVING;
+				_processing.command = _battleStatus.curCommand;
+				_processing.img = IMAGEMANAGER->findImage(L"command-evolution_zerg_pneumatized_carapace");
+				_processing.curTime = 0.0f;
+				_processing.maxTime = evolution.cost.duration;
+				_processing.complete = false;
+
+				evolution.isProcessing = true;
+			}
+			else
+			{
+				//실패
+			}
+			_battleStatus.curCommand = COMMAND_NONE;
+		}
+		break;
+
+		case COMMAND_ESC:
+		{
+			if (_processing.command == COMMAND_EVOLUTION_ZERG_BURROW)
+			{
+				tagEvolution evolution = _player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_BURROW];
+
+				_player->addResource((UINT)(evolution.cost.mineral * CANCLE_RESOURCE), (UINT)(evolution.cost.gas * CANCLE_RESOURCE));
+				evolution.isProcessing = false;
+				evolution.complete = false;
+			}
+			else if (_processing.command == COMMAND_EVOLUTION_ZERG_VECTRAL_SACS)
+			{
+				tagEvolution evolution = _player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_VECTRAL_SACS];
+
+				_player->addResource((UINT)(evolution.cost.mineral * CANCLE_RESOURCE), (UINT)(evolution.cost.gas * CANCLE_RESOURCE));
+				evolution.isProcessing = false;
+				evolution.complete = false;
+			}
+			else if (_processing.command == COMMAND_EVOLUTION_ZERG_ANTENNAE)
+			{
+				tagEvolution evolution = _player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_ANTENNAE];
+
+				_player->addResource((UINT)(evolution.cost.mineral * CANCLE_RESOURCE), (UINT)(evolution.cost.gas * CANCLE_RESOURCE));
+				evolution.isProcessing = false;
+				evolution.complete = false;
+			}
+			else if (_processing.command == COMMAND_EVOLUTION_ZERG_PNEUMATIZED_CARAPACE)
+			{
+				tagEvolution evolution = _player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_PNEUMATIZED_CARAPACE];
+
+				_player->addResource((UINT)(evolution.cost.mineral * CANCLE_RESOURCE), (UINT)(evolution.cost.gas * CANCLE_RESOURCE));
+				evolution.isProcessing = false;
+				evolution.complete = false;
+			}
+
+			ZeroMemory(&_processing, sizeof(tagProcessing));
+
+			_battleStatus.curCommand = COMMAND_NONE;
+		}
+		break;
+
+	}
+}

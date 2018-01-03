@@ -20,7 +20,6 @@ zuUltralisk::zuUltralisk(PLAYER playerNum)
 	//유닛 고유 번호
 	_unitNumZ = UNITNUM_ZERG_ULTRALISK;
 
-	_zergProductionInfo = new zergProductionInfo;
 }
 
 
@@ -51,7 +50,7 @@ void zuUltralisk::initBaseStatus(void)
 	TCHAR strKey[100];
 	_stprintf(strKey, L"ZU-ultralisk-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);
-	_baseStatus.imgFace = NULL;
+	_baseStatus.imgFace = IMAGEMANAGER->findImage(L"ZU-ultralisk-Face");;
 	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-ultralisk-Stat1");
 	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-ultralisk-Stat2");
 
@@ -118,7 +117,6 @@ void zuUltralisk::initBattleStatus(POINT pt)
 
 void zuUltralisk::release(void)
 {
-	SAFE_DELETE(_zergProductionInfo);
 
 }
 

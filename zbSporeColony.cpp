@@ -44,7 +44,7 @@ void zbSporeColony::initBaseStatus(void)
 	TCHAR strKey[100];
 	_stprintf(strKey, L"ZB-sporecolony-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);
-	_baseStatus.imgFace = NULL;
+	_baseStatus.imgFace = IMAGEMANAGER->findImage(L"ZB-Face");
 	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZB-sporecolony-Stat1");
 	_baseStatus.imgStat2 = NULL;
 
@@ -95,7 +95,7 @@ void zbSporeColony::initBaseStatus(void)
 void zbSporeColony::initBattleStatus(POINT ptTile)
 {
 	//BattleStatus
-	_battleStatus.curCommand = COMMAND_NONE;
+	_battleStatus.curCommand = COMMAND_STOP;
 	_battleStatus.clicked = false;
 	_battleStatus.curHP = _baseStatus.maxHP;			//현재 HP
 	_battleStatus.maxHP = _baseStatus.maxHP;			//최대 HP
@@ -122,7 +122,39 @@ void zbSporeColony::update(void)
 
 void zbSporeColony::render(int imgOffsetX, int imgOffsetY)
 {
-	Building::render();
+	POINT imgOffset = BUILDIMAGEOFFSET_SPORECOLONY;
+	Building::render(imgOffset.x * TILESIZE, imgOffset.y * TILESIZE);
 
 }
 
+void zbSporeColony::updateBattleStatus(void)
+{
+
+}
+void zbSporeColony::updatePosition(void)
+{
+
+}
+
+void zbSporeColony::updateImageFrame(void)
+{
+
+}
+
+void zbSporeColony::updateProcessing(void)
+{
+	Building::updateProcessing();
+
+}
+
+void zbSporeColony::updateCommandSet(void)
+{
+	_baseStatus.commands[1] = COMMAND_STOP;
+	_baseStatus.commands[2] = COMMAND_ATTACK;
+}
+
+
+void zbSporeColony::procCommands(void)
+{
+	Building::procCommands();
+}

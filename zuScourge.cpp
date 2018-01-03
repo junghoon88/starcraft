@@ -20,7 +20,6 @@ zuScourge::zuScourge(PLAYER playerNum)
 	//유닛 고유 번호
 	_unitNumZ = UNITNUM_ZERG_SCOURGE;
 
-	_zergProductionInfo = new zergProductionInfo;
 }
 
 
@@ -50,7 +49,7 @@ void zuScourge::initBaseStatus(void)
 	TCHAR strKey[100];
 	_stprintf(strKey, L"ZU-scourge-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);
-	_baseStatus.imgFace = NULL;
+	_baseStatus.imgFace = IMAGEMANAGER->findImage(L"ZU-scourge-Face");
 	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-scourge-Stat1");
 	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-scourge-Stat2");
 
@@ -118,7 +117,6 @@ void zuScourge::initBattleStatus(POINT pt)
 
 void zuScourge::release(void)
 {
-	SAFE_DELETE(_zergProductionInfo);
 }
 
 void zuScourge::update(void)

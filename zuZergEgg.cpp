@@ -33,16 +33,9 @@ zuZergEgg::zuZergEgg(PLAYER playerNum, UNITNUM_ZERG nextUnitNum)
 
 	_nextUnitNum = nextUnitNum;
 
-
-	_buildTime = _buildTimeMax = 0.0f;
-
-	_complete = false;
-
-	_zergProductionInfo = new zergProductionInfo;
+	
 
 	_nextUnit = NULL;
-
-	_progressBar = NULL;
 }
 
 
@@ -55,6 +48,7 @@ HRESULT zuZergEgg::init(POINT pt)
 	initNextUnit(pt);
 	initBaseStatus();
 	initBattleStatus(pt);
+	initProcessing();
 
 
 
@@ -63,13 +57,9 @@ HRESULT zuZergEgg::init(POINT pt)
 	updateBattleStatus();
 
 
-	_buildTimeMax = _zergProductionInfo->getZUProductionInfo(_nextUnitNum).buildTime;
 
 
 
-	_progressBar = new progressBar;
-	_progressBar->init(L"Mutating");
-	_progressBar->setPointLT(263, 427);
 
 
 
@@ -130,7 +120,7 @@ void zuZergEgg::initBaseStatus(void)
 	TCHAR strKey[100];
 	_stprintf(strKey, L"ZU-zergegg-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);				
-	_baseStatus.imgFace = NULL;											
+	_baseStatus.imgFace = IMAGEMANAGER->findImage(L"ZU-zergegg-Face");;
 	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-zergegg-Stat1");	
 	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-zergegg-Stat2");	
 	
@@ -183,12 +173,38 @@ void zuZergEgg::initBattleStatus(POINT pt)
 	_battleStatus.moveSpeed = _baseStatus.moveSpeed;
 }
 
+void zuZergEgg::initProcessing(void)
+{
+	_processing.type = PROCESSING_MORPHING;
+
+	switch (_nextUnitNum)
+	{
+	case UNITNUM_ZERG_DRONE:				_processing.command = COMMAND_UNIT_DRONE;				_processing.img = IMAGEMANAGER->findImage(L"command-unit_drone");			break;
+	case UNITNUM_ZERG_ZERGLING:				_processing.command = COMMAND_UNIT_ZERGLING;			_processing.img = IMAGEMANAGER->findImage(L"command-unit_zergling");		break;
+	case UNITNUM_ZERG_HYDRALISK:			_processing.command = COMMAND_UNIT_HYDRALISK;			_processing.img = IMAGEMANAGER->findImage(L"command-unit_hydralisk");		break;
+	case UNITNUM_ZERG_LURKER:				_processing.command = COMMAND_UNIT_LURKER;				_processing.img = IMAGEMANAGER->findImage(L"command-unit_lurker");			break;
+	case UNITNUM_ZERG_ULTRALISK:			_processing.command = COMMAND_UNIT_ULTRALISK;			_processing.img = IMAGEMANAGER->findImage(L"command-unit_ultralisk");		break;
+	case UNITNUM_ZERG_DEFILER:				_processing.command = COMMAND_UNIT_DEFILER;				_processing.img = IMAGEMANAGER->findImage(L"command-unit_defiler");			break;
+	case UNITNUM_ZERG_INFESTEDTERRAN:		_processing.command = COMMAND_UNIT_INFESTEDTERRAN;		_processing.img = IMAGEMANAGER->findImage(L"command-unit_infestedterran");	break;
+	case UNITNUM_ZERG_OVERLORD:				_processing.command = COMMAND_UNIT_OVERLORD;			_processing.img = IMAGEMANAGER->findImage(L"command-unit_overlord");		break;
+	case UNITNUM_ZERG_MUTALISK:				_processing.command = COMMAND_UNIT_MUTALISK;			_processing.img = IMAGEMANAGER->findImage(L"command-unit_mutalisk");		break;
+	case UNITNUM_ZERG_SCOURGE:				_processing.command = COMMAND_UNIT_SCOURGE;				_processing.img = IMAGEMANAGER->findImage(L"command-unit_scourge");			break;
+	case UNITNUM_ZERG_QUEEN:				_processing.command = COMMAND_UNIT_QUEEN;				_processing.img = IMAGEMANAGER->findImage(L"command-unit_queen");			break;
+	case UNITNUM_ZERG_GUADIAN:				_processing.command = COMMAND_UNIT_GUADIAN;				_processing.img = IMAGEMANAGER->findImage(L"command-unit_guadian");			break;
+	case UNITNUM_ZERG_DEVOURER:				_processing.command = COMMAND_UNIT_DEVOURER;			_processing.img = IMAGEMANAGER->findImage(L"command-unit_devourer");		break;
+	}
+
+	_processing.curTime = 0.0f;
+	_processing.maxTime = _player->getZergProductionInfo()->getZUProductionInfo(_nextUnitNum).buildTime;
+	_processing.complete = false;
+
+}
+
 
 void zuZergEgg::release(void)
 {
 	SAFE_RELEASEDELETE(_nextUnit);
-	SAFE_RELEASEDELETE(_progressBar);
-	SAFE_DELETE(_zergProductionInfo);
+	
 }
 
 void zuZergEgg::update(void)
@@ -204,7 +220,6 @@ void zuZergEgg::render(void)
 {
 	Unit::render();
 
-	_progressBar->ZRender(ZORDER_INTERFACE2);
 
 }
 
@@ -233,7 +248,7 @@ void zuZergEgg::updateImageFrame(void)
 	{
 		_battleStatus.bodyFrameTime -= UNIT_BODY_FPS_TIME;
 
-		if (!_complete)
+		if (!_processing.complete)
 		{
 			//Ã³À½
 			if (_battleStatus.bodyFrame.x < 4)
@@ -267,21 +282,18 @@ void zuZergEgg::updateProgressBar(void)
 {
 	float tick = TIMEMANAGER->getElapsedTime() * BUILDSPEEDMULTIPLY;
 
-	if (_complete == false)
+	if (_processing.complete == false)
 	{
-		_buildTime += tick;
+		_processing.curTime += tick;
 
-		if (_buildTime >= _buildTimeMax)
+		if (_processing.curTime >= _processing.maxTime)
 		{
-			_buildTime = _buildTimeMax;
+			_processing.curTime = _processing.maxTime;
 
-			_complete = true;
+			_processing.complete = true;
 			_battleStatus.bodyFrame.x = 7;
 		}
 	}
-
-	_progressBar->setGauge(_buildTime, _buildTimeMax);
-
 }
 
 void zuZergEgg::procCommands(void)

@@ -44,7 +44,7 @@ void zbEvolutionChamber::initBaseStatus(void)
 	TCHAR strKey[100];
 	_stprintf(strKey, L"ZB-evolutionchamber-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);
-	_baseStatus.imgFace = NULL;
+	_baseStatus.imgFace = IMAGEMANAGER->findImage(L"ZB-Face");
 	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZB-evolutionchamber-Stat1");
 	_baseStatus.imgStat2 = NULL;
 
@@ -70,17 +70,6 @@ void zbEvolutionChamber::initBaseStatus(void)
 	_baseStatus.sameGWAW = FALSE;
 	_baseStatus.GWable = FALSE;
 	_baseStatus.AWable = FALSE;
-
-	_baseStatus.commands[0] = COMMAND_UPGRADE_ZERG_MELEEATTACKS;
-	_baseStatus.commands[1] = COMMAND_UPGRADE_ZERG_MISSILEATTACKS;
-	_baseStatus.commands[2] = COMMAND_UPGRADE_ZERG_CARAPACE;
-	_baseStatus.commands[3] = COMMAND_NONE;
-	_baseStatus.commands[4] = COMMAND_NONE;
-	_baseStatus.commands[5] = COMMAND_NONE;
-	_baseStatus.commands[6] = COMMAND_NONE;
-	_baseStatus.commands[7] = COMMAND_NONE;
-	_baseStatus.commands[8] = COMMAND_NONE;
-
 }
 void zbEvolutionChamber::initBattleStatus(POINT ptTile)
 {
@@ -112,7 +101,188 @@ void zbEvolutionChamber::update(void)
 
 void zbEvolutionChamber::render(int imgOffsetX, int imgOffsetY)
 {
-	Building::render();
+	POINT imgOffset = BUILDIMAGEOFFSET_EVOLUTIONCHAMBER;
+	Building::render(imgOffset.x * TILESIZE, imgOffset.y * TILESIZE);
 
 }
 
+
+void zbEvolutionChamber::updateBattleStatus(void)
+{
+
+}
+void zbEvolutionChamber::updatePosition(void)
+{
+
+}
+
+void zbEvolutionChamber::updateImageFrame(void)
+{
+
+}
+
+void zbEvolutionChamber::updateProcessing(void)
+{
+	Building::updateProcessing();
+
+}
+
+void zbEvolutionChamber::updateCommandSet(void)
+{
+	if (_processing.type == PROCESSING_EVOLVING)
+	{
+		_baseStatus.commands[0] = COMMAND_NONE;
+		_baseStatus.commands[1] = COMMAND_NONE;
+		_baseStatus.commands[2] = COMMAND_NONE;
+		_baseStatus.commands[8] = COMMAND_ESC;
+	}
+	else
+	{
+		tagUpgrade upgMelee    = _player->getZergUpgrade()->getUpgrade()[UPGRADE_ZERG_MELEEATTACKS];
+		tagUpgrade upgMissile  = _player->getZergUpgrade()->getUpgrade()[UPGRADE_ZERG_MISSILEATTACKS];
+		tagUpgrade upgCarapace = _player->getZergUpgrade()->getUpgrade()[UPGRADE_ZERG_CARAPACE];
+
+		if (upgMelee.complete || upgMelee.isProcessing)
+		{
+			_baseStatus.commands[0] = COMMAND_NONE;
+		}
+		else
+		{
+			_baseStatus.commands[0] = COMMAND_UPGRADE_ZERG_MELEEATTACKS;
+		}
+
+		if (upgMissile.complete || upgMissile.isProcessing)
+		{
+			_baseStatus.commands[1] = COMMAND_NONE;
+		}
+		else
+		{
+			_baseStatus.commands[1] = COMMAND_UPGRADE_ZERG_MISSILEATTACKS;
+		}
+
+		if (upgCarapace.complete || upgCarapace.isProcessing)
+		{
+			_baseStatus.commands[2] = COMMAND_NONE;
+		}
+		else
+		{
+			_baseStatus.commands[2] = COMMAND_UPGRADE_ZERG_CARAPACE;
+		}
+
+		_baseStatus.commands[8] = COMMAND_NONE;
+	}
+}
+
+
+void zbEvolutionChamber::procCommands(void)
+{
+	switch (_battleStatus.curCommand)
+	{
+		case COMMAND_UPGRADE_ZERG_MELEEATTACKS:
+		{
+			tagUpgrade upgMelee = _player->getZergUpgrade()->getUpgrade()[UPGRADE_ZERG_MELEEATTACKS];
+
+			if (_player->useResource(upgMelee.vCost[upgMelee.level].mineral, upgMelee.vCost[upgMelee.level].gas))
+			{
+				//성공
+				_processing.type = PROCESSING_EVOLVING;
+				_processing.command = _battleStatus.curCommand;
+				_processing.img = IMAGEMANAGER->findImage(L"command-upgrade_zerg_meleeattacks");
+				_processing.curTime = 0.0f;
+				_processing.maxTime = upgMelee.vCost[upgMelee.level].duration;
+				_processing.complete = false;
+
+				upgMelee.isProcessing = true;
+			}
+			else
+			{
+				//실패
+			}
+			_battleStatus.curCommand = COMMAND_NONE;
+		}
+		break;
+
+		case COMMAND_UPGRADE_ZERG_MISSILEATTACKS:
+		{
+			tagUpgrade upgMissile = _player->getZergUpgrade()->getUpgrade()[UPGRADE_ZERG_MISSILEATTACKS];
+
+			if (_player->useResource(upgMissile.vCost[upgMissile.level].mineral, upgMissile.vCost[upgMissile.level].gas))
+			{
+				//성공
+				_processing.type = PROCESSING_EVOLVING;
+				_processing.command = _battleStatus.curCommand;
+				_processing.img = IMAGEMANAGER->findImage(L"command-upgrade_zerg_missileattacks");
+				_processing.curTime = 0.0f;
+				_processing.maxTime = upgMissile.vCost[upgMissile.level].duration;
+				_processing.complete = false;
+
+				upgMissile.isProcessing = true;
+			}
+			else
+			{
+				//실패
+			}
+			_battleStatus.curCommand = COMMAND_NONE;
+		}
+		break;
+
+		case COMMAND_UPGRADE_ZERG_CARAPACE:
+		{
+			tagUpgrade upgCarapace = _player->getZergUpgrade()->getUpgrade()[UPGRADE_ZERG_CARAPACE];
+
+			if (_player->useResource(upgCarapace.vCost[upgCarapace.level].mineral, upgCarapace.vCost[upgCarapace.level].gas))
+			{
+				//성공
+				_processing.type = PROCESSING_EVOLVING;
+				_processing.command = _battleStatus.curCommand;
+				_processing.img = IMAGEMANAGER->findImage(L"command-upgrade_zerg_carapace");
+				_processing.curTime = 0.0f;
+				_processing.maxTime = upgCarapace.vCost[upgCarapace.level].duration;
+				_processing.complete = false;
+
+				upgCarapace.isProcessing = true;
+			}
+			else
+			{
+				//실패
+			}
+			_battleStatus.curCommand = COMMAND_NONE;
+		}
+		break;
+
+		case COMMAND_ESC:
+		{
+			if (_processing.command == COMMAND_UPGRADE_ZERG_MELEEATTACKS)
+			{
+				tagUpgrade upgMelee = _player->getZergUpgrade()->getUpgrade()[UPGRADE_ZERG_MELEEATTACKS];
+
+				_player->addResource((UINT)(upgMelee.vCost[upgMelee.level].mineral * CANCLE_RESOURCE), (UINT)(upgMelee.vCost[upgMelee.level].gas * CANCLE_RESOURCE));
+				upgMelee.isProcessing = false;
+				upgMelee.complete = false;
+			}
+			else if (_processing.command == COMMAND_UPGRADE_ZERG_MISSILEATTACKS)
+			{
+				tagUpgrade upgMissile = _player->getZergUpgrade()->getUpgrade()[UPGRADE_ZERG_MISSILEATTACKS];
+
+				_player->addResource((UINT)(upgMissile.vCost[upgMissile.level].mineral * CANCLE_RESOURCE), (UINT)(upgMissile.vCost[upgMissile.level].gas * CANCLE_RESOURCE));
+				upgMissile.isProcessing = false;
+				upgMissile.complete = false;
+			}
+			else if (_processing.command == COMMAND_UPGRADE_ZERG_CARAPACE)
+			{
+				tagUpgrade upgCarapace = _player->getZergUpgrade()->getUpgrade()[UPGRADE_ZERG_CARAPACE];
+
+				_player->addResource((UINT)(upgCarapace.vCost[upgCarapace.level].mineral * CANCLE_RESOURCE), (UINT)(upgCarapace.vCost[upgCarapace.level].gas * CANCLE_RESOURCE));
+				upgCarapace.isProcessing = false;
+				upgCarapace.complete = false;
+			}
+
+
+			ZeroMemory(&_processing, sizeof(tagProcessing));
+
+			_battleStatus.curCommand = COMMAND_NONE;
+		}
+		break;
+
+	}
+}

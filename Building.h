@@ -11,8 +11,6 @@ class Unit;
 class Building : public gameObject
 {
 protected:
-	//BOOL		_developing;
-	//COMMAND		
 
 public:
 	Building();
@@ -28,13 +26,15 @@ public:
 	virtual void updateBattleStatus(void);
 	virtual void updatePosition(void);
 	virtual void updateImageFrame(void);
+	virtual void updateProcessing(void);
+	virtual void updateCommandSet(void);
 
 	virtual void procCommands(void);
 
 
 public:
 	//getter, setter (자식함수용)
-	//virtual vector<zuLarva*> getLarvas(void);
+
 
 
 };

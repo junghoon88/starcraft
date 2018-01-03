@@ -8,6 +8,7 @@ class miniMap : public gameNode
 private:
 	image*		_img;
 	RECT		_rc;
+	RECT		_rcMiniMapCamera;
 
 	COLORREF	_color[TILEX][TILEY];
 

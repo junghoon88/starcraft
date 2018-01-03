@@ -21,7 +21,7 @@ zuLarva::zuLarva(PLAYER playerNum)
 	//유닛 고유 번호
 	_unitNumZ = UNITNUM_ZERG_LARVA;
 
-	_zergProductionInfo = new zergProductionInfo;
+	
 }
 
 
@@ -54,7 +54,7 @@ void zuLarva::initBaseStatus(void)
 	TCHAR strKey[100];
 	_stprintf(strKey, L"ZU-larva-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);				
-	_baseStatus.imgFace = NULL;											
+	_baseStatus.imgFace = IMAGEMANAGER->findImage(L"ZU-larva-Face");
 	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-larva-Stat1");	
 	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-larva-Stat2");
 
@@ -157,35 +157,34 @@ void zuLarva::updateImageFrame(void)
 
 void zuLarva::procCommands(void)
 {
+	UNITNUM_ZERG unitNum = UNITNUM_ZERG_NONE;
+
 	switch (_battleStatus.curCommand)
 	{
-		case COMMAND_UNIT_DRONE:
-			{
-				zuZergEgg* egg = new zuZergEgg(_playerNum, UNITNUM_ZERG_DRONE);
-				egg->setLinkAdressZergUpgrade(_zergUpgrade);
-				egg->setLinkAdressAstar(_aStar);
-				egg->setLinkAdressPlayer(_player);
-				egg->init(_battleStatus.pt.toPoint());
-				
-				_nextObject = egg;
-				_valid = false;
-
-				_player->addUnit(egg);
-
-
-				_battleStatus.curCommand = COMMAND_NONE;
-
-			}
-			break;
-		case COMMAND_UNIT_ZERGLING:
-		case COMMAND_UNIT_OVERLORD:
-		case COMMAND_UNIT_HYDRALISK:
-		case COMMAND_UNIT_MUTALISK:
-		case COMMAND_UNIT_SCOURGE:
-		case COMMAND_UNIT_QUEEN:
-		case COMMAND_UNIT_ULTRALISK:
-		case COMMAND_UNIT_DEFILER:
-			break;
+	case COMMAND_UNIT_DRONE:			unitNum = UNITNUM_ZERG_DRONE;		break;
+	case COMMAND_UNIT_ZERGLING:			unitNum = UNITNUM_ZERG_ZERGLING;	break;
+	case COMMAND_UNIT_OVERLORD:			unitNum = UNITNUM_ZERG_OVERLORD;	break;
+	case COMMAND_UNIT_HYDRALISK:		unitNum = UNITNUM_ZERG_HYDRALISK;	break;
+	case COMMAND_UNIT_MUTALISK:			unitNum = UNITNUM_ZERG_MUTALISK;	break;
+	case COMMAND_UNIT_SCOURGE:			unitNum = UNITNUM_ZERG_SCOURGE;		break;
+	case COMMAND_UNIT_QUEEN:			unitNum = UNITNUM_ZERG_QUEEN;		break;
+	case COMMAND_UNIT_ULTRALISK:		unitNum = UNITNUM_ZERG_ULTRALISK;	break;
+	case COMMAND_UNIT_DEFILER:			unitNum = UNITNUM_ZERG_DEFILER;		break;
 	}
 
+	if (unitNum != UNITNUM_ZERG_NONE)
+	{
+		zuZergEgg* egg = new zuZergEgg(_playerNum, unitNum);
+		egg->setLinkAdressZergUpgrade(_zergUpgrade);
+		egg->setLinkAdressAstar(_aStar);
+		egg->setLinkAdressPlayer(_player);
+		egg->init(_battleStatus.pt.toPoint());
+
+		_nextObject = egg;
+		_valid = false;
+
+		_player->addUnit(egg);
+
+		_battleStatus.curCommand = COMMAND_NONE;
+	}
 }

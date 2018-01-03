@@ -43,7 +43,7 @@ void zbCreepColony::initBaseStatus(void)
 	TCHAR strKey[100];
 	_stprintf(strKey, L"ZB-creepcolony-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);
-	_baseStatus.imgFace = NULL;
+	_baseStatus.imgFace = IMAGEMANAGER->findImage(L"ZB-Face");
 	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZB-creepcolony-Stat1");
 	_baseStatus.imgStat2 = NULL;
 
@@ -70,15 +70,6 @@ void zbCreepColony::initBaseStatus(void)
 	_baseStatus.GWable = FALSE;
 	_baseStatus.AWable = FALSE;
 
-	_baseStatus.commands[0] = COMMAND_NONE;
-	_baseStatus.commands[1] = COMMAND_NONE;
-	_baseStatus.commands[2] = COMMAND_NONE;
-	_baseStatus.commands[3] = COMMAND_NONE;
-	_baseStatus.commands[4] = COMMAND_NONE;
-	_baseStatus.commands[5] = COMMAND_NONE;
-	_baseStatus.commands[6] = COMMAND_BUILD_SPORECOLONY;
-	_baseStatus.commands[7] = COMMAND_BUILD_SUNKENCOLONY;
-	_baseStatus.commands[8] = COMMAND_NONE;
 
 }
 void zbCreepColony::initBattleStatus(POINT ptTile)
@@ -111,7 +102,94 @@ void zbCreepColony::update(void)
 
 void zbCreepColony::render(int imgOffsetX, int imgOffsetY)
 {
-	Building::render();
+	POINT imgOffset = BUILDIMAGEOFFSET_CREEPCOLONY;
+	Building::render(imgOffset.x * TILESIZE, imgOffset.y * TILESIZE);
 
 }
 
+void zbCreepColony::updateBattleStatus(void)
+{
+
+}
+void zbCreepColony::updatePosition(void)
+{
+
+}
+void zbCreepColony::updateImageFrame(void)
+{
+
+}
+
+void zbCreepColony::updateProcessing(void)
+{
+	Building::updateProcessing();
+
+}
+
+void zbCreepColony::updateCommandSet(void)
+{
+	_baseStatus.commands[6] = COMMAND_BUILD_SPORECOLONY;
+	_baseStatus.commands[7] = COMMAND_BUILD_SUNKENCOLONY;
+}
+
+void zbCreepColony::procCommands(void)
+{
+	switch (_battleStatus.curCommand)
+	{
+	case COMMAND_BUILD_SPORECOLONY:
+		{
+			tagProduction buildCost = _player->getZergProductionInfo()->getZBProductionInfo(BUILDINGNUM_ZERG_SPORECOLONY);
+
+			if (_player->useResource(buildCost.costMinerals, buildCost.costGas))
+			{
+				//성공
+				zbMutating* nextBuilding = new zbMutating(_playerNum, BUILDINGNUM_ZERG_SPORECOLONY, this);
+				nextBuilding->setLinkAdressZergUpgrade(_zergUpgrade);
+				nextBuilding->setLinkAdressAstar(_aStar);
+				nextBuilding->setLinkAdressPlayer(_player);
+				nextBuilding->init(_battleStatus.ptTile);
+
+				_player->addBuilding(nextBuilding);
+
+				_nextObject = nextBuilding;
+				_valid = false;
+			}
+			else
+			{
+				//실패
+				_battleStatus.curCommand = COMMAND_NONE;
+			}
+
+		}
+
+		break;
+	case COMMAND_BUILD_SUNKENCOLONY:
+		{
+			tagProduction buildCost = _player->getZergProductionInfo()->getZBProductionInfo(BUILDINGNUM_ZERG_SUNKENCOLONY);
+
+			if (_player->useResource(buildCost.costMinerals, buildCost.costGas))
+			{
+				//성공
+				zbMutating* nextBuilding = new zbMutating(_playerNum, BUILDINGNUM_ZERG_SUNKENCOLONY, this);
+				nextBuilding->setLinkAdressZergUpgrade(_zergUpgrade);
+				nextBuilding->setLinkAdressAstar(_aStar);
+				nextBuilding->setLinkAdressPlayer(_player);
+				nextBuilding->init(_battleStatus.ptTile);
+
+				_player->addBuilding(nextBuilding);
+
+				_nextObject = nextBuilding;
+				_valid = false;
+			}
+			else
+			{
+				//실패
+				_battleStatus.curCommand = COMMAND_NONE;
+			}
+
+		}
+
+		break;
+	}
+
+}

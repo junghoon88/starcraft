@@ -6,7 +6,7 @@
 
 
 gameController::gameController()
-	: _imgInterface(NULL), _imgCursor(NULL), _hotkeys(NULL), _miniMap(NULL), _myPlayer(NULL), _gameMap(NULL)
+	: _imgInterface(NULL), _imgCursor(NULL), _hotkeys(NULL), _miniMap(NULL), _myPlayer(NULL), _progressBar(NULL), _gameMap(NULL)
 {
 	_cursorState = CURSORSTATE_IDLE;
 
@@ -20,6 +20,8 @@ gameController::gameController()
 
 	ZeroMemory(&_selectInfo, sizeof(tagSelectInfo));
 
+	
+
 
 	_cursorPt = { 0, 0 };
 	_cursorTile = { 0, 0 };
@@ -30,6 +32,7 @@ gameController::gameController()
 
 gameController::~gameController()
 {
+	SAFE_RELEASEDELETE(_progressBar);
 	SAFE_RELEASEDELETE(_hotkeys);
 	SAFE_RELEASEDELETE(_miniMap);
 
@@ -63,6 +66,11 @@ HRESULT gameController::init(PLAYER playerNum, RACES races)
 
 	_hotkeys = new hotkeys;
 	_hotkeys->init();
+
+	_progressBar = new progressBar;
+	_progressBar->init(L"Mutating");
+	_progressBar->setPointLT(263, 427);
+
 
 
 	//debug
@@ -143,6 +151,8 @@ void gameController::render(void)
 	renderInterface();
 
 	renderCursor();
+
+	renderMyResouce();
 }
 
 void gameController::initCommandSet(void)
@@ -511,7 +521,43 @@ void gameController::actionMouseMap(void)
 			_isClicked = false;
 			_findLocation = false;
 		}
+		else if (KEYMANAGER->isOnceKeyDown(VK_LBUTTON))
+		{
+			if (_buildable)
+			{
+				bool findDrone = false;
+				for (int i = 0; i < SELECTUNIT_MAX; i++)
+				{
+					if (_selectInfo.object[i] == NULL) continue;
 
+					if (_selectInfo.object[i]->getUnitnumZerg() == UNITNUM_ZERG_DRONE)
+					{
+						POINT ptTileMouseReal;
+						ptTileMouseReal.x = (_ptMouse.x + MAINCAMERA->getCameraX()) / TILESIZE;
+						ptTileMouseReal.y = (_ptMouse.y + MAINCAMERA->getCameraY()) / TILESIZE;
+
+						POINT ptCenter;
+						POINT buildsize = BUILDSIZE_HATCHERY;
+						ptCenter.x = ((float)ptTileMouseReal.x + (float)buildsize.x * 0.5f) * TILESIZE;
+						ptCenter.y = ((float)ptTileMouseReal.y + (float)buildsize.y * 0.5f) * TILESIZE;
+
+						_selectInfo.object[i]->receiveCommand(_curCommand, ptCenter, ptTileMouseReal);
+						findDrone = true;
+						break;
+					}
+				}
+
+				//드론에게 전달했으면, 드론이 없어도 어차피 초기화 해야됨
+				_curCommand = COMMAND_NONE;
+				_cursorState = CURSORSTATE_IDLE;
+				_isClicked = false;
+				_findLocation = false;
+			}
+			else
+			{
+				//빌드 실패 사운드
+			}
+		}
 		break;
 	case CURSORSTATE_BUILD_HATCHERY:	// 건물-해처리
 		if (KEYMANAGER->isOnceKeyDown(VK_RBUTTON))
@@ -583,16 +629,7 @@ void gameController::actionMouseCommandSet(int num)
 	if (_commandSet[i].command == COMMAND_NONE) 
 		return;
 
-	if (_commandSet[i].command == COMMAND_ESC)
-	{
-		_curCommand = COMMAND_NONE;
-		_findTarget = false;
-		_findLocation = false;
-	}
-	else
-	{
-		_curCommand = _commandSet[i].command;
-	}
+	_curCommand = _commandSet[i].command;
 }
 
 
@@ -618,17 +655,7 @@ BOOL gameController::actionHotkeys(void)
 
 		if (KEYMANAGER->isOnceKeyDown(_commandSet[i].hotkey))
 		{
-			if (_commandSet[i].command == COMMAND_ESC)
-			{
-				_curCommand = COMMAND_NONE;
-				_cursorState = CURSORSTATE_IDLE;
-				_findTarget = false;
-				_findLocation = false;
-			}
-			else
-			{
-				_curCommand = _commandSet[i].command;
-			}
+			_commandSet[i].button->click();
 			return true;
 		}
 	}
@@ -713,6 +740,7 @@ BOOL gameController::checkBuildable(void)
 	{
 
 	}
+
 	for (int i = 0; i < _buildingSize.x; i++)
 	{
 		for (int j = 0; j < _buildingSize.y; j++)
@@ -747,43 +775,94 @@ void gameController::renderBuildImage(void)
 	if (!_findLocation)
 		return;
 
-
 	POINT ptTileMouseReal;
 	ptTileMouseReal.x = (_ptMouse.x + MAINCAMERA->getCameraX()) / TILESIZE;
 	ptTileMouseReal.y = (_ptMouse.y + MAINCAMERA->getCameraY()) / TILESIZE;
 
+	TCHAR strKey[100];
+	image* imgBuilding = NULL;
+	POINT imgOffset = { 0, 0 };
+
 	if (_cursorState == CURSORSTATE_BUILD_HATCHERY)
 	{
-		//IMAGEMANAGER->frameRender(L"ZB-hatchery", getMemDC(), (ptTileMouseReal.x * TILESIZE) - TILESIZE - MAINCAMERA->getCameraX(), (ptTileMouseReal.y * TILESIZE) - TILESIZE - MAINCAMERA->getCameraY(), 0, 0);
-		TCHAR strKey[100];
 		_stprintf(strKey, L"ZB-hatchery-Body%d", _playerNum);
-		image* imgHatchery = IMAGEMANAGER->findImage(strKey);
-		RENDERMANAGER->insertImgFrame(ZORDER_GAMEMOUSEDRAG, imgHatchery, (ptTileMouseReal.x * TILESIZE) - TILESIZE - MAINCAMERA->getCameraX(), (ptTileMouseReal.y * TILESIZE) - TILESIZE - MAINCAMERA->getCameraY(), 0, 0);
-		
+		imgBuilding = IMAGEMANAGER->findImage(strKey);
+		imgOffset = BUILDIMAGEOFFSET_HATCHERY;
 	}
 	else if (_cursorState == CURSORSTATE_BUILD_EXTRACTOR)
 	{
-
+		_stprintf(strKey, L"ZB-extractor-Body%d", _playerNum);
+		imgBuilding = IMAGEMANAGER->findImage(strKey);
+		imgOffset = BUILDIMAGEOFFSET_EXTRACTOR;
 	}
-	else
+	else if (_cursorState == CURSORSTATE_BUILD_NORMAL)
 	{
 		switch (_curCommand)
 		{
 			//BUILD1
-		case COMMAND_BUILD_CREEPCOLONY:			;	break;
-		case COMMAND_BUILD_SPAWNINGPOOL:		;	break;
-		case COMMAND_BUILD_EVOLUTIONCHAMBER:	;	break;
-		case COMMAND_BUILD_HYDRALISKDEN:		;	break;
+		case COMMAND_BUILD_CREEPCOLONY:			
+			_stprintf(strKey, L"ZB-creepcolony-Body%d", _playerNum);
+			imgBuilding = IMAGEMANAGER->findImage(strKey);
+			imgOffset = BUILDIMAGEOFFSET_CREEPCOLONY;
+			break;
+		case COMMAND_BUILD_SPAWNINGPOOL:		
+			_stprintf(strKey, L"ZB-spawningpool-Body%d", _playerNum);
+			imgBuilding = IMAGEMANAGER->findImage(strKey);
+			imgOffset = BUILDIMAGEOFFSET_SPAWNINGPOOL;
+			break;
+		case COMMAND_BUILD_EVOLUTIONCHAMBER:	
+			_stprintf(strKey, L"ZB-evolutionchamber-Body%d", _playerNum);
+			imgBuilding = IMAGEMANAGER->findImage(strKey);
+			imgOffset = BUILDIMAGEOFFSET_EVOLUTIONCHAMBER;
+			break;
+		case COMMAND_BUILD_HYDRALISKDEN:
+			_stprintf(strKey, L"ZB-hydraliskden-Body%d", _playerNum);
+			imgBuilding = IMAGEMANAGER->findImage(strKey);
+			imgOffset = BUILDIMAGEOFFSET_HYDRALISKDEN;
+			break;
+
 			//BUILD2
-		case COMMAND_BUILD_SPIRE:				;	break;
-		case COMMAND_BUILD_QUEENSNEST:			;	break;
-		case COMMAND_BUILD_NYDUSCANAL:			;	break;
-		case COMMAND_BUILD_ULTRALISKCAVERN:		;	break;
-		case COMMAND_BUILD_DEFILERMOUND:		;	break;
+		case COMMAND_BUILD_SPIRE:				
+			_stprintf(strKey, L"ZB-spire-Body%d", _playerNum);
+			imgBuilding = IMAGEMANAGER->findImage(strKey);
+			imgOffset = BUILDIMAGEOFFSET_SPIRE;
+			break;
+
+		case COMMAND_BUILD_QUEENSNEST:			
+			_stprintf(strKey, L"ZB-queensnest-Body%d", _playerNum);
+			imgBuilding = IMAGEMANAGER->findImage(strKey);
+			imgOffset = BUILDIMAGEOFFSET_QUEENSNEST;
+			break;
+		case COMMAND_BUILD_NYDUSCANAL:			
+			_stprintf(strKey, L"ZB-nyduscanal-Body%d", _playerNum);
+			imgBuilding = IMAGEMANAGER->findImage(strKey);
+			imgOffset = BUILDIMAGEOFFSET_NYDUSCANAL;
+			break;
+
+		case COMMAND_BUILD_ULTRALISKCAVERN:		
+			_stprintf(strKey, L"ZB-ultraliskcavern-Body%d", _playerNum);
+			imgBuilding = IMAGEMANAGER->findImage(strKey);
+			imgOffset = BUILDIMAGEOFFSET_ULTRALISKCAVERN;
+			break;
+
+		case COMMAND_BUILD_DEFILERMOUND:		
+			_stprintf(strKey, L"ZB-defilermound-Body%d", _playerNum);
+			imgBuilding = IMAGEMANAGER->findImage(strKey);
+			imgOffset = BUILDIMAGEOFFSET_DEFILERMOUND;
+			break;
 		}
 	}
+	else
+	{
+		return;
+	}
 
-	image* imgEnableTile = IMAGEMANAGER->findImage(L"maptool-object-enableTile");
+	//건물 이미지 보여줌
+	RENDERMANAGER->insertImgFrame(ZORDER_GAMEMOUSEDRAG, imgBuilding, (ptTileMouseReal.x * TILESIZE) - (imgOffset.x * TILESIZE) - MAINCAMERA->getCameraX(), (ptTileMouseReal.y * TILESIZE) - (imgOffset.y * TILESIZE) - MAINCAMERA->getCameraY(), 0, 0);
+
+
+	//건물이 설치 가능한지 타일별로 색깔표현
+	image* imgEnableTile  = IMAGEMANAGER->findImage(L"maptool-object-enableTile");
 	image* imgDisableTile = IMAGEMANAGER->findImage(L"maptool-object-disableTile");
 
 	for (int i = 0; i < _buildingSize.x; i++)
@@ -792,16 +871,10 @@ void gameController::renderBuildImage(void)
 		{
 			if (_buildingPlaceable[i][j] == BUILDSTATE_PLACEABLE)
 			{
-				//IMAGEMANAGER->alphaRender(L"maptool-object-enableTile", getMemDC(),
-				//	(ptTileMouseReal.x + i) * TILESIZE - MAINCAMERA->getCameraX(), (ptTileMouseReal.y + j) * TILESIZE - MAINCAMERA->getCameraY(), 128);
-
 				RENDERMANAGER->insertImgAlpha(ZORDER_GAMEMOUSEDRAG, imgEnableTile, (ptTileMouseReal.x + i) * TILESIZE - MAINCAMERA->getCameraX(), (ptTileMouseReal.y + j) * TILESIZE - MAINCAMERA->getCameraY(), 128);
 			}
 			else if (_buildingPlaceable[i][j] == BUILDSTATE_OVERLAP)
 			{
-				//IMAGEMANAGER->alphaRender(L"maptool-object-disableTile", getMemDC(),
-				//	(ptTileMouseReal.x + i) * TILESIZE - MAINCAMERA->getCameraX(), (ptTileMouseReal.y + j) * TILESIZE - MAINCAMERA->getCameraY(), 128);
-
 				RENDERMANAGER->insertImgAlpha(ZORDER_GAMEMOUSEDRAG, imgDisableTile, (ptTileMouseReal.x + i) * TILESIZE - MAINCAMERA->getCameraX(), (ptTileMouseReal.y + j) * TILESIZE - MAINCAMERA->getCameraY(), 128);
 			}
 		}
@@ -871,6 +944,25 @@ void gameController::renderCursor(void)
 	}
 }
 
+void gameController::renderMyResouce(void)
+{
+	TCHAR strMineral[20]	= L""; 
+	TCHAR strGas[20]		= L"";
+	TCHAR strControl[20]	= L"";
+
+	_stprintf(strMineral,	L" %d", _myPlayer->getShowMineral());
+	_stprintf(strGas,		L" %d", _myPlayer->getShowGas());
+	_stprintf(strControl,	L" %d/%d", (int)(_myPlayer->getMyControl() + 0.5f), (int)(_myPlayer->getMyControlMax() + 0.5f));
+
+	RENDERMANAGER->insertImg(ZORDER_INTERFACE, IMAGEMANAGER->findImage(L"interface-iconMineral"),	436, 3);
+	RENDERMANAGER->insertImg(ZORDER_INTERFACE, IMAGEMANAGER->findImage(L"interface-iconGas"),		504, 3);
+	RENDERMANAGER->insertImg(ZORDER_INTERFACE, IMAGEMANAGER->findImage(L"interface-iconControl"),	572, 3);
+
+	RENDERMANAGER->insertText(ZORDER_INTERFACE, RectMake(450, 3, 54, 14), strMineral,	TEXTCOLOR_MYRESOURCE);
+	RENDERMANAGER->insertText(ZORDER_INTERFACE, RectMake(518, 3, 54, 14), strGas,		TEXTCOLOR_MYRESOURCE);
+	RENDERMANAGER->insertText(ZORDER_INTERFACE, RectMake(586, 3, 54, 14), strControl,	TEXTCOLOR_MYRESOURCE);
+}
+
 void gameController::renderInterface(void)
 {
 	if (_imgInterface == NULL)
@@ -898,49 +990,86 @@ void gameController::renderSelectInfo(void)
 	{
 		tagBaseStatus baseStatus = _selectInfo.object[0]->getBaseStatus();
 		tagBattleStatus battleStatus = _selectInfo.object[0]->getBattleStatus();
+		tagProcessing processing = _selectInfo.object[0]->getProcessing();
 
-		if (battleStatus.isDead)
+		//유닛 이름
+		RENDERMANAGER->insertTextCenter(ZORDER_INTERFACE, RectMake(248, 389, 140, 16), baseStatus.name, TEXTCOLOR_UNITNAME);
+
+
+		//디텍터
+		if (baseStatus.detector)
 		{
-			_selectInfo.object[0] = NULL;
+			RENDERMANAGER->insertTextCenter(ZORDER_INTERFACE, RectMake(295, 406, 50, 16), L"Detector", TEXTCOLOR_DETECTOR);
 		}
-		else
+		
+
+		//
+
+		//이미지
+		RENDERMANAGER->insertImg(ZORDER_INTERFACE, baseStatus.imgStat1, 153, 374);
+		RENDERMANAGER->insertImg(ZORDER_INTERFACE, baseStatus.imgFace, 417, 415);
+		
+
+		//HP
+		TCHAR strHP[100];
+		_stprintf(strHP, L"%d / %d", (INT)battleStatus.curHP, (INT)battleStatus.maxHP);
+		RENDERMANAGER->insertTextCenter(ZORDER_INTERFACE, RectMake(153, 453, 89, 12), strHP, TEXTCOLOR_UNITHP);
+
+		if (baseStatus.useMP)
 		{
-			//COLORREF oldColor = GetTextColor(getMemDC());
+			//MP
+			TCHAR strMP[100];
+			_stprintf(strMP, L"%d / %d", (INT)battleStatus.curMP, (INT)battleStatus.maxMP);
+			RENDERMANAGER->insertTextCenter(ZORDER_INTERFACE, RectMake(153, 470, 89, 12), strMP, TEXTCOLOR_UNITMP);
+		}
 
-			//이미지
-			RENDERMANAGER->insertImg(ZORDER_INTERFACE, baseStatus.imgStat1, 153, 374);
-
-			//HP
-			RECT rcHP = RectMake(178, 453, 80, 12);
-			TCHAR strHP[100];
-			_stprintf(strHP, L"%d / %d", (INT)battleStatus.curHP, (INT)battleStatus.maxHP);
-
-			//SetTextColor(getMemDC(), TEXTCOLOR_UNITHP);
-			//DrawText(getMemDC(), strHP, _tcslen(strHP), &rcHP, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-
-			RENDERMANAGER->insertText(ZORDER_INTERFACE, rcHP, strHP, TEXTCOLOR_UNITHP);
-
-			if (baseStatus.useMP)
-			{
-				//MP
-				RECT rcMP = RectMake(178, 470, 43, 12);
-				TCHAR strMP[100];
-				_stprintf(strMP, L"%d / %d", (INT)battleStatus.curMP, (INT)battleStatus.maxMP);
-				//SetTextColor(getMemDC(), TEXTCOLOR_UNITMP);
-				//DrawText(getMemDC(), strMP, _tcslen(strMP), &rcMP, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-				RENDERMANAGER->insertText(ZORDER_INTERFACE, rcMP, strMP, TEXTCOLOR_UNITMP);
-			}
-
-
-			//SetTextColor(getMemDC(), oldColor);
+		//진행작업표시
+		switch (processing.type)
+		{
+			case PROCESSING_MUTATING:
+				_progressBar->setPointLT(263, 427);
+				_progressBar->setGauge(processing.curTime, processing.maxTime);
+				_progressBar->ZRender(ZORDER_INTERFACE2);
+				RENDERMANAGER->insertTextCenter(ZORDER_INTERFACE, RectMake(292, 410, 48, 16), L"Mutating", TEXTCOLOR_UNITNAME);
+			break;
+			case PROCESSING_MORPHING:
+				_progressBar->setPointLT(282, 427);
+				_progressBar->setGauge(processing.curTime, processing.maxTime);
+				_progressBar->ZRender(ZORDER_INTERFACE2);
+				RENDERMANAGER->insertImgFrame(ZORDER_INTERFACE2, processing.img, 242, 410, 0, 0);
+				RENDERMANAGER->insertTextCenter(ZORDER_INTERFACE, RectMake(309, 410, 50, 16), L"Morphing", TEXTCOLOR_UNITNAME);
+			break;
+			case PROCESSING_EVOLVING:
+				_progressBar->setPointLT(282, 427);
+				_progressBar->setGauge(processing.curTime, processing.maxTime);
+				_progressBar->ZRender(ZORDER_INTERFACE2);
+				RENDERMANAGER->insertImgFrame(ZORDER_INTERFACE2, processing.img, 242, 410, 0, 0);
+				RENDERMANAGER->insertTextCenter(ZORDER_INTERFACE, RectMake(309, 410, 50, 16), L"Evolving", TEXTCOLOR_UNITNAME);
+			break;
 		}
 	}
 	else
 	{
+		int index = 0;
+		int topUnit = UNITNUM_ZERG_NONE;
 		for (int i = 0; i < SELECTUNIT_MAX; i++)
 		{
 			if (_selectInfo.object[i] == NULL) continue;
+
+			//유닛중에 제일 높은애를 찾는다.
+			if (topUnit < _selectInfo.object[i]->getUnitnumZerg())
+			{
+				topUnit = _selectInfo.object[i]->getUnitnumZerg();
+				index = i;
+			}
+
+			int posx = 168 + (i / 2) * 36;
+			int posy = 396 + (i % 2) * 37;
+
+			RENDERMANAGER->insertImg(ZORDER_INTERFACE, _selectInfo.object[i]->getBaseStatus().imgStat2, posx, posy);
 		}
+
+		RENDERMANAGER->insertImg(ZORDER_INTERFACE, _selectInfo.object[index]->getBaseStatus().imgFace, 417, 415);
 	}
 }
 
@@ -1225,6 +1354,7 @@ gameObject* gameController::getTargetInfo(void)
 
 void gameController::clearSelectInfo(void)
 {
+	_curCommand = COMMAND_NONE;
 	_selectInfo.isSelected = false;
 	_selectInfo.num = 0;
 	for (int i = 0; i < SELECTUNIT_MAX; i++)
@@ -1533,7 +1663,7 @@ void gameController::matchingCommandImage(void)
 			{
 				_commandSet[i].button->setImage(L"command-burrow");
 
-				if (_myPlayer->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_EVOLVE_BURROW].complete)
+				if (_myPlayer->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_BURROW].complete)
 				{
 					_commandSet[i].button->setDisable(false);
 				}
@@ -1586,7 +1716,7 @@ void gameController::matchingCommandImage(void)
 			{
 				_commandSet[i].button->setImage(L"command-broodring");
 
-				if (_myPlayer->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_EVOLVE_SPAWN_BROODLING].complete)
+				if (_myPlayer->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_SPAWN_BROODLING].complete)
 					_commandSet[i].button->setDisable(false);
 				else
 					_commandSet[i].button->setDisable(true);
@@ -1603,7 +1733,7 @@ void gameController::matchingCommandImage(void)
 			{
 				_commandSet[i].button->setImage(L"command-ensnare");
 
-				if (_myPlayer->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_EVOLVE_ENSNARE].complete)
+				if (_myPlayer->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_ENSNARE].complete)
 					_commandSet[i].button->setDisable(false);
 				else
 					_commandSet[i].button->setDisable(true);
@@ -1618,7 +1748,7 @@ void gameController::matchingCommandImage(void)
 			{
 				_commandSet[i].button->setImage(L"command-consume");
 
-				if (_myPlayer->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_EVOLVE_CONSUME].complete)
+				if (_myPlayer->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_CONSUME].complete)
 					_commandSet[i].button->setDisable(false);
 				else
 					_commandSet[i].button->setDisable(true);
@@ -1640,7 +1770,7 @@ void gameController::matchingCommandImage(void)
 			{
 				_commandSet[i].button->setImage(L"command-plague");
 
-				if (_myPlayer->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_EVOLVE_PLAGUE].complete)
+				if (_myPlayer->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_PLAGUE].complete)
 					_commandSet[i].button->setDisable(false);
 				else
 					_commandSet[i].button->setDisable(true);
@@ -1979,7 +2109,7 @@ void gameController::matchingCommandImage(void)
 			{
 				_commandSet[i].button->setImage(L"command-unit_lurker");
 
-				if (_myPlayer->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_EVOLVE_LURKER_ASPECT].complete)
+				if (_myPlayer->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_LURKER_ASPECT].complete)
 					_commandSet[i].button->setDisable(false);
 				else
 					_commandSet[i].button->setDisable(true);
@@ -2190,7 +2320,7 @@ void gameController::matchingCommandImage(void)
 				_commandSet[i].button->setOnlyDown(false);
 				break;
 			}
-			case COMMAND_EVOLUTION_ZERG_ANABOLIC_SYNTHESIS:		//울트라 이송업
+			case COMMAND_EVOLUTION_ZERG_ANABOLIC_SYNTHESIS:		//울트라 이속업
 			{
 				_commandSet[i].button->setImage(L"command-evolution_zerg_anabolic_synthesis");
 
@@ -2249,6 +2379,19 @@ void gameController::actionCommand(void)
 	case COMMAND_NONE:
 		break;
 	case COMMAND_ESC:
+		for (int i = 0; i < SELECTUNIT_MAX; i++)
+		{
+			if (_selectInfo.object[i] == NULL) continue;
+			if (_selectInfo.object[i]->getProcessing().type != PROCESSING_NONE)
+			{
+				_selectInfo.object[i]->receiveCommand(_curCommand);
+			}
+
+			_curCommand = COMMAND_NONE;
+			_cursorState = CURSORSTATE_IDLE;
+			_findTarget = false;
+			_findLocation = false;
+		}
 		break;
 	case COMMAND_MOVE:
 	case COMMAND_ATTACK:
@@ -2344,25 +2487,49 @@ void gameController::actionCommand(void)
 
 		//BUILD1
 	case COMMAND_BUILD_HATCHERY:			_findLocation = true;	_buildingSize = BUILDSIZE_HATCHERY			;	_buildable = false; break;
-	case COMMAND_BUILD_LAIR:				break;
-	case COMMAND_BUILD_HIVE:				break;
 	case COMMAND_BUILD_CREEPCOLONY:			_findLocation = true;	_buildingSize = BUILDSIZE_CREEPCOLONY		;	_buildable = false; break;
-	case COMMAND_BUILD_SUNKENCOLONY:		break;
-	case COMMAND_BUILD_SPORECOLONY:			break;
 	case COMMAND_BUILD_EXTRACTOR:			_findLocation = true;	_buildingSize = BUILDSIZE_EXTRACTOR			;	_buildable = false; break;
 	case COMMAND_BUILD_SPAWNINGPOOL:		_findLocation = true;	_buildingSize = BUILDSIZE_SPAWNINGPOOL		;	_buildable = false; break;
 	case COMMAND_BUILD_EVOLUTIONCHAMBER:	_findLocation = true;	_buildingSize = BUILDSIZE_EVOLUTIONCHAMBER	;	_buildable = false; break;
 	case COMMAND_BUILD_HYDRALISKDEN:		_findLocation = true;	_buildingSize = BUILDSIZE_HYDRALISKDEN		;	_buildable = false; break;
 		//BUILD2
 	case COMMAND_BUILD_SPIRE:				_findLocation = true;	_buildingSize = BUILDSIZE_SPIRE				;	_buildable = false; break;
-	case COMMAND_BUILD_GREATERSPIRE:		break;
 	case COMMAND_BUILD_QUEENSNEST:			_findLocation = true;	_buildingSize = BUILDSIZE_QUEENSNEST		;	_buildable = false; break;
 	case COMMAND_BUILD_NYDUSCANAL:			_findLocation = true;	_buildingSize = BUILDSIZE_NYDUSCANAL		;	_buildable = false; break;
 	case COMMAND_BUILD_ULTRALISKCAVERN:		_findLocation = true;	_buildingSize = BUILDSIZE_ULTRALISKCAVERN	;	_buildable = false; break;
 	case COMMAND_BUILD_DEFILERMOUND:		_findLocation = true;	_buildingSize = BUILDSIZE_DEFILERMOUND		;	_buildable = false; break;
 
+	case COMMAND_BUILD_LAIR:
+	case COMMAND_BUILD_HIVE:				
+	case COMMAND_BUILD_SUNKENCOLONY:		
+	case COMMAND_BUILD_SPORECOLONY:			
+	case COMMAND_BUILD_GREATERSPIRE:		
+	{
+		for (int i = 0; i < SELECTUNIT_MAX; i++)
+		{
+			if (_selectInfo.object[i] == NULL) continue;
+			_selectInfo.object[i]->receiveCommand(_curCommand);
+		}
+		_curCommand = COMMAND_NONE;
+		break;
+	}
+
+
 		//UNIT
 	case COMMAND_UNIT_DRONE:
+	case COMMAND_UNIT_ZERGLING:				
+	case COMMAND_UNIT_OVERLORD:				
+	case COMMAND_UNIT_HYDRALISK:			
+	case COMMAND_UNIT_MUTALISK:				
+	case COMMAND_UNIT_SCOURGE:				
+	case COMMAND_UNIT_QUEEN:				
+	case COMMAND_UNIT_ULTRALISK:			
+	case COMMAND_UNIT_DEFILER:				
+		//UNIT2
+	case COMMAND_UNIT_LURKER:
+	case COMMAND_UNIT_GUADIAN:			
+	case COMMAND_UNIT_DEVOURER:			
+	case COMMAND_UNIT_INFESTEDTERRAN:	
 		for (int i = 0; i < SELECTUNIT_MAX; i++)
 		{
 			if (_selectInfo.object[i] == NULL) continue;
@@ -2371,45 +2538,38 @@ void gameController::actionCommand(void)
 		_curCommand = COMMAND_NONE;
 		break;
 
-	case COMMAND_UNIT_ZERGLING:				break;
-	case COMMAND_UNIT_OVERLORD:				break;
-	case COMMAND_UNIT_HYDRALISK:			break;
-	case COMMAND_UNIT_MUTALISK:				break;
-	case COMMAND_UNIT_SCOURGE:				break;
-	case COMMAND_UNIT_QUEEN:				break;
-	case COMMAND_UNIT_ULTRALISK:			break;
-	case COMMAND_UNIT_DEFILER:				break;
-		//UNIT2
-	case COMMAND_UNIT_LURKER:				break;
-	case COMMAND_UNIT_GUADIAN:				break;
-	case COMMAND_UNIT_DEVOURER:				break;
-	case COMMAND_UNIT_INFESTEDTERRAN:		break;
 
 		//UPGRADE
-	case COMMAND_UPGRADE_ZERG_MELEEATTACKS:				break; //저그 지상유닛 근접 공격
-	case COMMAND_UPGRADE_ZERG_MISSILEATTACKS:			break; //저그 지상유닛 원거리 공격
-	case COMMAND_UPGRADE_ZERG_CARAPACE:					break; //저그 지상유닛 방어력
-	case COMMAND_UPGRADE_ZERG_FLYERATTACKS:				break; //저그 공중유닛 공격
-	case COMMAND_UPGRADE_ZERG_FLYERCARAPACE:			break; //저그 공중유닛 방어력
-
+	case COMMAND_UPGRADE_ZERG_MELEEATTACKS:				//저그 지상유닛 근접 공격
+	case COMMAND_UPGRADE_ZERG_MISSILEATTACKS:			//저그 지상유닛 원거리 공격
+	case COMMAND_UPGRADE_ZERG_CARAPACE:					//저그 지상유닛 방어력
+	case COMMAND_UPGRADE_ZERG_FLYERATTACKS:				//저그 공중유닛 공격
+	case COMMAND_UPGRADE_ZERG_FLYERCARAPACE:			//저그 공중유닛 방어력
 		//EVOLUTION
-	case COMMAND_EVOLUTION_ZERG_BURROW:			break; //저그 버러우 업글
-	case COMMAND_EVOLUTION_ZERG_METABOLICK_BOOST:		break; //저글링 이속업
-	case COMMAND_EVOLUTION_ZERG_ADRENAL_GLANDS:			break; //저글링 아드레날린
-	case COMMAND_EVOLUTION_ZERG_VECTRAL_SACS:			break; //오버로드 수송업
-	case COMMAND_EVOLUTION_ZERG_ANTENNAE:				break; //오버로드 시야업
-	case COMMAND_EVOLUTION_ZERG_PNEUMATIZED_CARAPACE:	break; //오버로드 이속업
-	case COMMAND_EVOLUTION_ZERG_MUSCULAR_AUGMENTS:		break; //히드라 이속업
-	case COMMAND_EVOLUTION_ZERG_GROOVED_SPINES:			break; //히드라 사정거리업
-	case COMMAND_EVOLUTION_ZERG_LURKER_ASPECT:	break; //럴커 업글
-	case COMMAND_EVOLUTION_ZERG_SPAWN_BROODLING:	break; //퀸 브루드링 업글
-	case COMMAND_EVOLUTION_ZERG_ENSNARE:			break; //퀸 인스테어 업글
-	case COMMAND_EVOLUTION_ZERG_GAMETE_MEIOSIS:			break; //퀸 마나업
-	case COMMAND_EVOLUTION_ZERG_ANABOLIC_SYNTHESIS:		break; //울트라 이송업
-	case COMMAND_EVOLUTION_ZERG_CHITINOUS_PLATING:		break; //울트라 방업(+2)
-	case COMMAND_EVOLUTION_ZERG_PLAGUE:			break; //디파일러 플레이그
-	case COMMAND_EVOLUTION_ZERG_CONSUME:			break; //디파일러 컨슘
-	case COMMAND_EVOLUTION_ZERG_METASYNAPTIC_NODE:		break; //디파일러 마나업
+	case COMMAND_EVOLUTION_ZERG_BURROW:					//저그 버러우 업글
+	case COMMAND_EVOLUTION_ZERG_METABOLICK_BOOST:		//저글링 이속업
+	case COMMAND_EVOLUTION_ZERG_ADRENAL_GLANDS:			//저글링 아드레날린
+	case COMMAND_EVOLUTION_ZERG_VECTRAL_SACS:			//오버로드 수송업
+	case COMMAND_EVOLUTION_ZERG_ANTENNAE:				//오버로드 시야업
+	case COMMAND_EVOLUTION_ZERG_PNEUMATIZED_CARAPACE:	//오버로드 이속업
+	case COMMAND_EVOLUTION_ZERG_MUSCULAR_AUGMENTS:		//히드라 이속업
+	case COMMAND_EVOLUTION_ZERG_GROOVED_SPINES:			//히드라 사정거리업
+	case COMMAND_EVOLUTION_ZERG_LURKER_ASPECT:			//럴커 업글
+	case COMMAND_EVOLUTION_ZERG_SPAWN_BROODLING:		//퀸 브루드링 업글
+	case COMMAND_EVOLUTION_ZERG_ENSNARE:				//퀸 인스테어 업글
+	case COMMAND_EVOLUTION_ZERG_GAMETE_MEIOSIS:			//퀸 마나업
+	case COMMAND_EVOLUTION_ZERG_ANABOLIC_SYNTHESIS:		//울트라 이속업
+	case COMMAND_EVOLUTION_ZERG_CHITINOUS_PLATING:		//울트라 방업(+2)
+	case COMMAND_EVOLUTION_ZERG_PLAGUE:					//디파일러 플레이그
+	case COMMAND_EVOLUTION_ZERG_CONSUME:				//디파일러 컨슘
+	case COMMAND_EVOLUTION_ZERG_METASYNAPTIC_NODE:		//디파일러 마나업
+		for (int i = 0; i < SELECTUNIT_MAX; i++)
+		{
+			if (_selectInfo.object[i] == NULL) continue;
+			_selectInfo.object[i]->receiveCommand(_curCommand);
+		}
+		_curCommand = COMMAND_NONE;
+		break;
 
 	}
 

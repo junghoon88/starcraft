@@ -34,6 +34,9 @@ gameObject::gameObject()
 	//BattleStatus
 	ZeroMemory(&_battleStatus, sizeof(tagBattleStatus));
 
+	//현재 진행중인 작업
+	ZeroMemory(&_processing, sizeof(tagProcessing));
+
 
 	_zergUpgrade = NULL;
 

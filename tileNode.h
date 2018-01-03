@@ -102,11 +102,11 @@ enum FOGLEVEL
 //타일 구조체
 struct tagTile
 {
-	DWORD	terrain;	//터레인
+	DWORD	terrain;		//터레인
 	POINT	terrainNum;		//터레인 인덱스
 
 	DWORD	obj;			//
-	UINT	nrAmount;//NeutralResource 자원양
+	UINT	nrAmount;		//NeutralResource 자원양
 
 	DWORD	attribute;
 	

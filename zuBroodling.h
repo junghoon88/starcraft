@@ -1,12 +1,10 @@
 #pragma once
 #include "Unit.h"
 
-#include "zergProductionInfo.h"
 
 class zuBroodling : public Unit
 {
 private:
-	zergProductionInfo* _zergProductionInfo;
 
 	FLOAT		_lifeTime;
 	FLOAT		_lifeTimeMax;

@@ -85,6 +85,8 @@ public:
 	void setText(const TCHAR* text);
 	void setRect(int x,int y);
 
+	void click(void);
+
 public:
 	inline RECT getRect(void) { return _rc; }
 	inline void setFontNum(FONTVERSION fontNum) { _fontNum = fontNum; }

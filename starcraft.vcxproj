@@ -99,7 +99,6 @@
     <ClInclude Include="gameMap.h" />
     <ClInclude Include="gameNode.h" />
     <ClInclude Include="gameObject.h" />
-    <ClInclude Include="gameObjectPool.h" />
     <ClInclude Include="globalMacroVariables.h" />
     <ClInclude Include="globalTools.h" />
     <ClInclude Include="hotkeys.h" />
@@ -192,7 +191,6 @@
     <ClCompile Include="gameMap.cpp" />
     <ClCompile Include="gameNode.cpp" />
     <ClCompile Include="gameObject.cpp" />
-    <ClCompile Include="gameObjectPool.cpp" />
     <ClCompile Include="globalTools.cpp" />
     <ClCompile Include="hotkeys.cpp" />
     <ClCompile Include="image.cpp" />

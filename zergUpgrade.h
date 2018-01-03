@@ -41,6 +41,9 @@ public:
 	zergUpgrade();
 	~zergUpgrade();
 
+	void upgradeComplete(UPGRADE_ZERG num);
+	void evolutionComplete(EVOLUTION_ZERG num);
+
 public:
 	inline tagUpgrade* getUpgrade(void) { return _upgrade; }
 	inline tagEvolution* getEvolution(void) { return _evolution; }

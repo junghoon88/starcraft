@@ -42,10 +42,10 @@ void zbSpawningPool::initBaseStatus(void)
 	_stprintf(_baseStatus.name, L"Zerg Spawning Pool");
 
 	TCHAR strKey[100];
-	_stprintf(strKey, L"ZB-spawningPool-Body%d", _playerNum);
+	_stprintf(strKey, L"ZB-spawningpool-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);
-	_baseStatus.imgFace = NULL;
-	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZB-spawningPool-Stat1");
+	_baseStatus.imgFace = IMAGEMANAGER->findImage(L"ZB-Face");
+	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZB-spawningpool-Stat1");
 	_baseStatus.imgStat2 = NULL;
 
 	_baseStatus.maxHP = 750.0f;
@@ -71,15 +71,6 @@ void zbSpawningPool::initBaseStatus(void)
 	_baseStatus.GWable = FALSE;
 	_baseStatus.AWable = FALSE;
 
-	_baseStatus.commands[0] = COMMAND_EVOLUTION_ZERG_METABOLICK_BOOST;
-	_baseStatus.commands[1] = COMMAND_EVOLUTION_ZERG_ADRENAL_GLANDS;
-	_baseStatus.commands[2] = COMMAND_NONE;
-	_baseStatus.commands[3] = COMMAND_NONE;
-	_baseStatus.commands[4] = COMMAND_NONE;
-	_baseStatus.commands[5] = COMMAND_NONE;
-	_baseStatus.commands[6] = COMMAND_NONE;
-	_baseStatus.commands[7] = COMMAND_NONE;
-	_baseStatus.commands[8] = COMMAND_NONE;
 
 }
 void zbSpawningPool::initBattleStatus(POINT ptTile)
@@ -112,7 +103,143 @@ void zbSpawningPool::update(void)
 
 void zbSpawningPool::render(int imgOffsetX, int imgOffsetY)
 {
-	Building::render();
+	POINT imgOffset = BUILDIMAGEOFFSET_SPAWNINGPOOL;
+	Building::render(imgOffset.x * TILESIZE, imgOffset.y * TILESIZE);
 
 }
 
+void zbSpawningPool::updateBattleStatus(void)
+{
+
+}
+void zbSpawningPool::updatePosition(void)
+{
+
+}
+
+void zbSpawningPool::updateImageFrame(void)
+{
+
+}
+
+void zbSpawningPool::updateProcessing(void)
+{
+	Building::updateProcessing();
+
+}
+
+void zbSpawningPool::updateCommandSet(void)
+{
+	if (_processing.type == PROCESSING_EVOLVING)
+	{
+		_baseStatus.commands[0] = COMMAND_NONE;
+		_baseStatus.commands[1] = COMMAND_NONE;
+		_baseStatus.commands[8] = COMMAND_ESC;
+	}
+	else
+	{
+		tagEvolution evoMetabolic = _player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_METABOLICK_BOOST];
+		tagEvolution evoAdrenal   = _player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_ADRENAL_GLANDS];
+
+		if (evoMetabolic.complete || evoMetabolic.isProcessing)
+		{
+			_baseStatus.commands[0] = COMMAND_NONE;
+		}
+		else
+		{
+			_baseStatus.commands[0] = COMMAND_EVOLUTION_ZERG_METABOLICK_BOOST;
+		}
+
+		if (evoAdrenal.complete || evoAdrenal.isProcessing)
+		{
+			_baseStatus.commands[1] = COMMAND_NONE;
+		}
+		else
+		{
+			_baseStatus.commands[1] = COMMAND_EVOLUTION_ZERG_ADRENAL_GLANDS;
+		}
+
+		_baseStatus.commands[8] = COMMAND_NONE;
+	}
+}
+
+
+void zbSpawningPool::procCommands(void)
+{
+	switch (_battleStatus.curCommand)
+	{
+		case COMMAND_EVOLUTION_ZERG_METABOLICK_BOOST:
+		{
+			tagEvolution evolution = _player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_METABOLICK_BOOST];
+
+			if (_player->useResource(evolution.cost.mineral, evolution.cost.gas))
+			{
+				//성공
+				_processing.type = PROCESSING_EVOLVING;
+				_processing.command = _battleStatus.curCommand;
+				_processing.img = IMAGEMANAGER->findImage(L"command-evolution_zerg_metabolick_boost");
+				_processing.curTime = 0.0f;
+				_processing.maxTime = evolution.cost.duration;
+				_processing.complete = false;
+
+				evolution.isProcessing = true;
+			}
+			else
+			{
+				//실패
+			}
+			_battleStatus.curCommand = COMMAND_NONE;
+		}
+		break;
+
+		case COMMAND_EVOLUTION_ZERG_ADRENAL_GLANDS:
+		{
+			tagEvolution evolution = _player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_ADRENAL_GLANDS];
+
+			if (_player->useResource(evolution.cost.mineral, evolution.cost.gas))
+			{
+				//성공
+				_processing.type = PROCESSING_EVOLVING;
+				_processing.command = _battleStatus.curCommand;
+				_processing.img = IMAGEMANAGER->findImage(L"command-evolution_zerg_adrenal_glands");
+				_processing.curTime = 0.0f;
+				_processing.maxTime = evolution.cost.duration;
+				_processing.complete = false;
+
+				evolution.isProcessing = true;
+			}
+			else
+			{
+				//실패
+			}
+			_battleStatus.curCommand = COMMAND_NONE;
+		}
+		break;
+
+		case COMMAND_ESC:
+		{
+			if (_processing.command == COMMAND_EVOLUTION_ZERG_METABOLICK_BOOST)
+			{
+				tagEvolution evolution = _player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_METABOLICK_BOOST];
+
+				_player->addResource((UINT)(evolution.cost.mineral * CANCLE_RESOURCE), (UINT)(evolution.cost.gas * CANCLE_RESOURCE));
+				evolution.isProcessing = false;
+				evolution.complete = false;
+			}
+			else if (_processing.command == COMMAND_EVOLUTION_ZERG_ADRENAL_GLANDS)
+			{
+				tagEvolution evolution = _player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_ADRENAL_GLANDS];
+
+				_player->addResource((UINT)(evolution.cost.mineral * CANCLE_RESOURCE), (UINT)(evolution.cost.gas * CANCLE_RESOURCE));
+				evolution.isProcessing = false;
+				evolution.complete = false;
+			}
+
+			ZeroMemory(&_processing, sizeof(tagProcessing));
+
+			_battleStatus.curCommand = COMMAND_NONE;
+		}
+		break;
+
+	}
+}

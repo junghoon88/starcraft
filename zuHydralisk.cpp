@@ -20,7 +20,6 @@ zuHydralisk::zuHydralisk(PLAYER playerNum)
 	//유닛 고유 번호
 	_unitNumZ = UNITNUM_ZERG_HYDRALISK;
 
-	_zergProductionInfo = new zergProductionInfo;
 }
 
 
@@ -50,7 +49,7 @@ void zuHydralisk::initBaseStatus(void)
 	TCHAR strKey[100];
 	_stprintf(strKey, L"ZU-hydralisk-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);
-	_baseStatus.imgFace = NULL;
+	_baseStatus.imgFace = IMAGEMANAGER->findImage(L"ZU-hydralisk-Face");
 	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-hydralisk-Stat1");
 	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-hydralisk-Stat2");
 
@@ -126,7 +125,6 @@ void zuHydralisk::initBattleStatus(POINT pt)
 
 void zuHydralisk::release(void)
 {
-	SAFE_DELETE(_zergProductionInfo);
 
 }
 

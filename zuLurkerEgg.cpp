@@ -20,7 +20,6 @@ zuLurkerEgg::zuLurkerEgg(PLAYER playerNum)
 	//유닛 고유 번호
 	_unitNumZ = UNITNUM_ZERG_LURKEREGG;
 
-	_zergProductionInfo = new zergProductionInfo;
 }
 
 
@@ -51,7 +50,7 @@ void zuLurkerEgg::initBaseStatus(void)
 	TCHAR strKey[100];
 	_stprintf(strKey, L"ZU-lerkeregg-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);
-	_baseStatus.imgFace = NULL;
+	_baseStatus.imgFace = IMAGEMANAGER->findImage(L"ZU-lerkeregg-Face");
 	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-lerkeregg-Stat1");
 	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-lerkeregg-Stat2");
 
@@ -109,7 +108,6 @@ void zuLurkerEgg::initBattleStatus(POINT pt)
 
 void zuLurkerEgg::release(void)
 {
-	SAFE_DELETE(_zergProductionInfo);
 }
 
 void zuLurkerEgg::update(void)

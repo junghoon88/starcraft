@@ -19,9 +19,6 @@ zuOverlord::zuOverlord(PLAYER playerNum)
 
 	//유닛 고유 번호
 	_unitNumZ = UNITNUM_ZERG_OVERLORD;
-
-	_zergProductionInfo = new zergProductionInfo;
-
 }
 
 
@@ -51,7 +48,7 @@ void zuOverlord::initBaseStatus(void)
 	TCHAR strKey[100];
 	_stprintf(strKey, L"ZU-overlord-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);
-	_baseStatus.imgFace = NULL;
+	_baseStatus.imgFace = IMAGEMANAGER->findImage(L"ZU-overlord-Face");
 	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-overlord-Stat1");
 	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-overlord-Stat2");
 
@@ -112,7 +109,6 @@ void zuOverlord::initBattleStatus(POINT pt)
 
 void zuOverlord::release(void)
 {
-	SAFE_DELETE(_zergProductionInfo);
 }
 
 void zuOverlord::update(void)

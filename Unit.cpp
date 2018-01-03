@@ -2,18 +2,6 @@
 #include "Unit.h"
 #include "Building.h"
 
-#if 0
-POINT Unit::_zuBodySize[UNITNUM_ZERG_MAX];
-
-Unit::Unit(bool initUnitInfo)
-	: _zergUpgrade(NULL), _aStar(NULL)
-{
-	//À¯´Ö ¸öÃ¼ »çÀÌÁî
-	ZeroMemory(&_zuBodySize, sizeof(POINT) * UNITNUM_ZERG_MAX);
-
-}
-#endif
-
 Unit::Unit()
 {
 }
@@ -63,7 +51,7 @@ void Unit::render(void)
 		temp.right -= MAINCAMERA->getCameraX();
 		temp.top -= MAINCAMERA->getCameraY();
 		temp.bottom -= MAINCAMERA->getCameraY();
-		RENDERMANAGER->insertLineRectangle(ZORDER_INTERFACE2, temp, PENVERSION_BLUE1);
+		RENDERMANAGER->insertLineRectangle(ZORDER_GAMEDEBUG1, temp, PENVERSION_BLUE1);
 	}
 }
 
@@ -132,4 +120,15 @@ void Unit::updatePosition(void)
 void Unit::updateImageFrame(void)
 {
 	setImageFrameForAngle();
+}
+
+
+bool Unit::isInTargetPoint(void)
+{
+	if (fabs(_battleStatus.pt.x - _battleStatus.ptTarget.x) <= 0.1f
+		&& fabs(_battleStatus.pt.y - _battleStatus.ptTarget.y) <= 0.1f)
+	{
+		return true;
+	}
+	return false;
 }

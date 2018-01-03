@@ -1,13 +1,24 @@
 #pragma once
 #include "Unit.h"
 
-#include "zergProductionInfo.h"
+
+enum WORKSTATE
+{
+	WORKSTATE_IDLE,
+	WORKSTATE_MOVETO_MINERAL,
+	WORKSTATE_WAITING_MINERAL,
+	WORKSTATE_GATHERING_MINERAL,
+	WORKSTATE_RETURN_MINERAL,
+	WORKSTATE_MOVETO_GAS,
+	WORKSTATE_WAITING_GAS,
+	WORKSTATE_GATHERING_GAS,
+	WORKSTATE_RETURN_GAS
+};
 
 
 class zuDrone : public Unit
 {
 private:
-	zergProductionInfo* _zergProductionInfo;
 
 private:
 	void initBaseStatus(void);

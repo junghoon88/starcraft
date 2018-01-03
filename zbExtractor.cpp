@@ -43,7 +43,7 @@ void zbExtractor::initBaseStatus(void)
 	TCHAR strKey[100];
 	_stprintf(strKey, L"ZB-extractor-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);
-	_baseStatus.imgFace = NULL;
+	_baseStatus.imgFace = IMAGEMANAGER->findImage(L"ZB-Face");
 	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZB-extractor-Stat1");
 	_baseStatus.imgStat2 = NULL;
 
@@ -69,16 +69,6 @@ void zbExtractor::initBaseStatus(void)
 	_baseStatus.sameGWAW = FALSE;
 	_baseStatus.GWable = FALSE;
 	_baseStatus.AWable = FALSE;
-
-	_baseStatus.commands[0] = COMMAND_NONE;
-	_baseStatus.commands[1] = COMMAND_NONE;
-	_baseStatus.commands[2] = COMMAND_NONE;
-	_baseStatus.commands[3] = COMMAND_NONE;
-	_baseStatus.commands[4] = COMMAND_NONE;
-	_baseStatus.commands[5] = COMMAND_NONE;
-	_baseStatus.commands[6] = COMMAND_NONE;
-	_baseStatus.commands[7] = COMMAND_NONE;
-	_baseStatus.commands[8] = COMMAND_NONE;
 
 }
 void zbExtractor::initBattleStatus(POINT ptTile)
@@ -111,7 +101,38 @@ void zbExtractor::update(void)
 
 void zbExtractor::render(int imgOffsetX, int imgOffsetY)
 {
-	Building::render();
+	POINT imgOffset = BUILDIMAGEOFFSET_EXTRACTOR;
+	Building::render(imgOffset.x * TILESIZE, imgOffset.y * TILESIZE);
 
 }
 
+void zbExtractor::updateBattleStatus(void)
+{
+
+}
+void zbExtractor::updatePosition(void)
+{
+
+}
+
+void zbExtractor::updateImageFrame(void)
+{
+
+}
+
+void zbExtractor::updateProcessing(void)
+{
+	Building::updateProcessing();
+
+}
+
+void zbExtractor::updateCommandSet(void)
+{
+
+}
+
+
+void zbExtractor::procCommands(void)
+{
+
+}

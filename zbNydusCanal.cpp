@@ -44,7 +44,7 @@ void zbNydusCanal::initBaseStatus(void)
 	TCHAR strKey[100];
 	_stprintf(strKey, L"ZB-nyduscanal-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);
-	_baseStatus.imgFace = NULL;
+	_baseStatus.imgFace = IMAGEMANAGER->findImage(L"ZB-Face");
 	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZB-nyduscanal-Stat1");
 	_baseStatus.imgStat2 = NULL;
 
@@ -112,7 +112,38 @@ void zbNydusCanal::update(void)
 
 void zbNydusCanal::render(int imgOffsetX, int imgOffsetY)
 {
-	Building::render();
+	POINT imgOffset = BUILDIMAGEOFFSET_NYDUSCANAL;
+	Building::render(imgOffset.x * TILESIZE, imgOffset.y * TILESIZE);
 
 }
 
+void zbNydusCanal::updateBattleStatus(void)
+{
+
+}
+void zbNydusCanal::updatePosition(void)
+{
+
+}
+
+void zbNydusCanal::updateImageFrame(void)
+{
+
+}
+
+void zbNydusCanal::updateProcessing(void)
+{
+	Building::updateProcessing();
+
+}
+
+void zbNydusCanal::updateCommandSet(void)
+{
+	_baseStatus.commands[0] = COMMAND_BUILD_NYDUSCANAL;
+}
+
+
+void zbNydusCanal::procCommands(void)
+{
+
+}

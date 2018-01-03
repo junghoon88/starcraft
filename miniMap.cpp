@@ -31,6 +31,13 @@ HRESULT miniMap::init(void)
 
 	_rc = RectMake(6, 348, TILEX, TILEY);
 
+
+	int width = WINSIZEX / TILESIZE;
+	int height = WINSIZEY / TILESIZE;
+
+	_rcMiniMapCamera = RectMake(0, 0, width, height);
+
+
 	return S_OK;
 }
 
@@ -51,7 +58,7 @@ void miniMap::render(void)
 	RENDERMANAGER->insertImg(ZORDER_INTERFACE, _img, _rc.left, _rc.top);
 
 
-	int width = WINSIZEX / TILESIZE;
+	int width  = WINSIZEX / TILESIZE;
 	int height = WINSIZEY / TILESIZE;
 
 	image* _backBuffer3 = IMAGEMANAGER->addImage(L"backBuffer3", TILEX, TILEY);
@@ -75,5 +82,19 @@ void miniMap::render(void)
 		width, height,		//복사할 가로 세로 크기
 		RGB(0, 0, 0));			//제외할 칼라
 
+
+	//카메라
+	{
+		int x = MAINCAMERA->getCameraX() / TILESIZE;
+		int y = MAINCAMERA->getCameraY() / TILESIZE;
+		int width = WINSIZEX / TILESIZE;
+		int height = WINSIZEY / TILESIZE;
+
+		_rcMiniMapCamera = RectMake(x, y, width, height);
+
+
+
+		RENDERMANAGER->insertLineRectangle(ZORDER_INTERFACE, _rcMiniMapCamera, PENVERSION_MINIMAP);
+	}
 
 }

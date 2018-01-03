@@ -28,9 +28,8 @@ HRESULT sceneBattle::init(void)
 	_gameMap = new gameMap;
 	_gameMap->init();
 
-	//게임오브젝트 최대 1000개로 잡는다.
-	//_gameObjectPool = new gameObjectPool;
-	//_gameObjectPool->init(1000);
+
+	_zergProductionInfo = new zergProductionInfo(true);
 
 	for (int i = 0; i < PLAYER_NUM; i++)
 	{
@@ -38,7 +37,7 @@ HRESULT sceneBattle::init(void)
 
 		_player[i] = new player;
 		_player[i]->setLinkAdressGamemap(_gameMap);
-		//_player[i]->setLinkAdressGameObjectPool(_gameObjectPool);
+		_player[i]->setLinkAdressZergProduction(_zergProductionInfo);
 		_player[i]->init((PLAYER)i, selectRaces);
 
 		//_gameInterface[i] = new gameInterface;
@@ -54,7 +53,6 @@ HRESULT sceneBattle::init(void)
 
 	ShowCursor(false);
 
-	_zergProductionInfo = new zergProductionInfo(true);
 
 
 	return S_OK;

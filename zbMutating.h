@@ -1,38 +1,37 @@
 #pragma once
 #include "Building.h"
 
-#include "zergProductionInfo.h"
-
-#include "progressBar.h"
+#include "zuLarva.h"
 
 class zbMutating : public Building
 {
 private:
+	BUILDINGNUM_ZERG		_beforeBuildingNum;
+	BUILDINGNUM_ZERG		_nextBuildingNum;
+
 	Building*				_beforeBuilding;
 	Building*				_nextBuilding;
 
-	zergProductionInfo*		_zergProductionInfo;
 
-
-	FLOAT					_buildTime;
-	FLOAT					_buildTimeMax;
 	FLOAT					_buildHP;
 
-	progressBar*			_progressBar;
+	vector<zuLarva*>		_vLarva;
 
-	BOOL					_complete;
+
 
 private:
 	void initNextBuilding(POINT ptTile);
 	void initBaseStatus(void);
 	void initBattleStatus(POINT ptTile);
+	void initProcessing(void);
 
 	//상속받은 가상함수
 	void updateBattleStatus(void);
 	void updatePosition(void);
 	void updateImageFrame(void);
+	void updateProcessing(void);
 
-	void updateProgressBar(void);
+	void procCommands(void);
 
 
 
@@ -47,7 +46,10 @@ public:
 	void render(int imgOffsetX = 0, int imgOffsetY = 0);
 
 
-	void procCommands(void);
+
+
+public:
+	inline vector<zuLarva*> getLarvas(void) { return _vLarva; }
 
 };
 

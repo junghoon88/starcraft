@@ -50,7 +50,7 @@ zuDrone::zuDrone(PLAYER playerNum)
 	//_hangingGas = 0;		//0이면 안들고 있는 것.
 
 
-	_zergProductionInfo = new zergProductionInfo;
+	
 
 
 }
@@ -82,7 +82,7 @@ void zuDrone::initBaseStatus(void)
 	TCHAR strKey[100];
 	_stprintf(strKey, L"ZU-drone-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);				//이미지-몸체
-	_baseStatus.imgFace = NULL;											//이미지-얼굴(우측하단)
+	_baseStatus.imgFace = IMAGEMANAGER->findImage(L"ZU-drone-Face");	//이미지-얼굴(우측하단)
 	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-drone-Stat1");	//이미지-스탯상태(1마리클릭했을때)
 	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-drone-Stat2");	//이미지-스탯상태(복수클릭했을때)
 
@@ -150,7 +150,6 @@ void zuDrone::initBattleStatus(POINT pt)
 
 void zuDrone::release(void)
 {
-	SAFE_DELETE(_zergProductionInfo);
 }
 
 void zuDrone::update(void)
@@ -202,37 +201,44 @@ void zuDrone::procCommands(void)
 {
 	Unit::procCommands();
 
-	POINT buildsize = { 0, 0 };
-	POINT ptBuildTile = { 0, 0 };
-
+	BUILDINGNUM_ZERG buildingNum = BUILDINGNUM_ZERG_NONE;
 
 	switch (_battleStatus.curCommand)
 	{
 		//BUILD1
-	case COMMAND_BUILD_HATCHERY:
+	case COMMAND_BUILD_HATCHERY:					buildingNum = BUILDINGNUM_ZERG_HATCHERY;			break;
+	case COMMAND_BUILD_CREEPCOLONY:					buildingNum = BUILDINGNUM_ZERG_CREEPCOLONY;			break;
+	case COMMAND_BUILD_EXTRACTOR:					buildingNum = BUILDINGNUM_ZERG_EXTRACTOR;			break;
+	case COMMAND_BUILD_SPAWNINGPOOL:				buildingNum = BUILDINGNUM_ZERG_SPAWNINGPOOL;		break;
+	case COMMAND_BUILD_EVOLUTIONCHAMBER:			buildingNum = BUILDINGNUM_ZERG_EVOLUTIONCHAMBER;	break;
+	case COMMAND_BUILD_HYDRALISKDEN:				buildingNum = BUILDINGNUM_ZERG_HYDRALISKDEN;		break;
+		//BUILD2
+	case COMMAND_BUILD_SPIRE:						buildingNum = BUILDINGNUM_ZERG_SPIRE;				break;
+	case COMMAND_BUILD_QUEENSNEST:					buildingNum = BUILDINGNUM_ZERG_QUEENSNEST;			break;
+	case COMMAND_BUILD_NYDUSCANAL:					buildingNum = BUILDINGNUM_ZERG_NYDUSCANAL;			break;
+	case COMMAND_BUILD_ULTRALISKCAVERN:				buildingNum = BUILDINGNUM_ZERG_ULTRALISKCAVERN;		break;
+	case COMMAND_BUILD_DEFILERMOUND:				buildingNum = BUILDINGNUM_ZERG_DEFILERMOUND;		break;
+	}
+
+
+	if (buildingNum != BUILDINGNUM_ZERG_NONE)
 	{
-		if (fabs(_battleStatus.pt.x - _battleStatus.ptTarget.x) <= 0.1f
-			&& fabs(_battleStatus.pt.y - _battleStatus.ptTarget.y) <= 0.1f)
+		if (Unit::isInTargetPoint())
 		{
-			buildsize = BUILDSIZE_HATCHERY;
-			ptBuildTile = _battleStatus.ptTileTarget;
-
-
-
-			tagProduction buildCost = _zergProductionInfo->getZBProductionInfo(BUILDINGNUM_ZERG_HATCHERY);
+			tagProduction buildCost = _player->getZergProductionInfo()->getZBProductionInfo(buildingNum);
 
 			if (_player->useResource(buildCost.costMinerals, buildCost.costGas))
 			{
 				//성공
-				zbMutating* hatchery = new zbMutating(_playerNum, BUILDINGNUM_ZERG_HATCHERY);
-				hatchery->setLinkAdressZergUpgrade(_zergUpgrade);
-				hatchery->setLinkAdressAstar(_aStar);
-				hatchery->setLinkAdressPlayer(_player);
-				hatchery->init(_battleStatus.ptTileTarget);
+				zbMutating* nextBuilding = new zbMutating(_playerNum, buildingNum);
+				nextBuilding->setLinkAdressZergUpgrade(_zergUpgrade);
+				nextBuilding->setLinkAdressAstar(_aStar);
+				nextBuilding->setLinkAdressPlayer(_player);
+				nextBuilding->init(_battleStatus.ptTileTarget);
 
-				_player->addBuilding(hatchery);
+				_player->addBuilding(nextBuilding);
 
-				_nextObject = hatchery;
+				_nextObject = nextBuilding;
 				_valid = false;
 			}
 			else
@@ -247,23 +253,5 @@ void zuDrone::procCommands(void)
 			Unit::moveGround();
 		}
 	}
-	break;
-	//case COMMAND_BUILD_LAIR:
-	//case COMMAND_BUILD_HIVE:
-	case COMMAND_BUILD_CREEPCOLONY:
-	//case COMMAND_BUILD_SUNKENCOLONY:
-	//case COMMAND_BUILD_SPORECOLONY:
-	case COMMAND_BUILD_EXTRACTOR:
-	case COMMAND_BUILD_SPAWNINGPOOL:
-	case COMMAND_BUILD_EVOLUTIONCHAMBER:
-	case COMMAND_BUILD_HYDRALISKDEN:
-		//BUILD2
-	case COMMAND_BUILD_SPIRE:
-	//case COMMAND_BUILD_GREATERSPIRE:
-	case COMMAND_BUILD_QUEENSNEST:
-	case COMMAND_BUILD_NYDUSCANAL:
-	case COMMAND_BUILD_ULTRALISKCAVERN:
-	case COMMAND_BUILD_DEFILERMOUND:
-		break;
-	}
+
 }

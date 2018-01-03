@@ -2,7 +2,6 @@
 #include "gameNode.h"
 #include "player.h"
 #include "gameMap.h"
-#include "gameObjectPool.h"
 
 #include "zergProductionInfo.h"
 
@@ -12,9 +11,6 @@ class sceneBattle : public gameNode
 private:
 	//맵정보
 	gameMap*		_gameMap;
-
-	//게임오브젝트풀
-	//gameObjectPool* _gameObjectPool;
 
 
 	//플레이어

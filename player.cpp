@@ -89,7 +89,7 @@ unsigned CALLBACK ControllerThread(void* pArguments)
 #endif
 
 player::player()
-	: _zergUpgrade(NULL), _gameMap(NULL), _fog(NULL), _aStar(NULL), _gameController(NULL)//, _gameObjectPool(NULL)
+	: _zergUpgrade(NULL), _gameMap(NULL), _fog(NULL), _aStar(NULL), _gameController(NULL)
 {
 }
 
@@ -101,8 +101,9 @@ player::~player()
 
 HRESULT player::init(PLAYER playerNum, RACES races)
 {
-	_myMineral = 5000;
-	_myGas = 1000;
+	_myMineral = _showMineral = 10000;
+	_myGas = _showGas = 10000;
+
 	_myControl = _myControlMax = 0;
 
 	_playerNum = playerNum;
@@ -133,12 +134,16 @@ HRESULT player::init(PLAYER playerNum, RACES races)
 
 
 	//debug
-	zuDrone* drone = new zuDrone(_playerNum);
-	drone->setLinkAdressZergUpgrade(_zergUpgrade);
-	drone->setLinkAdressAstar(_aStar);
-	drone->setLinkAdressPlayer(this);
-	drone->init({ 200, 200 });
-	_vUnits.push_back(drone);
+	for (int i = 0; i < 10; i++)
+	{
+		zuDrone* drone = new zuDrone(_playerNum);
+		drone->setLinkAdressZergUpgrade(_zergUpgrade);
+		drone->setLinkAdressAstar(_aStar);
+		drone->setLinkAdressPlayer(this);
+		drone->init({ 200, 200 });
+		_vUnits.push_back(drone);
+
+	}
 
 
 
@@ -190,6 +195,42 @@ void player::update(void)
 	for (UINT i = 0; i < _vBuildings.size(); i++)
 	{
 		_vBuildings[i]->update();
+	}
+
+
+	if (_showMineral > _myMineral)
+	{
+		UINT delta = _showMineral - _myMineral;
+		delta = delta * 0.1f + 1;
+		_showMineral -= delta;
+	}
+	else if (_showMineral < _myMineral)
+	{
+		UINT delta = _myMineral - _showMineral;
+		delta = delta * 0.1f + 1;
+		_showMineral += delta;
+	}
+
+	if (_showGas > _myGas)
+	{
+		UINT delta = _showGas - _myGas;
+		delta = delta * 0.1f + 1;
+		_showGas -= delta;
+	}
+	else if (_showGas < _myGas)
+	{
+		UINT delta = _myGas - _showGas;
+		delta = delta * 0.1f + 1;
+		_showGas += delta;
+	}
+
+	if (_vBuildings.size() > 10)
+	{
+		printf("");
+	}
+	if (_vBuildingsInCamera.size() > 10)
+	{
+		printf("");
 	}
 
 

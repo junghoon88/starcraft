@@ -20,7 +20,6 @@ zuInfestedTerran::zuInfestedTerran(PLAYER playerNum)
 	//유닛 고유 번호
 	_unitNumZ = UNITNUM_ZERG_INFESTEDTERRAN;
 
-	_zergProductionInfo = new zergProductionInfo;
 }
 
 
@@ -51,7 +50,7 @@ void zuInfestedTerran::initBaseStatus(void)
 	TCHAR strKey[100]; 
 	_stprintf(strKey, L"ZU-infestedTerran-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);
-	_baseStatus.imgFace = NULL;
+	_baseStatus.imgFace = IMAGEMANAGER->findImage(L"ZU-infestedTerran-Face");
 	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-infestedTerran-Stat1");
 	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-infestedTerran-Stat2");
 
@@ -119,7 +118,6 @@ void zuInfestedTerran::initBattleStatus(POINT pt)
 
 void zuInfestedTerran::release(void)
 {
-	SAFE_DELETE(_zergProductionInfo);
 }
 
 void zuInfestedTerran::update(void)

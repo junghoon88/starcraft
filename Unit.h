@@ -118,14 +118,7 @@ struct tagUnitBattleStatus
 
 class Unit : public gameObject
 {
-	//전역변수처럼 Unit 정보들을 담아놓고 원할때 자식클래스에서 받아오도록 한다.
-private:
-	//static POINT		_zuBodySize[UNITNUM_ZERG_MAX];
-
-
-
 public:
-	//Unit(bool initUnitInfo);
 	Unit();
 	~Unit();
 
@@ -154,17 +147,10 @@ public:
 
 	void setImageFrameForAngle(void);
 
-
+	bool isInTargetPoint(void);
 
 public:
-
-
-
-
-	//inline POINT getZuBodySize(UNITNUM_ZERG num) { return _zuBodySize[num]; }
-
-
-
+	
 
 
 };

@@ -16,6 +16,14 @@ private:
 	void initBattleStatus(POINT ptTile);
 	void initLarva(UINT num);
 
+	//상속받은 가상함수
+	void updateBattleStatus(void);
+	void updatePosition(void);
+	void updateImageFrame(void);
+	void updateProcessing(void);
+	void updateCommandSet(void);
+
+	void procCommands(void);
 
 public:
 	zbHatchery(PLAYER playerNum);
@@ -28,7 +36,7 @@ public:
 	void render(int imgOffsetX = 0, int imgOffsetY = 0);
 
 public:
-	vector<zuLarva*> getLarvas(void) { return _vLarva; }
+	inline vector<zuLarva*> getLarvas(void) { return _vLarva; }
 
 };
 

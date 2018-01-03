@@ -19,8 +19,6 @@ zuDevourer::zuDevourer(PLAYER playerNum)
 
 	//유닛 고유 번호
 	_unitNumZ = UNITNUM_ZERG_DEVOURER;
-
-	_zergProductionInfo = new zergProductionInfo;
 }
 
 
@@ -50,7 +48,7 @@ void zuDevourer::initBaseStatus(void)
 	TCHAR strKey[100];
 	_stprintf(strKey, L"ZU-devourer-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);
-	_baseStatus.imgFace = NULL;
+	_baseStatus.imgFace = IMAGEMANAGER->findImage(L"ZU-devourer-Face");
 	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-devourer-Stat1");
 	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-devourer-Stat2");
 
@@ -118,7 +116,6 @@ void zuDevourer::initBattleStatus(POINT pt)
 
 void zuDevourer::release(void)
 {
-	SAFE_DELETE(_zergProductionInfo);
 }
 
 void zuDevourer::update(void)

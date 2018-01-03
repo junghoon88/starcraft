@@ -19,9 +19,6 @@ zuCocoon::zuCocoon(PLAYER playerNum)
 
 	//유닛 고유 번호
 	_unitNumZ = UNITNUM_ZERG_COCOON;
-
-	_zergProductionInfo = new zergProductionInfo;
-
 }
 
 
@@ -51,7 +48,7 @@ void zuCocoon::initBaseStatus(void)
 	TCHAR strKey[100];
 	_stprintf(strKey, L"ZU-cocoon-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);
-	_baseStatus.imgFace = NULL;
+	_baseStatus.imgFace = IMAGEMANAGER->findImage(L"ZU-cocoon-Face");
 	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-cocoon-Stat1");
 	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-cocoon-Stat2");
 
@@ -111,7 +108,6 @@ void zuCocoon::initBattleStatus(POINT pt)
 
 void zuCocoon::release(void)
 {
-	SAFE_DELETE(_zergProductionInfo);
 }
 
 void zuCocoon::update(void)

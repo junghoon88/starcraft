@@ -22,19 +22,15 @@ enum UNITSTATE
 	//UNITSTATE_ATTACK
 };
 
-enum WORKSTATE
+enum PROCESSING
 {
-	WORKSTATE_IDLE,
-	WORKSTATE_MOVETO_MINERAL,
-	WORKSTATE_WAITING_MINERAL,
-	WORKSTATE_GATHERING_MINERAL,
-	WORKSTATE_RETURN_MINERAL,
-	WORKSTATE_MOVETO_GAS,
-	WORKSTATE_WAITING_GAS,
-	WORKSTATE_GATHERING_GAS,
-	WORKSTATE_RETURN_GAS
-};
+	PROCESSING_NONE,
+	PROCESSING_MUTATING,
+	PROCESSING_MORPHING,
+	PROCESSING_EVOLVING,
 
+	PROCESSING_MAX
+};
 
 
 //BaseStatus
@@ -147,6 +143,16 @@ struct tagBattleStatus
 
 };
 
+struct tagProcessing
+{
+	PROCESSING		type;
+	COMMAND			command;
+	image*			img;
+	FLOAT			curTime;
+	FLOAT			maxTime;
+	BOOL			complete;
+};
+
 class gameObject : public gameNode
 {
 protected:
@@ -180,6 +186,9 @@ protected:
 	//기본속성과 실시간속성으로 나누자!
 	tagBaseStatus			_baseStatus;
 	tagBattleStatus			_battleStatus;
+
+	//현재 진행중인 작업
+	tagProcessing			_processing;
 	
 	zergUpgrade*			_zergUpgrade;
 
@@ -231,6 +240,8 @@ public:
 	inline tagBaseStatus getBaseStatus(void) { return _baseStatus; }
 	inline tagBattleStatus getBattleStatus(void) { return _battleStatus; }
 	inline void setBattleStatus(tagBattleStatus status) { _battleStatus = status; }
+	inline tagProcessing getProcessing(void) { return _processing; }
+
 
 	//A* 관련
 	inline BOOL getIsBusy(void) { return _battleStatus.isBusy; }
@@ -243,6 +254,7 @@ public:
 	//battleStatus 중 일부만 받을때
 	inline void setClicked(BOOL clicked) { _battleStatus.clicked = clicked; }
 	inline BOOL getClicked(void) { return _battleStatus.clicked; }
+	inline void setCurHP(float curHP) { _battleStatus.curHP = curHP; }
 
 };
 

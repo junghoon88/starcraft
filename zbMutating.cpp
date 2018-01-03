@@ -35,18 +35,16 @@ zbMutating::zbMutating(PLAYER playerNum, BUILDINGNUM_ZERG buildingNum)
 	_isBuilding = true;
 
 	//유닛 고유 번호
-	_buildingNumZ = buildingNum;
+	_buildingNumZ = BUILDINGNUM_ZERG_MUTATING;
+	_beforeBuildingNum = BUILDINGNUM_ZERG_NONE;
+	_nextBuildingNum = buildingNum;
 
 	_beforeBuilding = NULL;
 	_nextBuilding = NULL;
 
-	_zergProductionInfo = new zergProductionInfo;
 	
-	_buildTime = _buildTimeMax = _buildHP = 0.0f;
-
-	_progressBar = NULL;
-
-	_complete = false;
+	
+	_buildHP = 0.0f;
 }
 
 zbMutating::zbMutating(PLAYER playerNum, BUILDINGNUM_ZERG buildingNum, Building* beforeBuilding)
@@ -63,18 +61,16 @@ zbMutating::zbMutating(PLAYER playerNum, BUILDINGNUM_ZERG buildingNum, Building*
 	_isBuilding = true;
 
 	//유닛 고유 번호
-	_buildingNumZ = buildingNum;
+	_buildingNumZ = beforeBuilding->getBuildingNumZerg();
+	_beforeBuildingNum = beforeBuilding->getBuildingNumZerg();
+	_nextBuildingNum = buildingNum;
 
 	_beforeBuilding = beforeBuilding;
 	_nextBuilding = NULL;
 
-	_zergProductionInfo = new zergProductionInfo;
+	
 
-	_buildTime = _buildTimeMax = _buildHP = 0.0f;
-
-	_progressBar = NULL;
-
-	_complete = false;
+	_buildHP = 0.0f;
 }
 
 zbMutating::~zbMutating()
@@ -86,12 +82,8 @@ HRESULT zbMutating::init(POINT ptTile)
 	initNextBuilding(ptTile);
 	initBaseStatus();
 	initBattleStatus(ptTile);
+	initProcessing();
 
-	_buildTimeMax = _zergProductionInfo->getZBProductionInfo(_buildingNumZ).buildTime;
-
-	_progressBar = new progressBar;
-	_progressBar->init(L"Mutating");
-	_progressBar->setPointLT(263, 427);
 
 
 
@@ -100,24 +92,24 @@ HRESULT zbMutating::init(POINT ptTile)
 
 void zbMutating::initNextBuilding(POINT ptTile)
 {
-	switch (_buildingNumZ)
+	switch (_nextBuildingNum)
 	{
 	case BUILDINGNUM_ZERG_HATCHERY:					_nextBuilding = new zbHatchery(_playerNum);				break;
-	//case BUILDINGNUM_ZERG_LAIR:					_nextBuilding = new zbLair(_playerNum);					break;
-	//case BUILDINGNUM_ZERG_HIVE:					_nextBuilding = new zbHive(_playerNum);					break;
-	//case BUILDINGNUM_ZERG_CREEPCOLONY:			_nextBuilding = new zbCreepColony(_playerNum);			break;
-	//case BUILDINGNUM_ZERG_SUNKENCOLONY:			_nextBuilding = new zbSunkenColony(_playerNum);			break;
-	//case BUILDINGNUM_ZERG_SPORECOLONY:			_nextBuilding = new zbSporeColony(_playerNum);			break;
-	//case BUILDINGNUM_ZERG_EXTRACTOR:				_nextBuilding = new zbExtractor(_playerNum);			break;
-	//case BUILDINGNUM_ZERG_SPAWNINGPOOL:			_nextBuilding = new zbSpawningPool(_playerNum);			break;
-	//case BUILDINGNUM_ZERG_EVOLUTIONCHAMBER:		_nextBuilding = new zbEvolutionChamber(_playerNum);		break;
-	//case BUILDINGNUM_ZERG_HYDRALISKDEN:			_nextBuilding = new zbHydraliskDen(_playerNum);			break;
-	//case BUILDINGNUM_ZERG_SPIRE:					_nextBuilding = new zbSpire(_playerNum);				break;
-	//case BUILDINGNUM_ZERG_GREATERSPIRE:			_nextBuilding = new zbGreaterSpire(_playerNum);			break;
-	//case BUILDINGNUM_ZERG_QUEENSNEST:				_nextBuilding = new zbQueensNest(_playerNum);			break;
-	//case BUILDINGNUM_ZERG_NYDUSCANAL:				_nextBuilding = new zbNydusCanal(_playerNum);			break;
-	//case BUILDINGNUM_ZERG_ULTRALISKCAVERN:		_nextBuilding = new zbUltraliskCavern(_playerNum);		break;
-	//case BUILDINGNUM_ZERG_DEFILERMOUND:			_nextBuilding = new zbEvolutionChamber(_playerNum);		break;
+	case BUILDINGNUM_ZERG_LAIR:						_nextBuilding = new zbLair(_playerNum);					break;
+	case BUILDINGNUM_ZERG_HIVE:						_nextBuilding = new zbHive(_playerNum);					break;
+	case BUILDINGNUM_ZERG_CREEPCOLONY:				_nextBuilding = new zbCreepColony(_playerNum);			break;
+	case BUILDINGNUM_ZERG_SUNKENCOLONY:				_nextBuilding = new zbSunkenColony(_playerNum);			break;
+	case BUILDINGNUM_ZERG_SPORECOLONY:				_nextBuilding = new zbSporeColony(_playerNum);			break;
+	case BUILDINGNUM_ZERG_EXTRACTOR:				_nextBuilding = new zbExtractor(_playerNum);			break;
+	case BUILDINGNUM_ZERG_SPAWNINGPOOL:				_nextBuilding = new zbSpawningPool(_playerNum);			break;
+	case BUILDINGNUM_ZERG_EVOLUTIONCHAMBER:			_nextBuilding = new zbEvolutionChamber(_playerNum);		break;
+	case BUILDINGNUM_ZERG_HYDRALISKDEN:				_nextBuilding = new zbHydraliskDen(_playerNum);			break;
+	case BUILDINGNUM_ZERG_SPIRE:					_nextBuilding = new zbSpire(_playerNum);				break;
+	case BUILDINGNUM_ZERG_GREATERSPIRE:				_nextBuilding = new zbGreaterSpire(_playerNum);			break;
+	case BUILDINGNUM_ZERG_QUEENSNEST:				_nextBuilding = new zbQueensNest(_playerNum);			break;
+	case BUILDINGNUM_ZERG_NYDUSCANAL:				_nextBuilding = new zbNydusCanal(_playerNum);			break;
+	case BUILDINGNUM_ZERG_ULTRALISKCAVERN:			_nextBuilding = new zbUltraliskCavern(_playerNum);		break;
+	case BUILDINGNUM_ZERG_DEFILERMOUND:				_nextBuilding = new zbDefilerMound(_playerNum);		break;
 	}
 
 	_nextBuilding->setLinkAdressZergUpgrade(_zergUpgrade);
@@ -136,24 +128,24 @@ void zbMutating::initBaseStatus(void)
 	tagBaseStatus nextStatus = _nextBuilding->getBaseStatus();
 
 
-	switch (_buildingNumZ)
+	switch (_nextBuildingNum)
 	{
-	case BUILDINGNUM_ZERG_HATCHERY:				_baseStatus.imgBody = IMAGEMANAGER->findImage(L"ZB-MutatingBody2");	break;
-	case BUILDINGNUM_ZERG_LAIR:					_baseStatus.imgBody = IMAGEMANAGER->findImage(L"ZB-MutatingBody2");	break;
-	case BUILDINGNUM_ZERG_HIVE:					_baseStatus.imgBody = IMAGEMANAGER->findImage(L"ZB-MutatingBody2");	break;
-	case BUILDINGNUM_ZERG_CREEPCOLONY:			_baseStatus.imgBody = IMAGEMANAGER->findImage(L"ZB-MutatingBody1");	break;
-	case BUILDINGNUM_ZERG_SUNKENCOLONY:			_baseStatus.imgBody = IMAGEMANAGER->findImage(L"ZB-MutatingBody1");	break;
-	case BUILDINGNUM_ZERG_SPORECOLONY:			_baseStatus.imgBody = IMAGEMANAGER->findImage(L"ZB-MutatingBody1");	break;
-	case BUILDINGNUM_ZERG_EXTRACTOR:			_baseStatus.imgBody = IMAGEMANAGER->findImage(L"ZB-MutatingBody3");	break;
-	case BUILDINGNUM_ZERG_SPAWNINGPOOL:			_baseStatus.imgBody = IMAGEMANAGER->findImage(L"ZB-MutatingBody2");	break;
-	case BUILDINGNUM_ZERG_EVOLUTIONCHAMBER:		_baseStatus.imgBody = IMAGEMANAGER->findImage(L"ZB-MutatingBody2");	break;
-	case BUILDINGNUM_ZERG_HYDRALISKDEN:			_baseStatus.imgBody = IMAGEMANAGER->findImage(L"ZB-MutatingBody2");	break;
-	case BUILDINGNUM_ZERG_SPIRE:				_baseStatus.imgBody = IMAGEMANAGER->findImage(L"ZB-MutatingBody2");	break;
-	case BUILDINGNUM_ZERG_GREATERSPIRE:			_baseStatus.imgBody = IMAGEMANAGER->findImage(L"ZB-MutatingBody2");	break;
-	case BUILDINGNUM_ZERG_QUEENSNEST:			_baseStatus.imgBody = IMAGEMANAGER->findImage(L"ZB-MutatingBody2");	break;
-	case BUILDINGNUM_ZERG_NYDUSCANAL:			_baseStatus.imgBody = IMAGEMANAGER->findImage(L"ZB-MutatingBody2");	break;
-	case BUILDINGNUM_ZERG_ULTRALISKCAVERN:		_baseStatus.imgBody = IMAGEMANAGER->findImage(L"ZB-MutatingBody2");	break;
-	case BUILDINGNUM_ZERG_DEFILERMOUND:			_baseStatus.imgBody = IMAGEMANAGER->findImage(L"ZB-MutatingBody2");	break;
+	case BUILDINGNUM_ZERG_HATCHERY:				_baseStatus.imgBody = IMAGEMANAGER->findImage(L"ZB-MutatingBody2");		break;
+	case BUILDINGNUM_ZERG_LAIR:					_baseStatus.imgBody = IMAGEMANAGER->findImage(L"ZB-MutatingBody2");		break;
+	case BUILDINGNUM_ZERG_HIVE:					_baseStatus.imgBody = IMAGEMANAGER->findImage(L"ZB-MutatingBody2");		break;
+	case BUILDINGNUM_ZERG_CREEPCOLONY:			_baseStatus.imgBody = IMAGEMANAGER->findImage(L"ZB-MutatingBody1");		break;
+	case BUILDINGNUM_ZERG_SUNKENCOLONY:			_baseStatus.imgBody = IMAGEMANAGER->findImage(L"ZB-MutatingBody1");		break;
+	case BUILDINGNUM_ZERG_SPORECOLONY:			_baseStatus.imgBody = IMAGEMANAGER->findImage(L"ZB-MutatingBody1");		break;
+	case BUILDINGNUM_ZERG_EXTRACTOR:			_baseStatus.imgBody = IMAGEMANAGER->findImage(L"ZB-MutatingBody3");		break;
+	case BUILDINGNUM_ZERG_SPAWNINGPOOL:			_baseStatus.imgBody = IMAGEMANAGER->findImage(L"ZB-MutatingBody2");		break;
+	case BUILDINGNUM_ZERG_EVOLUTIONCHAMBER:		_baseStatus.imgBody = IMAGEMANAGER->findImage(L"ZB-MutatingBody2");		break;
+	case BUILDINGNUM_ZERG_HYDRALISKDEN:			_baseStatus.imgBody = IMAGEMANAGER->findImage(L"ZB-MutatingBody2");		break;
+	case BUILDINGNUM_ZERG_SPIRE:				_baseStatus.imgBody = IMAGEMANAGER->findImage(L"ZB-MutatingBody1");		break;
+	case BUILDINGNUM_ZERG_GREATERSPIRE:			_baseStatus.imgBody = IMAGEMANAGER->findImage(L"ZB-MutatingBody1");		break;
+	case BUILDINGNUM_ZERG_QUEENSNEST:			_baseStatus.imgBody = IMAGEMANAGER->findImage(L"ZB-MutatingBody2");		break;
+	case BUILDINGNUM_ZERG_NYDUSCANAL:			_baseStatus.imgBody = IMAGEMANAGER->findImage(L"ZB-MutatingBody2");		break;
+	case BUILDINGNUM_ZERG_ULTRALISKCAVERN:		_baseStatus.imgBody = IMAGEMANAGER->findImage(L"ZB-MutatingBody2");		break;
+	case BUILDINGNUM_ZERG_DEFILERMOUND:			_baseStatus.imgBody = IMAGEMANAGER->findImage(L"ZB-MutatingBody2");		break;
 	}
 
 
@@ -222,8 +214,8 @@ void zbMutating::initBaseStatus(void)
 		{
 		case BUILDINGNUM_ZERG_HATCHERY:
 		case BUILDINGNUM_ZERG_LAIR:
-			_baseStatus.commands[0] = COMMAND_NONE; //라바
-			_baseStatus.commands[1] = COMMAND_NONE; //렐리포인트
+			_baseStatus.commands[0] = COMMAND_SELECT_LARVA; //라바
+			_baseStatus.commands[1] = COMMAND_SETRALLYPOINT; //렐리포인트
 			_baseStatus.commands[2] = COMMAND_NONE;
 			_baseStatus.commands[3] = COMMAND_NONE;
 			_baseStatus.commands[4] = COMMAND_NONE;
@@ -251,8 +243,18 @@ void zbMutating::initBattleStatus(POINT ptTile)
 	//BattleStatus
 	_battleStatus.curCommand = COMMAND_NONE;
 	_battleStatus.clicked = false;
-	_battleStatus.curHP = 0.0f;			//현재 HP
-	_battleStatus.maxHP = _baseStatus.maxHP;			//최대 HP
+
+	if (_beforeBuilding == NULL)
+	{
+		_battleStatus.curHP = 0.0f;					
+		_battleStatus.maxHP = _baseStatus.maxHP;	
+	}
+	else
+	{
+		_battleStatus.curHP = _beforeBuilding->getBattleStatus().curHP;
+		_battleStatus.maxHP = _baseStatus.maxHP;
+	}
+
 
 
 	tagBattleStatus nextStatus = _nextBuilding->getBattleStatus();
@@ -264,61 +266,70 @@ void zbMutating::initBattleStatus(POINT ptTile)
 	_battleStatus.rcEllipse = nextStatus.rcEllipse;
 }
 
+void zbMutating::initProcessing(void)
+{
+	_processing.type = PROCESSING_MUTATING;
+
+	switch (_nextBuildingNum)
+	{
+	case BUILDINGNUM_ZERG_HATCHERY:					_processing.command = COMMAND_BUILD_HATCHERY;			break;
+	case BUILDINGNUM_ZERG_LAIR:						_processing.command = COMMAND_BUILD_LAIR;				break;
+	case BUILDINGNUM_ZERG_HIVE:						_processing.command = COMMAND_BUILD_HIVE;				break;
+	case BUILDINGNUM_ZERG_CREEPCOLONY:				_processing.command = COMMAND_BUILD_CREEPCOLONY;		break;
+	case BUILDINGNUM_ZERG_SUNKENCOLONY:				_processing.command = COMMAND_BUILD_SUNKENCOLONY;		break;
+	case BUILDINGNUM_ZERG_SPORECOLONY:				_processing.command = COMMAND_BUILD_SPORECOLONY;		break;
+	case BUILDINGNUM_ZERG_EXTRACTOR:				_processing.command = COMMAND_BUILD_EXTRACTOR;			break;
+	case BUILDINGNUM_ZERG_SPAWNINGPOOL:				_processing.command = COMMAND_BUILD_SPAWNINGPOOL;		break;
+	case BUILDINGNUM_ZERG_EVOLUTIONCHAMBER:			_processing.command = COMMAND_BUILD_EVOLUTIONCHAMBER;	break;
+	case BUILDINGNUM_ZERG_HYDRALISKDEN:				_processing.command = COMMAND_BUILD_HYDRALISKDEN;		break;
+	case BUILDINGNUM_ZERG_SPIRE:					_processing.command = COMMAND_BUILD_SPIRE;				break;
+	case BUILDINGNUM_ZERG_GREATERSPIRE:				_processing.command = COMMAND_BUILD_GREATERSPIRE;		break;
+	case BUILDINGNUM_ZERG_QUEENSNEST:				_processing.command = COMMAND_BUILD_QUEENSNEST;			break;
+	case BUILDINGNUM_ZERG_NYDUSCANAL:				_processing.command = COMMAND_BUILD_NYDUSCANAL;			break;
+	case BUILDINGNUM_ZERG_ULTRALISKCAVERN:			_processing.command = COMMAND_BUILD_ULTRALISKCAVERN;	break;
+	case BUILDINGNUM_ZERG_DEFILERMOUND:				_processing.command = COMMAND_BUILD_DEFILERMOUND;		break;
+	}
+
+	_processing.img = NULL;
+	_processing.curTime = 0.0f;
+	_processing.maxTime = _player->getZergProductionInfo()->getZBProductionInfo(_nextBuildingNum).buildTime;
+}
+
 void zbMutating::release(void)
 {
-	SAFE_RELEASEDELETE(_progressBar);
-	SAFE_DELETE(_zergProductionInfo);
 }
 
 void zbMutating::update(void)
 {
 	Building::update();
 
-	updateProgressBar();
+	updateProcessing();
 
 }
 
 void zbMutating::render(int imgOffsetX, int imgOffsetY)
 {
-	switch (_buildingNumZ)
+	switch (_nextBuildingNum)
 	{
-	case BUILDINGNUM_ZERG_HATCHERY:						   Building::render(-16, -48);		break;
-		//case BUILDINGNUM_ZERG_LAIR:					   Building::render(0, 0);		break;
-		//case BUILDINGNUM_ZERG_HIVE:					   Building::render(0, 0);		break;
-		//case BUILDINGNUM_ZERG_CREEPCOLONY:			   Building::render(0, 0);		break;
-		//case BUILDINGNUM_ZERG_SUNKENCOLONY:			   Building::render(0, 0);		break;
-		//case BUILDINGNUM_ZERG_SPORECOLONY:			   Building::render(0, 0);		break;
-		//case BUILDINGNUM_ZERG_EXTRACTOR:				   Building::render(0, 0);		break;
-		//case BUILDINGNUM_ZERG_SPAWNINGPOOL:			   Building::render(0, 0);		break;
-		//case BUILDINGNUM_ZERG_EVOLUTIONCHAMBER:		   Building::render(0, 0);		break;
-		//case BUILDINGNUM_ZERG_HYDRALISKDEN:			   Building::render(0, 0);		break;
-		//case BUILDINGNUM_ZERG_SPIRE:					   Building::render(0, 0);		break;
-		//case BUILDINGNUM_ZERG_GREATERSPIRE:			   Building::render(0, 0);		break;
-		//case BUILDINGNUM_ZERG_QUEENSNEST:				   Building::render(0, 0);		break;
-		//case BUILDINGNUM_ZERG_NYDUSCANAL:				   Building::render(0, 0);		break;
-		//case BUILDINGNUM_ZERG_ULTRALISKCAVERN:		   Building::render(0, 0);		break;
-		//case BUILDINGNUM_ZERG_DEFILERMOUND:			   Building::render(0, 0);		break;
+	case BUILDINGNUM_ZERG_HATCHERY:					Building::render(16, 48);		break;
+	case BUILDINGNUM_ZERG_LAIR:						Building::render(16, 48);		break;
+	case BUILDINGNUM_ZERG_HIVE:						Building::render(16, 48);		break;
+	case BUILDINGNUM_ZERG_CREEPCOLONY:				Building::render(48, 64);		break;
+	case BUILDINGNUM_ZERG_SUNKENCOLONY:				Building::render(48, 64);		break;
+	case BUILDINGNUM_ZERG_SPORECOLONY:				Building::render(48, 64);		break;
+	case BUILDINGNUM_ZERG_EXTRACTOR:				Building::render(48, 64);		break;
+	case BUILDINGNUM_ZERG_SPAWNINGPOOL:				Building::render(32, 64);		break;
+	case BUILDINGNUM_ZERG_EVOLUTIONCHAMBER:			Building::render(32, 64);		break;
+	case BUILDINGNUM_ZERG_HYDRALISKDEN:				Building::render(32, 64);		break;
+	case BUILDINGNUM_ZERG_SPIRE:					Building::render(32, 64);		break;
+	case BUILDINGNUM_ZERG_GREATERSPIRE:				Building::render(32, 64);		break;
+	case BUILDINGNUM_ZERG_QUEENSNEST:				Building::render(32, 64);		break;
+	case BUILDINGNUM_ZERG_NYDUSCANAL:				Building::render(32, 64);		break;
+	case BUILDINGNUM_ZERG_ULTRALISKCAVERN:			Building::render(32, 64);		break;
+	case BUILDINGNUM_ZERG_DEFILERMOUND:				Building::render(16, 64);		break;
 	}
 	
 
-	_progressBar->ZRender(ZORDER_INTERFACE2);
-
-#if 0
-	if (_battleStatus.clicked)
-	{
-		RENDERMANAGER->insertEllipse(ZORDER_GAMEOBJECT, _battleStatus.rcEllipse, PENVERSION_UNITCLICK);
-	}
-
-	//_baseStatus.imgBody->frameRender(getMemDC(), 
-	//	_battleStatus.ptTile.x * TILESIZE - MAINCAMERA->getCameraX(), 
-	//	_battleStatus.ptTile.y * TILESIZE - MAINCAMERA->getCameraY(), 
-	//	_battleStatus.bodyFrame.x, _battleStatus.bodyFrame.y);
-
-	RENDERMANAGER->insertImgFrame(ZORDER_GAMEOBJECT, _baseStatus.imgBody,
-		_battleStatus.ptTile.x * TILESIZE - MAINCAMERA->getCameraX(),
-		_battleStatus.ptTile.y * TILESIZE - MAINCAMERA->getCameraY(),
-		1, 1);//_battleStatus.bodyFrame.x, _battleStatus.bodyFrame.y);
-#endif
 }
 
 void zbMutating::updateBattleStatus(void)
@@ -331,7 +342,7 @@ void zbMutating::updatePosition(void)
 }
 void zbMutating::updateImageFrame(void)
 {
-	if (!_complete)
+	if (!_processing.complete)
 	{
 		//처음
 		if (_battleStatus.bodyFrame.x < 2)
@@ -367,6 +378,7 @@ void zbMutating::updateImageFrame(void)
 			{
 				_nextBuilding->init(_battleStatus.ptTile, 1);
 			}
+			//_nextBuilding->setCurHP(_battleStatus.curHP);
 
 
 			_nextBuilding->setBattleStatus(temp);
@@ -379,30 +391,39 @@ void zbMutating::updateImageFrame(void)
 
 }
 
-void zbMutating::updateProgressBar(void)
+void zbMutating::updateProcessing(void)
 {
+	if (_processing.type == PROCESSING_NONE)
+		return;
+
 	float tick = TIMEMANAGER->getElapsedTime() * BUILDSPEEDMULTIPLY;
 
-	if (_complete == false)
+	if (_processing.complete == false)
 	{
-		if (_buildTime + tick >= _buildTimeMax)
+		if (_processing.curTime + tick >= _processing.maxTime)
 		{
-			_buildTime = _buildTimeMax;
-			_battleStatus.curHP += _battleStatus.maxHP - _buildHP;
+			_processing.curTime = _processing.maxTime;
+
+			if (_beforeBuildingNum == BUILDINGNUM_ZERG_NONE)
+			{
+				_battleStatus.curHP += _battleStatus.maxHP - _buildHP;
+			}
 		
-			_complete = true;
+			_processing.complete = true;
 			_battleStatus.bodyFrame.x = 8;
 		}
 		else
 		{
-			_buildTime += tick;
+			_processing.curTime += tick;
 
-			_buildHP += _battleStatus.maxHP * tick / _buildTimeMax;
-			_battleStatus.curHP += _battleStatus.maxHP * tick / _buildTimeMax;
+			_buildHP += _battleStatus.maxHP * tick / _processing.maxTime;
+
+			if (_beforeBuildingNum == BUILDINGNUM_ZERG_NONE)
+			{
+				_battleStatus.curHP += _battleStatus.maxHP * tick / _processing.maxTime;
+			}
 		}
 	}
-
-	_progressBar->setGauge(_buildTime, _buildTimeMax);
 }
 
 void zbMutating::procCommands(void)

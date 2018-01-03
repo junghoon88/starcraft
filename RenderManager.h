@@ -11,6 +11,7 @@ enum RENDER_TYPE
 	RENDER_TYPE_LINERECT,
 	RENDER_TYPE_ELLIPSE,
 	RENDER_TYPE_TEXT,
+	RENDER_TYPE_TEXTCENTER,
 
 	RENDER_TYPE_IMAGE_NORMAL,
 	RENDER_TYPE_IMAGE_RESIZE,
@@ -30,7 +31,11 @@ enum ZORDER
 {
 	ZORDER_TILES,
 	ZORDER_GAMEOBJECT,
+	ZORDER_GAMEOBJECTAIR,
 	ZORDER_GAMEMOUSEDRAG,
+
+	ZORDER_GAMEDEBUG1,
+
 	ZORDER_INTERFACE,
 	ZORDER_INTERFACE2,
 	ZORDER_MOUSECURSOR,
@@ -105,7 +110,8 @@ public:
 	void insertLineRectangle(ZORDER zorder, RECT rc, PENVERSION penVersion);
 	void insertEllipse(ZORDER zorder, RECT rc, PENVERSION penVersion);
 	void insertText(ZORDER zorder, RECT rc, TCHAR* text, COLORREF color = RGB(0, 0, 0));
-	//void insertText(ZORDER zorder, RECT rc, TCHAR* text, FONTVERSION fontVersion, COLORREF color = RGB(0, 0, 0));
+	void insertTextCenter(ZORDER zorder, RECT rc, TCHAR* text, COLORREF color = RGB(0, 0, 0));
+	//void insertTextCenter(ZORDER zorder, RECT rc, TCHAR* text, FONTVERSION fontVersion, COLORREF color = RGB(0, 0, 0));
 
 	//image
 	void insertImg(ZORDER zorder, image* img, int destX, int destY);

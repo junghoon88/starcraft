@@ -20,8 +20,6 @@ zuGuadian::zuGuadian(PLAYER playerNum)
 	//유닛 고유 번호
 	_unitNumZ = UNITNUM_ZERG_GUADIAN;
 
-	_zergProductionInfo = new zergProductionInfo;
-
 }
 
 
@@ -50,7 +48,7 @@ void zuGuadian::initBaseStatus(void)
 	TCHAR strKey[100];
 	_stprintf(strKey, L"ZU-guadian-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);
-	_baseStatus.imgFace = NULL;
+	_baseStatus.imgFace = IMAGEMANAGER->findImage(L"ZU-guadian-Face");
 	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-guadian-Stat1");
 	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-guadian-Stat2");
 
@@ -118,7 +116,6 @@ void zuGuadian::initBattleStatus(POINT pt)
 
 void zuGuadian::release(void)
 {
-	SAFE_DELETE(_zergProductionInfo);
 }
 
 void zuGuadian::update(void)

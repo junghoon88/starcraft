@@ -1,12 +1,9 @@
 #pragma once
 #include "Unit.h"
 
-#include "zergProductionInfo.h"
-
 class zuDevourer : public Unit
 {
 private:
-	zergProductionInfo* _zergProductionInfo;
 
 private:
 	void initBaseStatus(void);

@@ -43,7 +43,7 @@ void zbQueensNest::initBaseStatus(void)
 	TCHAR strKey[100];
 	_stprintf(strKey, L"ZB-queensnest-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);
-	_baseStatus.imgFace = NULL;
+	_baseStatus.imgFace = IMAGEMANAGER->findImage(L"ZB-Face");
 	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZB-queensnest-Stat1");
 	_baseStatus.imgStat2 = NULL;
 
@@ -70,15 +70,6 @@ void zbQueensNest::initBaseStatus(void)
 	_baseStatus.GWable = FALSE;
 	_baseStatus.AWable = FALSE;
 
-	_baseStatus.commands[0] = COMMAND_EVOLUTION_ZERG_SPAWN_BROODLING;
-	_baseStatus.commands[1] = COMMAND_EVOLUTION_ZERG_ENSNARE;
-	_baseStatus.commands[2] = COMMAND_EVOLUTION_ZERG_GAMETE_MEIOSIS;
-	_baseStatus.commands[3] = COMMAND_NONE;
-	_baseStatus.commands[4] = COMMAND_NONE;
-	_baseStatus.commands[5] = COMMAND_NONE;
-	_baseStatus.commands[6] = COMMAND_NONE;
-	_baseStatus.commands[7] = COMMAND_NONE;
-	_baseStatus.commands[8] = COMMAND_NONE;
 
 }
 void zbQueensNest::initBattleStatus(POINT ptTile)
@@ -111,7 +102,188 @@ void zbQueensNest::update(void)
 
 void zbQueensNest::render(int imgOffsetX, int imgOffsetY)
 {
-	Building::render();
+	POINT imgOffset = BUILDIMAGEOFFSET_QUEENSNEST;
+	Building::render(imgOffset.x * TILESIZE, imgOffset.y * TILESIZE);
 
 }
 
+
+void zbQueensNest::updateBattleStatus(void)
+{
+
+}
+void zbQueensNest::updatePosition(void)
+{
+
+}
+
+void zbQueensNest::updateImageFrame(void)
+{
+
+}
+
+void zbQueensNest::updateProcessing(void)
+{
+	Building::updateProcessing();
+
+}
+
+void zbQueensNest::updateCommandSet(void)
+{
+	if (_processing.type == PROCESSING_EVOLVING)
+	{
+		_baseStatus.commands[0] = COMMAND_NONE;
+		_baseStatus.commands[1] = COMMAND_NONE;
+		_baseStatus.commands[2] = COMMAND_NONE;
+		_baseStatus.commands[8] = COMMAND_ESC;
+	}
+	else
+	{
+		tagEvolution evobroodling = _player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_SPAWN_BROODLING];
+		tagEvolution evoEnsnare   = _player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_ENSNARE];
+		tagEvolution evoMeiosis   = _player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_GAMETE_MEIOSIS];
+
+		if (evobroodling.complete || evobroodling.isProcessing)
+		{
+			_baseStatus.commands[0] = COMMAND_NONE;
+		}
+		else
+		{
+			_baseStatus.commands[0] = COMMAND_EVOLUTION_ZERG_SPAWN_BROODLING;
+		}
+
+		if (evoEnsnare.complete || evoEnsnare.isProcessing)
+		{
+			_baseStatus.commands[1] = COMMAND_NONE;
+		}
+		else
+		{
+			_baseStatus.commands[1] = COMMAND_EVOLUTION_ZERG_ENSNARE;
+		}
+
+		if (evoMeiosis.complete || evoMeiosis.isProcessing)
+		{
+			_baseStatus.commands[2] = COMMAND_NONE;
+		}
+		else
+		{
+			_baseStatus.commands[2] = COMMAND_EVOLUTION_ZERG_GAMETE_MEIOSIS;
+		}
+
+		_baseStatus.commands[8] = COMMAND_NONE;
+	}
+}
+
+
+void zbQueensNest::procCommands(void)
+{
+	switch (_battleStatus.curCommand)
+	{
+		case COMMAND_EVOLUTION_ZERG_SPAWN_BROODLING:
+		{
+			tagEvolution evolution = _player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_SPAWN_BROODLING];
+
+			if (_player->useResource(evolution.cost.mineral, evolution.cost.gas))
+			{
+				//성공
+				_processing.type = PROCESSING_EVOLVING;
+				_processing.command = _battleStatus.curCommand;
+				_processing.img = IMAGEMANAGER->findImage(L"command-evolution_zerg_evolve_spawn_broodling");
+				_processing.curTime = 0.0f;
+				_processing.maxTime = evolution.cost.duration;
+				_processing.complete = false;
+
+				evolution.isProcessing = true;
+			}
+			else
+			{
+				//실패
+			}
+			_battleStatus.curCommand = COMMAND_NONE;
+		}
+		break;
+
+		case COMMAND_EVOLUTION_ZERG_ENSNARE:
+		{
+			tagEvolution evolution = _player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_ENSNARE];
+
+			if (_player->useResource(evolution.cost.mineral, evolution.cost.gas))
+			{
+				//성공
+				_processing.type = PROCESSING_EVOLVING;
+				_processing.command = _battleStatus.curCommand;
+				_processing.img = IMAGEMANAGER->findImage(L"command-evolution_zerg_evolve_ensnare");
+				_processing.curTime = 0.0f;
+				_processing.maxTime = evolution.cost.duration;
+				_processing.complete = false;
+
+				evolution.isProcessing = true;
+			}
+			else
+			{
+				//실패
+			}
+			_battleStatus.curCommand = COMMAND_NONE;
+		}
+		break;
+
+		case COMMAND_EVOLUTION_ZERG_GAMETE_MEIOSIS:
+		{
+			tagEvolution evolution = _player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_GAMETE_MEIOSIS];
+
+			if (_player->useResource(evolution.cost.mineral, evolution.cost.gas))
+			{
+				//성공
+				_processing.type = PROCESSING_EVOLVING;
+				_processing.command = _battleStatus.curCommand;
+				_processing.img = IMAGEMANAGER->findImage(L"command-evolution_zerg_gamete_meiosis");
+				_processing.curTime = 0.0f;
+				_processing.maxTime = evolution.cost.duration;
+				_processing.complete = false;
+
+				evolution.isProcessing = true;
+			}
+			else
+			{
+				//실패
+			}
+			_battleStatus.curCommand = COMMAND_NONE;
+		}
+		break;
+
+		case COMMAND_ESC:
+		{
+			if (_processing.command == COMMAND_EVOLUTION_ZERG_SPAWN_BROODLING)
+			{
+				tagEvolution evolution = _player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_SPAWN_BROODLING];
+
+				_player->addResource((UINT)(evolution.cost.mineral * CANCLE_RESOURCE), (UINT)(evolution.cost.gas * CANCLE_RESOURCE));
+				evolution.isProcessing = false;
+				evolution.complete = false;
+			}
+			else if (_processing.command == COMMAND_EVOLUTION_ZERG_ENSNARE)
+			{
+				tagEvolution evolution = _player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_ENSNARE];
+
+				_player->addResource((UINT)(evolution.cost.mineral * CANCLE_RESOURCE), (UINT)(evolution.cost.gas * CANCLE_RESOURCE));
+				evolution.isProcessing = false;
+				evolution.complete = false;
+			}
+			else if (_processing.command == COMMAND_EVOLUTION_ZERG_GAMETE_MEIOSIS)
+			{
+				tagEvolution evolution = _player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_GAMETE_MEIOSIS];
+
+				_player->addResource((UINT)(evolution.cost.mineral * CANCLE_RESOURCE), (UINT)(evolution.cost.gas * CANCLE_RESOURCE));
+				evolution.isProcessing = false;
+				evolution.complete = false;
+			}
+
+
+			ZeroMemory(&_processing, sizeof(tagProcessing));
+
+			_battleStatus.curCommand = COMMAND_NONE;
+		}
+		break;
+
+	}
+}

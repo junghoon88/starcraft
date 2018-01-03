@@ -219,6 +219,23 @@ void button::setRect(int x, int y)
 	_rc = RectMake(x, y, _image->getFrameWidth(), _image->getFrameHeight());
 }
 
+void button::click(void)
+{
+	if (_disable)
+	{
+		return;
+	}
+
+	if (_callbackFunction != NULL)
+	{
+		_callbackFunction();
+	}
+	else if (_callbackFunctionParameter != NULL && _obj != NULL)
+	{
+		_callbackFunctionParameter(_obj);
+	}
+}
+
 void button::renderImage(void)
 {
 	if (_image == NULL)
@@ -324,5 +341,5 @@ void button::renderText(ZORDER zorder)
 	//DeleteObject(oldFont);
 	//SetTextColor(getMemDC(), oldcolor);
 
-	RENDERMANAGER->insertText(zorder, _rc, _strText, _color);
+	RENDERMANAGER->insertTextCenter(zorder, _rc, _strText, _color);
 }

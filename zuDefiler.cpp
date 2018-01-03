@@ -20,7 +20,6 @@ zuDefiler::zuDefiler(PLAYER playerNum)
 	//유닛 고유 번호
 	_unitNumZ = UNITNUM_ZERG_DEFILER;
 
-	_zergProductionInfo = new zergProductionInfo;
 }
 
 
@@ -50,7 +49,7 @@ void zuDefiler::initBaseStatus(void)
 	TCHAR strKey[100];
 	_stprintf(strKey, L"ZU-defiler-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);
-	_baseStatus.imgFace = NULL;
+	_baseStatus.imgFace = IMAGEMANAGER->findImage(L"ZU-defiler-Face");
 	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-defiler-Stat1");
 	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-defiler-Stat2");
 
@@ -112,7 +111,6 @@ void zuDefiler::initBattleStatus(POINT pt)
 
 void zuDefiler::release(void)
 {
-	SAFE_DELETE(_zergProductionInfo);
 }
 
 void zuDefiler::update(void)

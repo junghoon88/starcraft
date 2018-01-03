@@ -71,12 +71,25 @@ void RenderManager::insertText(ZORDER zorder, RECT rc, TCHAR* text, COLORREF col
 	_vTextRenderList[zorder].push_back(info);
 }
 
-//void RenderManager::insertText(ZORDER zorder, RECT rc, TCHAR* text, COLORREF color)
+void RenderManager::insertTextCenter(ZORDER zorder, RECT rc, TCHAR* text, COLORREF color)
+{
+	tagTextRenderInfo info;
+	ZeroMemory(&info, sizeof(tagTextRenderInfo));
+
+	info.renderType = RENDER_TYPE_TEXTCENTER;
+	info.rcShow = rc;
+	_tcscpy(info.strText, text);
+	info.colorText = color;
+
+	_vTextRenderList[zorder].push_back(info);
+}
+
+//void RenderManager::insertTextCenter(ZORDER zorder, RECT rc, TCHAR* text, COLORREF color)
 //{
 //	tagRenderInfo info;
 //	ZeroMemory(&info, sizeof(tagRenderInfo));
 //
-//	info.renderType = RENDER_TYPE_TEXT;
+//	info.renderType = RENDER_TYPE_TEXTCENTER;
 //	info.rcShow = rc;
 //	info.strText = text;
 //	info.colorText = color;
@@ -448,11 +461,18 @@ void RenderManager::sort(void)
 	{
 		qsort((tagRenderInfo*)&_vRenderList[ZORDER_GAMEOBJECT][0], _vRenderList[ZORDER_GAMEOBJECT].size(), sizeof(tagRenderInfo), &funcCompare);
 	}
+
+	if (_vRenderList[ZORDER_GAMEOBJECTAIR].size() >= 2)
+	{
+		qsort((tagRenderInfo*)&_vRenderList[ZORDER_GAMEOBJECTAIR][0], _vRenderList[ZORDER_GAMEOBJECTAIR].size(), sizeof(tagRenderInfo), &funcCompare);
+	}
 }
 
 
 void RenderManager::render(HDC hdc)
 {
+	HFONT oldFont = (HFONT)SelectObject(hdc, _gFont[FONTVERSION_STARCRAFT]);
+
 	HPEN oldPen = NULL;
 
 
@@ -498,7 +518,7 @@ void RenderManager::render(HDC hdc)
 					RGB(255, 255, 255));
 			}
 				break;
-			//case RENDER_TYPE_TEXT:
+			//case RENDER_TYPE_TEXTCENTER:
 			//	{
 			//		COLORREF oldColor = GetTextColor(hdc);
 			//		SetTextColor(hdc, info.colorText);
@@ -540,7 +560,16 @@ void RenderManager::render(HDC hdc)
 
 			switch (info.renderType)
 			{
-			case RENDER_TYPE_TEXT:
+				case RENDER_TYPE_TEXT:
+				{
+					COLORREF oldColor = GetTextColor(hdc);
+					SetTextColor(hdc, info.colorText);
+					DrawText(hdc, info.strText, _tcslen(info.strText), &info.rcShow, DT_VCENTER | DT_SINGLELINE);
+					SetTextColor(hdc, oldColor);
+				}
+				break;
+
+				case RENDER_TYPE_TEXTCENTER:
 				{
 					COLORREF oldColor = GetTextColor(hdc);
 					SetTextColor(hdc, info.colorText);
@@ -553,4 +582,8 @@ void RenderManager::render(HDC hdc)
 		}
 		_vTextRenderList[i].clear();
 	}
+
+	SelectObject(hdc, oldFont);
+	DeleteObject(oldFont);
+
 }

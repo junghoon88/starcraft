@@ -46,7 +46,7 @@ void zbSunkenColony::initBaseStatus(void)
 	TCHAR strKey[100];
 	_stprintf(strKey, L"ZB-sunkenColony-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);
-	_baseStatus.imgFace = NULL;
+	_baseStatus.imgFace = IMAGEMANAGER->findImage(L"ZB-Face");
 	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZB-sunkenColony-Stat1");
 	_baseStatus.imgStat2 = NULL;
 
@@ -83,21 +83,12 @@ void zbSunkenColony::initBaseStatus(void)
 
 	_baseStatus.AWable = FALSE;
 
-	_baseStatus.commands[0] = COMMAND_NONE;
-	_baseStatus.commands[1] = COMMAND_STOP;
-	_baseStatus.commands[2] = COMMAND_ATTACK;
-	_baseStatus.commands[3] = COMMAND_NONE;
-	_baseStatus.commands[4] = COMMAND_NONE;
-	_baseStatus.commands[5] = COMMAND_NONE;
-	_baseStatus.commands[6] = COMMAND_NONE;
-	_baseStatus.commands[7] = COMMAND_NONE;
-	_baseStatus.commands[8] = COMMAND_NONE;
 
 }
 void zbSunkenColony::initBattleStatus(POINT ptTile)
 {
 	//BattleStatus
-	_battleStatus.curCommand = COMMAND_NONE;
+	_battleStatus.curCommand = COMMAND_STOP;
 	_battleStatus.clicked = false;
 	_battleStatus.curHP = _baseStatus.maxHP;			//현재 HP
 	_battleStatus.maxHP = _baseStatus.maxHP;			//최대 HP
@@ -124,7 +115,39 @@ void zbSunkenColony::update(void)
 
 void zbSunkenColony::render(int imgOffsetX, int imgOffsetY)
 {
-	Building::render();
+	POINT imgOffset = BUILDIMAGEOFFSET_SUNKENCOLONY;
+	Building::render(imgOffset.x * TILESIZE, imgOffset.y * TILESIZE);
 
 }
 
+void zbSunkenColony::updateBattleStatus(void)
+{
+
+}
+void zbSunkenColony::updatePosition(void)
+{
+
+}
+
+void zbSunkenColony::updateImageFrame(void)
+{
+
+}
+
+void zbSunkenColony::updateProcessing(void)
+{
+	Building::updateProcessing();
+
+}
+
+void zbSunkenColony::updateCommandSet(void)
+{
+	_baseStatus.commands[1] = COMMAND_STOP;
+	_baseStatus.commands[2] = COMMAND_ATTACK;
+}
+
+
+void zbSunkenColony::procCommands(void)
+{
+	Building::procCommands();
+}

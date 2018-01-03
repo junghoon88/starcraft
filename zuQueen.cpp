@@ -20,8 +20,6 @@ zuQueen::zuQueen(PLAYER playerNum)
 	//유닛 고유 번호
 	_unitNumZ = UNITNUM_ZERG_QUEEN;
 
-	_zergProductionInfo = new zergProductionInfo;
-
 }
 
 
@@ -51,7 +49,7 @@ void zuQueen::initBaseStatus(void)
 	TCHAR strKey[100];
 	_stprintf(strKey, L"ZU-queen-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);
-	_baseStatus.imgFace = NULL;
+	_baseStatus.imgFace = IMAGEMANAGER->findImage(L"ZU-queen-Face");
 	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-queen-Stat1");
 	_baseStatus.imgStat2 = IMAGEMANAGER->findImage(L"ZU-queen-Stat2");
 
@@ -111,7 +109,6 @@ void zuQueen::initBattleStatus(POINT pt)
 
 void zuQueen::release(void)
 {
-	SAFE_DELETE(_zergProductionInfo);
 }
 
 void zuQueen::update(void)

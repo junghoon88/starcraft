@@ -8,11 +8,11 @@
 #include "fog.h"
 
 #include "zergHeader.h"
+#include "zergProductionInfo.h"
 
 #include "aStar.h"
 
 #include "gameController.h"
-#include "gameObjectPool.h"
 
 class player : public gameNode
 {
@@ -24,6 +24,10 @@ private:
 	UINT							_myGas;
 	FLOAT							_myControl;
 	FLOAT							_myControlMax;
+
+	UINT							_showMineral;
+	UINT							_showGas;
+
 
 	vUnits							_vUnits;				//플레이어가 가지고 있는 유닛들
 	vUnits							_vUnitsInCamera;		//카메라에 보여주는 유닛들
@@ -39,6 +43,7 @@ private:
 
 
 	zergUpgrade*					_zergUpgrade;
+	zergProductionInfo*				_zergProductionInfo;
 
 	//맵정보
 	gameMap*						_gameMap;				//게임맵(타일정보) -> sceneBattle 에서 링크로 받는다.
@@ -53,8 +58,6 @@ private:
 	//interface
 	gameController*					_gameController;
 	
-	//게임오브젝트풀
-	//gameObjectPool*					_gameObjectPool;
 
 public:
 	player();
@@ -67,8 +70,10 @@ public:
 
 	bool isHaveBuilding(BUILDINGNUM_ZERG num);
 
+
 	bool useResource(UINT mineral, UINT gas);
 	bool useResource(UINT mineral, UINT gas, float control);
+	inline void addResource(UINT mineral, UINT gas)		{ _myMineral += mineral; _myGas += gas; }
 
 
 	void checkUnitValid(void);
@@ -82,7 +87,15 @@ private:
 
 public:
 	inline void setLinkAdressGamemap(gameMap* map) { _gameMap = map; }
-	//inline void setLinkAdressGameObjectPool(gameObjectPool* pool) { _gameObjectPool = pool; }
+	inline void setLinkAdressZergProduction(zergProductionInfo* info) { _zergProductionInfo = info; }
+	inline zergProductionInfo* getZergProductionInfo(void) { return _zergProductionInfo; }
+
+
+	inline FLOAT getMyControl(void)		{ return _myControl; }
+	inline FLOAT getMyControlMax(void)	{ return _myControlMax; }
+	inline UINT	getShowMineral(void)	{ return _showMineral; }
+	inline UINT	getShowGas(void)		{ return _showGas; }
+
 
 	inline void addUnit(Unit* unit) { _vUnits.push_back(unit); }
 	inline void addBuilding(Building* building) { _vBuildings.push_back(building); }
@@ -104,6 +117,8 @@ public:
 	
 	inline aStar* getAstar(void) { return _aStar; }
 	inline BOOL getEndThread(void) { return _endThread; }
+
+
 
 	inline gameController* getGameController(void) { return _gameController; }
 

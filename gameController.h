@@ -8,6 +8,7 @@
 #include "hotkeys.h"
 #include "miniMap.h"
 #include "button.h"
+#include "progressBar.h"
 
 
 //전방선언
@@ -117,6 +118,9 @@ private:
 	
 	tagSelectInfo		_selectInfo;	//마우스로 클릭한 유닛 혹은 건물의 정보
 
+	progressBar*		_progressBar;
+
+
 	hotkeys*			_hotkeys;		//단축키 클래스
 	miniMap*			_miniMap;		//미니맵 클래스
 
@@ -163,6 +167,8 @@ private:
 
 	void renderBuildImage(void);
 	void renderCursor(void);
+
+	void renderMyResouce(void);
 
 
 	TEAM searchObject();
