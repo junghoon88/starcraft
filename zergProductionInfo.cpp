@@ -6,6 +6,9 @@ tagProduction zergProductionInfo::_zbProduction[BUILDINGNUM_ZERG_MAX];
 
 zergProductionInfo::zergProductionInfo(bool initInfo)
 {
+	ZeroMemory(&_zuProduction, sizeof(tagProduction) * UNITNUM_ZERG_MAX);
+	ZeroMemory(&_zbProduction, sizeof(tagProduction) * BUILDINGNUM_ZERG_MAX);
+
 	if (!initInfo) return;
 
 	for (int i = 0; i < UNITNUM_ZERG_MAX; i++)
@@ -13,6 +16,7 @@ zergProductionInfo::zergProductionInfo(bool initInfo)
 		switch (i)
 		{
 			case UNITNUM_ZERG_LARVA: 
+				_zuProduction[i].buildTime = 15.0f;		//ºôµå½Ã°£
 				break;
 			case UNITNUM_ZERG_ZERGEGG: 
 				break;

@@ -20,6 +20,7 @@ private:
 	float _costToGoal;		//H
 
 	bool _isOpen;
+	bool _isFind;
 
 	tile* _parentNode;
 
@@ -63,6 +64,10 @@ public:
 
 	void setIsOpen(bool isOpen) { _isOpen = isOpen; }
 	bool getIsOpen() { return _isOpen; }
+
+	inline void setIsFind(bool isFind) { _isFind = isFind; }
+	inline bool getIsFind(void) { return _isFind; }
+
 };
 
 typedef vector<tile*> vTile;

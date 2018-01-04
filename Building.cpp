@@ -142,30 +142,30 @@ void Building::updateProcessing(void)
 				switch (_processing.command)
 				{
 				//UPGRADE
-				case COMMAND_UPGRADE_ZERG_MELEEATTACKS:				_player->getZergUpgrade()->upgradeComplete(UPGRADE_ZERG_MELEEATTACKS	);	break;	//저그 지상유닛 근접 공격
-				case COMMAND_UPGRADE_ZERG_MISSILEATTACKS:			_player->getZergUpgrade()->upgradeComplete(UPGRADE_ZERG_MISSILEATTACKS	);	break;	//저그 지상유닛 원거리 공격
-				case COMMAND_UPGRADE_ZERG_CARAPACE:					_player->getZergUpgrade()->upgradeComplete(UPGRADE_ZERG_CARAPACE		);	break;	//저그 지상유닛 방어력
-				case COMMAND_UPGRADE_ZERG_FLYERATTACKS:				_player->getZergUpgrade()->upgradeComplete(UPGRADE_ZERG_FLYERATTACKS	);	break;	//저그 공중유닛 공격
-				case COMMAND_UPGRADE_ZERG_FLYERCARAPACE:			_player->getZergUpgrade()->upgradeComplete(UPGRADE_ZERG_FLYERCARAPACE	);	break;	//저그 공중유닛 방어력
+				case COMMAND_UPGRADE_ZERG_MELEEATTACKS:				_player->addZergUpgradeComplete(UPGRADE_ZERG_MELEEATTACKS	);					break;	//저그 지상유닛 근접 공격
+				case COMMAND_UPGRADE_ZERG_MISSILEATTACKS:			_player->addZergUpgradeComplete(UPGRADE_ZERG_MISSILEATTACKS	);					break;	//저그 지상유닛 원거리 공격
+				case COMMAND_UPGRADE_ZERG_CARAPACE:					_player->addZergUpgradeComplete(UPGRADE_ZERG_CARAPACE		);					break;	//저그 지상유닛 방어력
+				case COMMAND_UPGRADE_ZERG_FLYERATTACKS:				_player->addZergUpgradeComplete(UPGRADE_ZERG_FLYERATTACKS	);					break;	//저그 공중유닛 공격
+				case COMMAND_UPGRADE_ZERG_FLYERCARAPACE:			_player->addZergUpgradeComplete(UPGRADE_ZERG_FLYERCARAPACE	);					break;	//저그 공중유닛 방어력
 
 				//EVOLUTION
-				case COMMAND_EVOLUTION_ZERG_BURROW:					_player->getZergUpgrade()->evolutionComplete(EVOLUTION_ZERG_BURROW			);		break;	//저그 버러우 업글
-				case COMMAND_EVOLUTION_ZERG_METABOLICK_BOOST:		_player->getZergUpgrade()->evolutionComplete(EVOLUTION_ZERG_METABOLICK_BOOST		);		break;	//저글링 이속업
-				case COMMAND_EVOLUTION_ZERG_ADRENAL_GLANDS:			_player->getZergUpgrade()->evolutionComplete(EVOLUTION_ZERG_ADRENAL_GLANDS			);		break;	//저글링 아드레날린
-				case COMMAND_EVOLUTION_ZERG_VECTRAL_SACS:			_player->getZergUpgrade()->evolutionComplete(EVOLUTION_ZERG_VECTRAL_SACS			);		break;	//오버로드 수송업
-				case COMMAND_EVOLUTION_ZERG_ANTENNAE:				_player->getZergUpgrade()->evolutionComplete(EVOLUTION_ZERG_ANTENNAE				);		break;	//오버로드 시야업
-				case COMMAND_EVOLUTION_ZERG_PNEUMATIZED_CARAPACE:	_player->getZergUpgrade()->evolutionComplete(EVOLUTION_ZERG_PNEUMATIZED_CARAPACE	);		break;	//오버로드 이속업
-				case COMMAND_EVOLUTION_ZERG_MUSCULAR_AUGMENTS:		_player->getZergUpgrade()->evolutionComplete(EVOLUTION_ZERG_MUSCULAR_AUGMENTS		);		break;	//히드라 이속업
-				case COMMAND_EVOLUTION_ZERG_GROOVED_SPINES:			_player->getZergUpgrade()->evolutionComplete(EVOLUTION_ZERG_GROOVED_SPINES			);		break;	//히드라 사정거리업
-				case COMMAND_EVOLUTION_ZERG_LURKER_ASPECT:			_player->getZergUpgrade()->evolutionComplete(EVOLUTION_ZERG_LURKER_ASPECT	);		break;	//럴커 업글
-				case COMMAND_EVOLUTION_ZERG_SPAWN_BROODLING:		_player->getZergUpgrade()->evolutionComplete(EVOLUTION_ZERG_SPAWN_BROODLING	);		break;	//퀸 브루드링 업글
-				case COMMAND_EVOLUTION_ZERG_ENSNARE:				_player->getZergUpgrade()->evolutionComplete(EVOLUTION_ZERG_ENSNARE			);		break;	//퀸 인스테어 업글
-				case COMMAND_EVOLUTION_ZERG_GAMETE_MEIOSIS:			_player->getZergUpgrade()->evolutionComplete(EVOLUTION_ZERG_GAMETE_MEIOSIS			);		break;	//퀸 마나업
-				case COMMAND_EVOLUTION_ZERG_ANABOLIC_SYNTHESIS:		_player->getZergUpgrade()->evolutionComplete(EVOLUTION_ZERG_ANABOLIC_SYNTHESIS		);		break;	//울트라 이속업
-				case COMMAND_EVOLUTION_ZERG_CHITINOUS_PLATING:		_player->getZergUpgrade()->evolutionComplete(EVOLUTION_ZERG_CHITINOUS_PLATING		);		break;	//울트라 방업(+2)
-				case COMMAND_EVOLUTION_ZERG_PLAGUE:					_player->getZergUpgrade()->evolutionComplete(EVOLUTION_ZERG_PLAGUE			);		break;	//디파일러 플레이그
-				case COMMAND_EVOLUTION_ZERG_CONSUME:				_player->getZergUpgrade()->evolutionComplete(EVOLUTION_ZERG_CONSUME			);		break;	//디파일러 컨슘
-				case COMMAND_EVOLUTION_ZERG_METASYNAPTIC_NODE:		_player->getZergUpgrade()->evolutionComplete(EVOLUTION_ZERG_METASYNAPTIC_NODE		);		break;	//디파일러 마나업
+				case COMMAND_EVOLUTION_ZERG_BURROW:					_player->addZergEvolutionComplete(EVOLUTION_ZERG_BURROW					);		break;	//저그 버러우 업글
+				case COMMAND_EVOLUTION_ZERG_METABOLICK_BOOST:		_player->addZergEvolutionComplete(EVOLUTION_ZERG_METABOLICK_BOOST		);		break;	//저글링 이속업
+				case COMMAND_EVOLUTION_ZERG_ADRENAL_GLANDS:			_player->addZergEvolutionComplete(EVOLUTION_ZERG_ADRENAL_GLANDS			);		break;	//저글링 아드레날린
+				case COMMAND_EVOLUTION_ZERG_VECTRAL_SACS:			_player->addZergEvolutionComplete(EVOLUTION_ZERG_VECTRAL_SACS			);		break;	//오버로드 수송업
+				case COMMAND_EVOLUTION_ZERG_ANTENNAE:				_player->addZergEvolutionComplete(EVOLUTION_ZERG_ANTENNAE				);		break;	//오버로드 시야업
+				case COMMAND_EVOLUTION_ZERG_PNEUMATIZED_CARAPACE:	_player->addZergEvolutionComplete(EVOLUTION_ZERG_PNEUMATIZED_CARAPACE	);		break;	//오버로드 이속업
+				case COMMAND_EVOLUTION_ZERG_MUSCULAR_AUGMENTS:		_player->addZergEvolutionComplete(EVOLUTION_ZERG_MUSCULAR_AUGMENTS		);		break;	//히드라 이속업
+				case COMMAND_EVOLUTION_ZERG_GROOVED_SPINES:			_player->addZergEvolutionComplete(EVOLUTION_ZERG_GROOVED_SPINES			);		break;	//히드라 사정거리업
+				case COMMAND_EVOLUTION_ZERG_LURKER_ASPECT:			_player->addZergEvolutionComplete(EVOLUTION_ZERG_LURKER_ASPECT			);		break;	//럴커 업글
+				case COMMAND_EVOLUTION_ZERG_SPAWN_BROODLING:		_player->addZergEvolutionComplete(EVOLUTION_ZERG_SPAWN_BROODLING		);		break;	//퀸 브루드링 업글
+				case COMMAND_EVOLUTION_ZERG_ENSNARE:				_player->addZergEvolutionComplete(EVOLUTION_ZERG_ENSNARE				);		break;	//퀸 인스테어 업글
+				case COMMAND_EVOLUTION_ZERG_GAMETE_MEIOSIS:			_player->addZergEvolutionComplete(EVOLUTION_ZERG_GAMETE_MEIOSIS			);		break;	//퀸 마나업
+				case COMMAND_EVOLUTION_ZERG_ANABOLIC_SYNTHESIS:		_player->addZergEvolutionComplete(EVOLUTION_ZERG_ANABOLIC_SYNTHESIS		);		break;	//울트라 이속업
+				case COMMAND_EVOLUTION_ZERG_CHITINOUS_PLATING:		_player->addZergEvolutionComplete(EVOLUTION_ZERG_CHITINOUS_PLATING		);		break;	//울트라 방업(+2)
+				case COMMAND_EVOLUTION_ZERG_PLAGUE:					_player->addZergEvolutionComplete(EVOLUTION_ZERG_PLAGUE					);		break;	//디파일러 플레이그
+				case COMMAND_EVOLUTION_ZERG_CONSUME:				_player->addZergEvolutionComplete(EVOLUTION_ZERG_CONSUME				);		break;	//디파일러 컨슘
+				case COMMAND_EVOLUTION_ZERG_METASYNAPTIC_NODE:		_player->addZergEvolutionComplete(EVOLUTION_ZERG_METASYNAPTIC_NODE		);		break;	//디파일러 마나업
 				}
 
 				_processing.type = PROCESSING_NONE;

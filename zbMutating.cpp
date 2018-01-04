@@ -109,7 +109,7 @@ void zbMutating::initNextBuilding(POINT ptTile)
 	case BUILDINGNUM_ZERG_QUEENSNEST:				_nextBuilding = new zbQueensNest(_playerNum);			break;
 	case BUILDINGNUM_ZERG_NYDUSCANAL:				_nextBuilding = new zbNydusCanal(_playerNum);			break;
 	case BUILDINGNUM_ZERG_ULTRALISKCAVERN:			_nextBuilding = new zbUltraliskCavern(_playerNum);		break;
-	case BUILDINGNUM_ZERG_DEFILERMOUND:				_nextBuilding = new zbDefilerMound(_playerNum);		break;
+	case BUILDINGNUM_ZERG_DEFILERMOUND:				_nextBuilding = new zbDefilerMound(_playerNum);			break;
 	}
 
 	_nextBuilding->setLinkAdressZergUpgrade(_zergUpgrade);
@@ -194,6 +194,8 @@ void zbMutating::initBaseStatus(void)
 		_baseStatus.imgFace		= nextStatus.imgFace;
 		_baseStatus.imgStat1	= nextStatus.imgStat1;
 		_baseStatus.imgStat2	= nextStatus.imgStat2;
+
+		_baseStatus.publicControl = beforeStatus.publicControl;
 
 		_baseStatus.maxHP = beforeStatus.maxHP;
 		_baseStatus.useSH = beforeStatus.useSH;
@@ -305,6 +307,11 @@ void zbMutating::update(void)
 
 	updateProcessing();
 
+	if (_buildingNumZ == BUILDINGNUM_ZERG_HATCHERY || _buildingNumZ == BUILDINGNUM_ZERG_HATCHERY)
+	{
+		larvaValidCheck();
+		responeLarva();
+	}
 }
 
 void zbMutating::render(int imgOffsetX, int imgOffsetY)
@@ -331,6 +338,88 @@ void zbMutating::render(int imgOffsetX, int imgOffsetY)
 	
 
 }
+
+void zbMutating::larvaValidCheck(void)
+{
+	for (int i = 0; i < _vLarva.size(); i++)
+	{
+		if (_vLarva[i]->getValid() == false)
+		{
+			//여기서 delete는 하지 않는다.
+			_vLarva.erase(_vLarva.begin() + i);
+		}
+	}
+}
+
+void zbMutating::responeLarva(void)
+{
+	if (_vLarva.size() == LARVA_MAX)
+	{
+		_larvaResponeTime = 0.0f;
+		return;
+	}
+
+	_larvaResponeTime += TIMEMANAGER->getElapsedTime() * BUILDSPEEDMULTIPLY * 0.1f;
+
+	float time = _player->getZergProductionInfo()->getZUProductionInfo(UNITNUM_ZERG_LARVA).buildTime;
+
+	if (_larvaResponeTime >= time)
+	{
+		_larvaResponeTime -= time;
+
+		if (_vLarva.size() == 0)
+		{
+			POINT larvaSize = UNITSIZE_ZERG_LARVA;
+			POINT pt;
+			pt.x = _battleStatus.rcBody.left + larvaSize.x * 0.5f;
+			pt.y = _battleStatus.rcBody.bottom + larvaSize.y * 0.5f;
+
+			createLarva(pt);
+			return;
+		}
+		else
+		{
+			for (int i = 0; i < LARVA_MAX; i++)
+			{
+				POINT larvaSize = UNITSIZE_ZERG_LARVA;
+				POINT pt;
+				pt.x = _battleStatus.rcBody.left + larvaSize.x * (i + 0.5f);
+				pt.y = _battleStatus.rcBody.bottom + larvaSize.y * 0.5f;
+
+				//겹치는지 확인하고 
+				bool overlap = false;
+				for (int j = 0; j < _vLarva.size(); j++)
+				{
+					RECT rcBody = _vLarva[j]->getBattleStatus().rcBody;
+					if (PtInRect(&rcBody, pt))
+					{
+						overlap = true;
+						break;
+					}
+				}
+				//겹치지 않았으면 생성
+				if (overlap == false)
+				{
+					createLarva(pt);
+					return;
+				}
+			}
+		}
+	}
+}
+
+void zbMutating::createLarva(POINT pt)
+{
+	zuLarva* larva = new zuLarva(_playerNum);
+	larva->setLinkAdressZergUpgrade(_zergUpgrade);
+	larva->setLinkAdressAstar(_aStar);
+	larva->setLinkAdressPlayer(_player);
+	larva->init(pt);
+
+	_player->addUnit(larva);
+	_vLarva.push_back(larva);
+}
+
 
 void zbMutating::updateBattleStatus(void)
 {
@@ -377,6 +466,18 @@ void zbMutating::updateImageFrame(void)
 			if (_nextBuilding->getBuildingNumZerg() == BUILDINGNUM_ZERG_HATCHERY)
 			{
 				_nextBuilding->init(_battleStatus.ptTile, 1);
+			}
+			else if (_nextBuilding->getBuildingNumZerg() == BUILDINGNUM_ZERG_LAIR)
+			{
+				zbLair* lair = (zbLair*)_nextBuilding;
+				lair->setLarvas(_vLarva);
+				lair->setLarvaResponeTime(_larvaResponeTime);
+			}
+			else if (_nextBuilding->getBuildingNumZerg() == BUILDINGNUM_ZERG_HIVE)
+			{
+				zbHive* hive = (zbHive*)_nextBuilding;
+				hive->setLarvas(_vLarva);
+				hive->setLarvaResponeTime(_larvaResponeTime);
 			}
 			//_nextBuilding->setCurHP(_battleStatus.curHP);
 

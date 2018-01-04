@@ -159,6 +159,20 @@ void zuMutalisk::updateBattleStatus(void)
 void zuMutalisk::updateImageFrame(void)
 {
 	Unit::setImageFrameForAngle();
+
+	float tick = TIMEMANAGER->getElapsedTime();
+
+	_battleStatus.bodyFrameTime += tick;
+	if (_battleStatus.bodyFrameTime >= UNIT_BODY_FPS_TIME)
+	{
+		_battleStatus.bodyFrameTime -= UNIT_BODY_FPS_TIME;
+
+		_battleStatus.bodyFrame.y++;
+		if (_battleStatus.bodyFrame.y >= _baseStatus.imgBody->getMaxFrameY())
+		{
+			_battleStatus.bodyFrame.y = 0;
+		}
+	}
 }
 
 void zuMutalisk::procCommands(void)

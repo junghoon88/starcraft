@@ -160,9 +160,14 @@ void gameMap::renderTiles(void)
 			if (idY >= TILEY) continue;
 			if (_imgTiles[idX][idY] == NULL) continue;
 
-
-			//_imgTiles[idX][idY]->frameRender(getMemDC(), idX*TILESIZE - cameraX, idY*TILESIZE - cameraY, _tiles[idX][idY].terrainNum.x, _tiles[idX][idY].terrainNum.y);
-			RENDERMANAGER->insertImgFrame(ZORDER_TILES, _imgTiles[idX][idY], idX*TILESIZE - cameraX, idY*TILESIZE - cameraY, _tiles[idX][idY].terrainNum.x, _tiles[idX][idY].terrainNum.y);
+			if (_tiles[idX][idY].attribute & ATTR_CREEP)
+			{
+				RENDERMANAGER->insertImgFrame(ZORDER_TILES, IMAGEMANAGER->findImage(L"gamemap-creep"), idX*TILESIZE - cameraX, idY*TILESIZE - cameraY, _tiles[idX][idY].terrainNum.x, _tiles[idX][idY].terrainNum.y);
+			}
+			else
+			{
+				RENDERMANAGER->insertImgFrame(ZORDER_TILES, _imgTiles[idX][idY], idX*TILESIZE - cameraX, idY*TILESIZE - cameraY, _tiles[idX][idY].terrainNum.x, _tiles[idX][idY].terrainNum.y);
+			}
 		}
 	}
 }

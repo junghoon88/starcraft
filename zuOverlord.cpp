@@ -63,11 +63,11 @@ void zuOverlord::initBaseStatus(void)
 	_baseStatus.useMP = FALSE;
 	_baseStatus.maxMP = 0.0f;
 
-	_baseStatus.sight = 9.0f; //업글시 11
+	_baseStatus.sight = (_player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_ANTENNAE].complete == false) ? 9.0f : 11.0f;
 	_baseStatus.detector = TRUE;
 
 	_baseStatus.isAir = TRUE;
-	_baseStatus.moveSpeed = 0.83; //업글시 3.33
+	_baseStatus.moveSpeed = (_player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_PNEUMATIZED_CARAPACE].complete == false) ? 0.83f : 3.33f;
 
 	_baseStatus.unitSize = UNITSIZE_LARGE;
 	_baseStatus.transportslots = 0;
@@ -137,7 +137,9 @@ void zuOverlord::updateBattleStatus(void)
 {
 	Unit::updateBattleStatus();
 
-
+	_baseStatus.sight = (_player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_ANTENNAE].complete == false) ? 9.0f : 11.0f;
+	_baseStatus.moveSpeed = (_player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_PNEUMATIZED_CARAPACE].complete == false) ? 0.83f : 3.33f;
+	_battleStatus.moveSpeed = (_player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_PNEUMATIZED_CARAPACE].complete == false) ? 0.83f : 3.33f;
 }
 
 void zuOverlord::updateImageFrame(void)

@@ -181,7 +181,14 @@ void Unit::moveGround(void)
 
 void Unit::moveAir(void)
 {
-
+	if (_battleStatus.targetObject != NULL)
+	{
+		moveToPoint(_battleStatus.targetObject->getBattleStatus().pt.toPoint());
+	}
+	else
+	{
+		moveToPoint(_battleStatus.ptTarget);
+	}
 }
 
 void Unit::moveToPoint(POINT ptEd)

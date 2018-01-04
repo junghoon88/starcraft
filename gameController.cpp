@@ -6,9 +6,10 @@
 
 
 gameController::gameController()
-	: _imgInterface(NULL), _imgCursor(NULL), _hotkeys(NULL), _miniMap(NULL), _myPlayer(NULL), _progressBar(NULL), _gameMap(NULL)
+	: _imgInterface(NULL), _imgCursor(NULL), _hotkeys(NULL), _myPlayer(NULL), _gameInterface(NULL), _gameMap(NULL)
 {
 	_cursorState = CURSORSTATE_IDLE;
+	_beforeCursor = CURSORSTATE_IDLE;
 
 	_curCommand = COMMAND_NONE;
 
@@ -32,9 +33,8 @@ gameController::gameController()
 
 gameController::~gameController()
 {
-	SAFE_RELEASEDELETE(_progressBar);
+	SAFE_RELEASEDELETE(_gameInterface);
 	SAFE_RELEASEDELETE(_hotkeys);
-	SAFE_RELEASEDELETE(_miniMap);
 
 	for (int i = 0; i < COMMAND_MAX; i++)
 	{
@@ -61,15 +61,13 @@ HRESULT gameController::init(PLAYER playerNum, RACES races)
 
 	initCommandSet();
 
-	_miniMap = new miniMap;
-	_miniMap->init();
 
 	_hotkeys = new hotkeys;
 	_hotkeys->init();
 
-	_progressBar = new progressBar;
-	_progressBar->init(L"Mutating");
-	_progressBar->setPointLT(263, 427);
+	_gameInterface = new gameInterface;
+	_gameInterface->setLinkAdressGameController(this);
+	_gameInterface->init();
 
 
 
@@ -105,22 +103,11 @@ void gameController::update(void)
 		{
 			//인터페이스 영역 밖에 마우스가 있을경우
 			_isInInterface = false;
-			actionMouseMap();
 		}
 		else
 		{
 			//인터페이스 영역 안에 마우스가 있을경우
 			_isInInterface = true;
-
-			//minimap
-			RECT rcMinimap = _miniMap->getRect();
-			if (PtInRect(&rcMinimap, _ptMouse))
-			{
-				actionMouseMiniMap();
-			}
-
-			//face
-			//actionMouseImageFace();
 
 			//command
 			for (int i = 0; i < COMMAND_MAX; i++)
@@ -130,6 +117,11 @@ void gameController::update(void)
 			}
 		}
 	}
+
+	actionMouseMap();
+
+	_gameInterface->update();
+
 
 	actionCommand();
 	setCommandSet();
@@ -148,8 +140,8 @@ void gameController::render(void)
 
 	renderBuildImage();
 
-	renderInterface();
 
+	renderInterface();
 	renderCursor();
 
 	renderMyResouce();
@@ -226,9 +218,16 @@ void gameController::actionMouseMap(void)
 	ptMouseReal.x = _ptMouse.x + MAINCAMERA->getCameraX();
 	ptMouseReal.y = _ptMouse.y + MAINCAMERA->getCameraY();
 
+	//마우스 화면 모서리 체크
+	checkMouseEdge();
+
+
+
 	switch (_cursorState)
 	{
 	case CURSORSTATE_IDLE:
+		if (_isInInterface) break;
+
 		if (KEYMANAGER->isOnceKeyDown(VK_LBUTTON))
 		{
 			_isClicked = true;
@@ -343,6 +342,8 @@ void gameController::actionMouseMap(void)
 	case CURSORSTATE_FOCUS_TO_ME:
 	case CURSORSTATE_FOCUS_TO_NEUTRAL:
 	case CURSORSTATE_FOCUS_TO_ENEMY:
+		if (_isInInterface) break;
+
 		if (KEYMANAGER->isOnceKeyDown(VK_LBUTTON))
 		{
 			gameObject* target = getTargetInfo();
@@ -398,6 +399,8 @@ void gameController::actionMouseMap(void)
 	case CURSORSTATE_ON_ME:
 	case CURSORSTATE_ON_NEUTRAL:
 	case CURSORSTATE_ON_ENEMY:
+		if (_isInInterface) break;
+
 		if (KEYMANAGER->isOnceKeyDown(VK_LBUTTON))
 		{
 			_isClicked = true;
@@ -497,23 +500,33 @@ void gameController::actionMouseMap(void)
 		}
 		break;
 	case CURSORSTATE_MOVE_LF:
+		MAINCAMERA->moveCamera(DIRECTION_LF);
 		break;
 	case CURSORSTATE_MOVE_LU:
+		MAINCAMERA->moveCamera(DIRECTION_LU);
 		break;
 	case CURSORSTATE_MOVE_UP:
+		MAINCAMERA->moveCamera(DIRECTION_UP);
 		break;
 	case CURSORSTATE_MOVE_RU:
+		MAINCAMERA->moveCamera(DIRECTION_RU);
 		break;
 	case CURSORSTATE_MOVE_RG:
+		MAINCAMERA->moveCamera(DIRECTION_RG);
 		break;
 	case CURSORSTATE_MOVE_RD:
+		MAINCAMERA->moveCamera(DIRECTION_RD);
 		break;
 	case CURSORSTATE_MOVE_DN:
+		MAINCAMERA->moveCamera(DIRECTION_DN);
 		break;
 	case CURSORSTATE_MOVE_LD:
+		MAINCAMERA->moveCamera(DIRECTION_LD);
 		break;
 
 	case CURSORSTATE_BUILD_NORMAL:		// 건물-기본
+		if (_isInInterface) break;
+
 		if (KEYMANAGER->isOnceKeyDown(VK_RBUTTON))
 		{
 			_curCommand = COMMAND_NONE;
@@ -560,6 +573,8 @@ void gameController::actionMouseMap(void)
 		}
 		break;
 	case CURSORSTATE_BUILD_HATCHERY:	// 건물-해처리
+		if (_isInInterface) break;
+
 		if (KEYMANAGER->isOnceKeyDown(VK_RBUTTON))
 		{
 			_curCommand = COMMAND_NONE;
@@ -606,6 +621,8 @@ void gameController::actionMouseMap(void)
 		}
 		break;
 	case CURSORSTATE_BUILD_EXTRACTOR:	// 건물-가스
+		if (_isInInterface) break;
+
 		if (KEYMANAGER->isOnceKeyDown(VK_RBUTTON))
 		{
 			_curCommand = COMMAND_NONE;
@@ -618,10 +635,159 @@ void gameController::actionMouseMap(void)
 	}
 }
 
-void gameController::actionMouseMiniMap(void)
+void gameController::checkMouseEdge(void)
 {
+if (_cursorState != CURSORSTATE_DRAGING)
+{
+	int margin = 20;
+	if (_ptMouse.x <= margin)
+	{
+		if (_ptMouse.y <= margin)
+		{
+			if (MAINCAMERA->moveable(DIRECTION_LU))
+			{
+				if (((int)_cursorState >= CURSORSTATE_MOVE_LF && (int)_cursorState <= CURSORSTATE_MOVE_LD) == false)
+				{
+					_beforeCursor = _cursorState;
+				}
+				_cursorState = CURSORSTATE_MOVE_LU;
+			}
+			else
+			{
+				_beforeCursor = _cursorState = CURSORSTATE_IDLE;
+			}
+		}
+		else if (_ptMouse.y >= WINSIZEY - margin)
+		{
+			if (MAINCAMERA->moveable(DIRECTION_LD))
+			{
+				if (((int)_cursorState >= CURSORSTATE_MOVE_LF && (int)_cursorState <= CURSORSTATE_MOVE_LD) == false)
+				{
+					_beforeCursor = _cursorState;
+				}
+
+				_cursorState = CURSORSTATE_MOVE_LD;
+			}
+			else
+			{
+				_beforeCursor = _cursorState = CURSORSTATE_IDLE;
+			}
+		}
+		else
+		{
+			if (MAINCAMERA->moveable(DIRECTION_LF))
+			{
+				if (((int)_cursorState >= CURSORSTATE_MOVE_LF && (int)_cursorState <= CURSORSTATE_MOVE_LD) == false)
+				{
+					_beforeCursor = _cursorState;
+				}
+
+				_cursorState = CURSORSTATE_MOVE_LF;
+			}
+			else
+			{
+				_beforeCursor = _cursorState = CURSORSTATE_IDLE;
+			}
+		}
+	}
+	else if (_ptMouse.x >= WINSIZEX - margin)
+	{
+		if (_ptMouse.y <= margin)
+		{
+			if (MAINCAMERA->moveable(DIRECTION_RU))
+			{
+				if (((int)_cursorState >= CURSORSTATE_MOVE_LF && (int)_cursorState <= CURSORSTATE_MOVE_LD) == false)
+				{
+					_beforeCursor = _cursorState;
+				}
+
+				_cursorState = CURSORSTATE_MOVE_RU;
+			}
+			else
+			{
+				_beforeCursor = _cursorState = CURSORSTATE_IDLE;
+			}
+		}
+		else if (_ptMouse.y >= WINSIZEY - margin)
+		{
+			if (MAINCAMERA->moveable(DIRECTION_RD))
+			{
+				if (((int)_cursorState >= CURSORSTATE_MOVE_LF && (int)_cursorState <= CURSORSTATE_MOVE_LD) == false)
+				{
+					_beforeCursor = _cursorState;
+				}
+
+				_cursorState = CURSORSTATE_MOVE_RD;
+			}
+			else
+			{
+				_beforeCursor = _cursorState = CURSORSTATE_IDLE;
+			}
+		}
+		else
+		{
+			if (MAINCAMERA->moveable(DIRECTION_RG))
+			{
+				if (((int)_cursorState >= CURSORSTATE_MOVE_LF && (int)_cursorState <= CURSORSTATE_MOVE_LD) == false)
+				{
+					_beforeCursor = _cursorState;
+				}
+
+				_cursorState = CURSORSTATE_MOVE_RG;
+			}
+			else
+			{
+				_beforeCursor = _cursorState = CURSORSTATE_IDLE;
+			}
+		}
+	}
+	else
+	{
+		if (_ptMouse.y <= margin)
+		{
+			if (MAINCAMERA->moveable(DIRECTION_UP))
+			{
+				if (((int)_cursorState >= CURSORSTATE_MOVE_LF && (int)_cursorState <= CURSORSTATE_MOVE_LD) == false)
+				{
+					_beforeCursor = _cursorState;
+				}
+
+				_cursorState = CURSORSTATE_MOVE_UP;
+			}
+			else
+			{
+				_beforeCursor = _cursorState = CURSORSTATE_IDLE;
+			}
+		}
+		else if (_ptMouse.y >= WINSIZEY - margin)
+		{
+			if (MAINCAMERA->moveable(DIRECTION_DN))
+			{
+				if (((int)_cursorState >= CURSORSTATE_MOVE_LF && (int)_cursorState <= CURSORSTATE_MOVE_LD) == false)
+				{
+					_beforeCursor = _cursorState;
+				}
+
+				_cursorState = CURSORSTATE_MOVE_DN;
+			}
+			else
+			{
+				_beforeCursor = _cursorState = CURSORSTATE_IDLE;
+			}
+		}
+		else
+		{
+			if (((int)_cursorState >= CURSORSTATE_MOVE_LF && (int)_cursorState <= CURSORSTATE_MOVE_LD))
+			{
+				_cursorState = _beforeCursor;
+			}
+		}
+	}
+}
 
 }
+
+
 void gameController::actionMouseCommandSet(int num)
 {
 	int i = num;
@@ -632,11 +798,6 @@ void gameController::actionMouseCommandSet(int num)
 	_curCommand = _commandSet[i].command;
 }
 
-
-void gameController::actionMouseImageFace(void)
-{
-
-}
 
 
 void gameController::calcMouseRealPosition(void)
@@ -669,7 +830,18 @@ void gameController::setImageCursor(void)
 
 	if (_isInInterface)
 	{
-		_imgCursor = IMAGEMANAGER->findImage(L"cursor-Idle");
+		switch (_cursorState)
+		{
+		case CURSORSTATE_MOVE_LF:			_imgCursor = IMAGEMANAGER->findImage(L"cursor-MoveLF");				break;
+		case CURSORSTATE_MOVE_LU:			_imgCursor = IMAGEMANAGER->findImage(L"cursor-MoveLU");				break;
+		case CURSORSTATE_MOVE_UP:			_imgCursor = IMAGEMANAGER->findImage(L"cursor-MoveUP");				break;
+		case CURSORSTATE_MOVE_RU:			_imgCursor = IMAGEMANAGER->findImage(L"cursor-MoveRU");				break;
+		case CURSORSTATE_MOVE_RG:			_imgCursor = IMAGEMANAGER->findImage(L"cursor-MoveRG");				break;
+		case CURSORSTATE_MOVE_RD:			_imgCursor = IMAGEMANAGER->findImage(L"cursor-MoveRD");				break;
+		case CURSORSTATE_MOVE_DN:			_imgCursor = IMAGEMANAGER->findImage(L"cursor-MoveDN");				break;
+		case CURSORSTATE_MOVE_LD:			_imgCursor = IMAGEMANAGER->findImage(L"cursor-MoveLD");				break;
+		default:							_imgCursor = IMAGEMANAGER->findImage(L"cursor-Idle");				break;
+		}
 	}
 	else
 	{
@@ -683,14 +855,14 @@ void gameController::setImageCursor(void)
 		case CURSORSTATE_ON_NEUTRAL:		_imgCursor = IMAGEMANAGER->findImage(L"cursor-onneutral");			break;
 		case CURSORSTATE_ON_ENEMY:			_imgCursor = IMAGEMANAGER->findImage(L"cursor-onenemy");			break;
 		case CURSORSTATE_DRAGING:			_imgCursor = IMAGEMANAGER->findImage(L"cursor-Dragging");			break;
-		case CURSORSTATE_MOVE_LF:			_imgCursor = IMAGEMANAGER->findImage(L"cursor-MoveDN");				break;
-		case CURSORSTATE_MOVE_LU:			_imgCursor = IMAGEMANAGER->findImage(L"cursor-MoveUP");				break;
-		case CURSORSTATE_MOVE_UP:			_imgCursor = IMAGEMANAGER->findImage(L"cursor-MoveLF");				break;
-		case CURSORSTATE_MOVE_RU:			_imgCursor = IMAGEMANAGER->findImage(L"cursor-MoveRG");				break;
-		case CURSORSTATE_MOVE_RG:			_imgCursor = IMAGEMANAGER->findImage(L"cursor-MoveLU");				break;
-		case CURSORSTATE_MOVE_RD:			_imgCursor = IMAGEMANAGER->findImage(L"cursor-MoveLD");				break;
-		case CURSORSTATE_MOVE_DN:			_imgCursor = IMAGEMANAGER->findImage(L"cursor-MoveRU");				break;
-		case CURSORSTATE_MOVE_LD:			_imgCursor = IMAGEMANAGER->findImage(L"cursor-MoveRD");				break;
+		case CURSORSTATE_MOVE_LF:			_imgCursor = IMAGEMANAGER->findImage(L"cursor-MoveLF");				break;
+		case CURSORSTATE_MOVE_LU:			_imgCursor = IMAGEMANAGER->findImage(L"cursor-MoveLU");				break;
+		case CURSORSTATE_MOVE_UP:			_imgCursor = IMAGEMANAGER->findImage(L"cursor-MoveUP");				break;
+		case CURSORSTATE_MOVE_RU:			_imgCursor = IMAGEMANAGER->findImage(L"cursor-MoveRU");				break;
+		case CURSORSTATE_MOVE_RG:			_imgCursor = IMAGEMANAGER->findImage(L"cursor-MoveRG");				break;
+		case CURSORSTATE_MOVE_RD:			_imgCursor = IMAGEMANAGER->findImage(L"cursor-MoveRD");				break;
+		case CURSORSTATE_MOVE_DN:			_imgCursor = IMAGEMANAGER->findImage(L"cursor-MoveDN");				break;
+		case CURSORSTATE_MOVE_LD:			_imgCursor = IMAGEMANAGER->findImage(L"cursor-MoveLD");				break;
 		case CURSORSTATE_BUILD_NORMAL:		_imgCursor = IMAGEMANAGER->findImage(L"cursor-Idle");				break; // 건물-기본
 		case CURSORSTATE_BUILD_HATCHERY:	_imgCursor = IMAGEMANAGER->findImage(L"cursor-Idle");				break; // 건물-해처리
 		case CURSORSTATE_BUILD_EXTRACTOR:	_imgCursor = IMAGEMANAGER->findImage(L"cursor-Idle");				break; // 건물-가스
@@ -730,32 +902,64 @@ BOOL gameController::checkBuildable(void)
 
 	if (_curCommand == COMMAND_BUILD_HATCHERY)
 	{
-
-	}
-	else if (_curCommand == COMMAND_BUILD_EXTRACTOR)
-	{
-
-	}
-	else
-	{
-
-	}
-
-	for (int i = 0; i < _buildingSize.x; i++)
-	{
-		for (int j = 0; j < _buildingSize.y; j++)
+		for (int i = 0; i < _buildingSize.x; i++)
 		{
-			DWORD attribute = _gameMap->getTiles()[ptTileMouseReal.x + i][ptTileMouseReal.y + j].attribute;
-			if ((attribute & ATTR_UNBUILD) == ATTR_UNBUILD)
+			for (int j = 0; j < _buildingSize.y; j++)
 			{
-				_buildingPlaceable[i][j] = BUILDSTATE_OVERLAP;
-			}
-			else
-			{
-				_buildingPlaceable[i][j] = BUILDSTATE_PLACEABLE;
+				DWORD attribute = _gameMap->getTiles()[ptTileMouseReal.x + i][ptTileMouseReal.y + j].attribute;
+				if ((attribute & ATTR_UNBUILD) == ATTR_UNBUILD)
+				{
+					_buildingPlaceable[i][j] = BUILDSTATE_OVERLAP;
+				}
+				else
+				{
+					_buildingPlaceable[i][j] = BUILDSTATE_PLACEABLE;
+				}
 			}
 		}
 	}
+	else if (_curCommand == COMMAND_BUILD_EXTRACTOR)
+	{
+		for (int i = 0; i < _buildingSize.x; i++)
+		{
+			for (int j = 0; j < _buildingSize.y; j++)
+			{
+				DWORD attribute = _gameMap->getTiles()[ptTileMouseReal.x + i][ptTileMouseReal.y + j].attribute;
+				if ((attribute & ATTR_UNBUILD) == ATTR_UNBUILD)
+				{
+					_buildingPlaceable[i][j] = BUILDSTATE_OVERLAP;
+				}
+				else
+				{
+					_buildingPlaceable[i][j] = BUILDSTATE_PLACEABLE;
+				}
+			}
+		}
+	}
+	else
+	{
+		for (int i = 0; i < _buildingSize.x; i++)
+		{
+			for (int j = 0; j < _buildingSize.y; j++)
+			{
+				DWORD attribute = _gameMap->getTiles()[ptTileMouseReal.x + i][ptTileMouseReal.y + j].attribute;
+				if ((attribute & ATTR_UNBUILD) == ATTR_UNBUILD)
+				{
+					_buildingPlaceable[i][j] = BUILDSTATE_OVERLAP;
+				}
+				else if ((attribute & ATTR_CREEP) == 0)
+				{
+					//크립이 없어도 건물 설치 불가
+					_buildingPlaceable[i][j] = BUILDSTATE_OVERLAP;
+				}
+				else
+				{
+					_buildingPlaceable[i][j] = BUILDSTATE_PLACEABLE;
+				}
+			}
+		}
+	}
+
 
 	for (int i = 0; i < _buildingSize.x; i++)
 	{
@@ -889,15 +1093,25 @@ void gameController::renderCursor(void)
 
 	if (_isInInterface)
 	{
-		//_imgCursor->frameRender(getMemDC(), _ptMouse.x, _ptMouse.y, _frameCursor, 0);
-		RENDERMANAGER->insertImgFrame(ZORDER_MOUSECURSOR, _imgCursor, _ptMouse.x, _ptMouse.y, _frameCursor, 0);
+		switch (_cursorState)
+		{
+		case CURSORSTATE_MOVE_LF:	RENDERMANAGER->insertImgFrameLC(ZORDER_MOUSECURSOR, _imgCursor, 0,			_ptMouse.y, _frameCursor, 0);		break;
+		case CURSORSTATE_MOVE_LU:	RENDERMANAGER->insertImgFrame(ZORDER_MOUSECURSOR,	_imgCursor, 0,			0,			_frameCursor, 0);		break;
+		case CURSORSTATE_MOVE_UP:	RENDERMANAGER->insertImgFrameCT(ZORDER_MOUSECURSOR, _imgCursor, _ptMouse.x, 0,			_frameCursor, 0);		break;
+		case CURSORSTATE_MOVE_RU:	RENDERMANAGER->insertImgFrameRT(ZORDER_MOUSECURSOR, _imgCursor, WINSIZEX,	0,			_frameCursor, 0);		break;
+		case CURSORSTATE_MOVE_RG:	RENDERMANAGER->insertImgFrameRC(ZORDER_MOUSECURSOR, _imgCursor, WINSIZEX,	_ptMouse.y, _frameCursor, 0);		break;
+		case CURSORSTATE_MOVE_RD:	RENDERMANAGER->insertImgFrameRB(ZORDER_MOUSECURSOR, _imgCursor, WINSIZEX,	WINSIZEY,	_frameCursor, 0);		break;
+		case CURSORSTATE_MOVE_DN:	RENDERMANAGER->insertImgFrameCB(ZORDER_MOUSECURSOR, _imgCursor, _ptMouse.x, WINSIZEY,	_frameCursor, 0);		break;
+		case CURSORSTATE_MOVE_LD:	RENDERMANAGER->insertImgFrameLB(ZORDER_MOUSECURSOR, _imgCursor, 0,			WINSIZEY,	_frameCursor, 0);		break;
+
+		default:					RENDERMANAGER->insertImgFrame(ZORDER_MOUSECURSOR, _imgCursor, _ptMouse.x, _ptMouse.y, _frameCursor, 0);			break;
+		}
 	}
 	else
 	{
 		switch (_cursorState)
 		{
 		case CURSORSTATE_IDLE:				
-			//_imgCursor->frameRender(getMemDC(), _ptMouse.x, _ptMouse.y, _frameCursor, 0);		
 			RENDERMANAGER->insertImgFrame(ZORDER_MOUSECURSOR, _imgCursor, _ptMouse.x, _ptMouse.y, _frameCursor, 0);
 			break;
 		case CURSORSTATE_FOCUS_TO_ME:		
@@ -906,39 +1120,29 @@ void gameController::renderCursor(void)
 		case CURSORSTATE_ON_ME:				
 		case CURSORSTATE_ON_NEUTRAL:		
 		case CURSORSTATE_ON_ENEMY:			
-			//_imgCursor->frameRenderCT(getMemDC(), _ptMouse.x, _ptMouse.y, _frameCursor, 0);		
 			RENDERMANAGER->insertImgFrameCC(ZORDER_MOUSECURSOR, _imgCursor, _ptMouse.x, _ptMouse.y, _frameCursor, 0);
 			break;
 		case CURSORSTATE_DRAGING:			
-			//_imgCursor->renderCT(getMemDC(), _ptMouse.x, _ptMouse.y);
 			RENDERMANAGER->insertImgCT(ZORDER_MOUSECURSOR, _imgCursor, _ptMouse.x, _ptMouse.y);
 			break;
-		case CURSORSTATE_MOVE_LF:
-		case CURSORSTATE_MOVE_LU:
-		case CURSORSTATE_MOVE_UP:
-		case CURSORSTATE_MOVE_RU:
-		case CURSORSTATE_MOVE_RG:
-		case CURSORSTATE_MOVE_RD:
-		case CURSORSTATE_MOVE_DN:
-		case CURSORSTATE_MOVE_LD:
-			//_imgCursor->frameRender(getMemDC(), _ptMouse.x, _ptMouse.y, _frameCursor, 0);
-			RENDERMANAGER->insertImgFrame(ZORDER_MOUSECURSOR, _imgCursor, _ptMouse.x, _ptMouse.y, _frameCursor, 0);
-			break;
+
+		case CURSORSTATE_MOVE_LF:	RENDERMANAGER->insertImgFrameLC(ZORDER_MOUSECURSOR, _imgCursor, 0,			_ptMouse.y, _frameCursor, 0);		break;
+		case CURSORSTATE_MOVE_LU:	RENDERMANAGER->insertImgFrame(ZORDER_MOUSECURSOR,   _imgCursor, 0,			0,			_frameCursor, 0);		break;
+		case CURSORSTATE_MOVE_UP:	RENDERMANAGER->insertImgFrameCT(ZORDER_MOUSECURSOR, _imgCursor, _ptMouse.x, 0,			_frameCursor, 0);		break;
+		case CURSORSTATE_MOVE_RU:	RENDERMANAGER->insertImgFrameRT(ZORDER_MOUSECURSOR, _imgCursor, WINSIZEX,	0,			_frameCursor, 0);		break;
+		case CURSORSTATE_MOVE_RG:	RENDERMANAGER->insertImgFrameRC(ZORDER_MOUSECURSOR, _imgCursor, WINSIZEX,	_ptMouse.y, _frameCursor, 0);		break;
+		case CURSORSTATE_MOVE_RD:	RENDERMANAGER->insertImgFrameRB(ZORDER_MOUSECURSOR, _imgCursor, WINSIZEX,	WINSIZEY,	_frameCursor, 0);		break;
+		case CURSORSTATE_MOVE_DN:	RENDERMANAGER->insertImgFrameCB(ZORDER_MOUSECURSOR, _imgCursor, _ptMouse.x, WINSIZEY,	_frameCursor, 0);		break;
+		case CURSORSTATE_MOVE_LD:	RENDERMANAGER->insertImgFrameLB(ZORDER_MOUSECURSOR, _imgCursor, 0,			WINSIZEY,	_frameCursor, 0);		break;
+
 		case CURSORSTATE_BUILD_NORMAL:		// 건물-기본
-			//_imgCursor->frameRender(getMemDC(), _ptMouse.x, _ptMouse.y, _frameCursor, 0);
 			RENDERMANAGER->insertImgFrame(ZORDER_MOUSECURSOR, _imgCursor, _ptMouse.x, _ptMouse.y, _frameCursor, 0);
-			//건물이미지
 			break;
 		case CURSORSTATE_BUILD_HATCHERY:	// 건물-해처리
-			//_imgCursor->frameRender(getMemDC(), _ptMouse.x, _ptMouse.y, _frameCursor, 0);
 			RENDERMANAGER->insertImgFrame(ZORDER_MOUSECURSOR, _imgCursor, _ptMouse.x, _ptMouse.y, _frameCursor, 0);
-			//건물이미지
 			break;
 		case CURSORSTATE_BUILD_EXTRACTOR:	// 건물-가스
-			//_imgCursor->frameRender(getMemDC(), _ptMouse.x, _ptMouse.y, _frameCursor, 0);
 			RENDERMANAGER->insertImgFrame(ZORDER_MOUSECURSOR, _imgCursor, _ptMouse.x, _ptMouse.y, _frameCursor, 0);
-			//건물이미지
-			//
 			break;
 		}
 	}
@@ -960,7 +1164,15 @@ void gameController::renderMyResouce(void)
 
 	RENDERMANAGER->insertText(ZORDER_INTERFACE, RectMake(450, 3, 54, 14), strMineral,	TEXTCOLOR_MYRESOURCE);
 	RENDERMANAGER->insertText(ZORDER_INTERFACE, RectMake(518, 3, 54, 14), strGas,		TEXTCOLOR_MYRESOURCE);
-	RENDERMANAGER->insertText(ZORDER_INTERFACE, RectMake(586, 3, 54, 14), strControl,	TEXTCOLOR_MYRESOURCE);
+
+	if (_myPlayer->getMyControl() > _myPlayer->getMyControlMax())
+	{
+		RENDERMANAGER->insertText(ZORDER_INTERFACE, RectMake(586, 3, 54, 14), strControl, TEXTCOLOR_MYRESOURCE_ERROR);
+	}
+	else
+	{
+		RENDERMANAGER->insertText(ZORDER_INTERFACE, RectMake(586, 3, 54, 14), strControl, TEXTCOLOR_MYRESOURCE);
+	}
 }
 
 void gameController::renderInterface(void)
@@ -970,109 +1182,12 @@ void gameController::renderInterface(void)
 
 	RENDERMANAGER->insertImg(ZORDER_INTERFACE, _imgInterface, 0, 0);
 
-	//선택된 유닛, 건물의 정보를 보여준다.
-	renderSelectInfo();
+	_gameInterface->render();
+
 
 	//선택된 유닛, 건물의 커맨드를 보여준다.
 	renderCommands();
-
-	//미니맵을 보여준다.
-	_miniMap->render();
 }
-
-void gameController::renderSelectInfo(void)
-{
-	if (_selectInfo.num == 0)
-	{
-		return;
-	}
-	else if (_selectInfo.num == 1)
-	{
-		tagBaseStatus baseStatus = _selectInfo.object[0]->getBaseStatus();
-		tagBattleStatus battleStatus = _selectInfo.object[0]->getBattleStatus();
-		tagProcessing processing = _selectInfo.object[0]->getProcessing();
-
-		//유닛 이름
-		RENDERMANAGER->insertTextCenter(ZORDER_INTERFACE, RectMake(248, 389, 140, 16), baseStatus.name, TEXTCOLOR_UNITNAME);
-
-
-		//디텍터
-		if (baseStatus.detector)
-		{
-			RENDERMANAGER->insertTextCenter(ZORDER_INTERFACE, RectMake(295, 406, 50, 16), L"Detector", TEXTCOLOR_DETECTOR);
-		}
-		
-
-		//
-
-		//이미지
-		RENDERMANAGER->insertImg(ZORDER_INTERFACE, baseStatus.imgStat1, 153, 374);
-		RENDERMANAGER->insertImg(ZORDER_INTERFACE, baseStatus.imgFace, 417, 415);
-		
-
-		//HP
-		TCHAR strHP[100];
-		_stprintf(strHP, L"%d / %d", (INT)battleStatus.curHP, (INT)battleStatus.maxHP);
-		RENDERMANAGER->insertTextCenter(ZORDER_INTERFACE, RectMake(153, 453, 89, 12), strHP, TEXTCOLOR_UNITHP);
-
-		if (baseStatus.useMP)
-		{
-			//MP
-			TCHAR strMP[100];
-			_stprintf(strMP, L"%d / %d", (INT)battleStatus.curMP, (INT)battleStatus.maxMP);
-			RENDERMANAGER->insertTextCenter(ZORDER_INTERFACE, RectMake(153, 470, 89, 12), strMP, TEXTCOLOR_UNITMP);
-		}
-
-		//진행작업표시
-		switch (processing.type)
-		{
-			case PROCESSING_MUTATING:
-				_progressBar->setPointLT(263, 427);
-				_progressBar->setGauge(processing.curTime, processing.maxTime);
-				_progressBar->ZRender(ZORDER_INTERFACE2);
-				RENDERMANAGER->insertTextCenter(ZORDER_INTERFACE, RectMake(292, 410, 48, 16), L"Mutating", TEXTCOLOR_UNITNAME);
-			break;
-			case PROCESSING_MORPHING:
-				_progressBar->setPointLT(282, 427);
-				_progressBar->setGauge(processing.curTime, processing.maxTime);
-				_progressBar->ZRender(ZORDER_INTERFACE2);
-				RENDERMANAGER->insertImgFrame(ZORDER_INTERFACE2, processing.img, 242, 410, 0, 0);
-				RENDERMANAGER->insertTextCenter(ZORDER_INTERFACE, RectMake(309, 410, 50, 16), L"Morphing", TEXTCOLOR_UNITNAME);
-			break;
-			case PROCESSING_EVOLVING:
-				_progressBar->setPointLT(282, 427);
-				_progressBar->setGauge(processing.curTime, processing.maxTime);
-				_progressBar->ZRender(ZORDER_INTERFACE2);
-				RENDERMANAGER->insertImgFrame(ZORDER_INTERFACE2, processing.img, 242, 410, 0, 0);
-				RENDERMANAGER->insertTextCenter(ZORDER_INTERFACE, RectMake(309, 410, 50, 16), L"Evolving", TEXTCOLOR_UNITNAME);
-			break;
-		}
-	}
-	else
-	{
-		int index = 0;
-		int topUnit = UNITNUM_ZERG_NONE;
-		for (int i = 0; i < SELECTUNIT_MAX; i++)
-		{
-			if (_selectInfo.object[i] == NULL) continue;
-
-			//유닛중에 제일 높은애를 찾는다.
-			if (topUnit < _selectInfo.object[i]->getUnitnumZerg())
-			{
-				topUnit = _selectInfo.object[i]->getUnitnumZerg();
-				index = i;
-			}
-
-			int posx = 168 + (i / 2) * 36;
-			int posy = 396 + (i % 2) * 37;
-
-			RENDERMANAGER->insertImg(ZORDER_INTERFACE, _selectInfo.object[i]->getBaseStatus().imgStat2, posx, posy);
-		}
-
-		RENDERMANAGER->insertImg(ZORDER_INTERFACE, _selectInfo.object[index]->getBaseStatus().imgFace, 417, 415);
-	}
-}
-
 
 void gameController::renderCommands(void)
 {
@@ -1255,7 +1370,8 @@ TEAM gameController::dragObjects(RECT rcDrag)
 					_selectInfo.object[findNum] = vUnitsInCamera[j];
 					findNum++;
 
-					if (_selectInfo.num == SELECTUNIT_MAX) break;
+					if (findNum == SELECTUNIT_MAX)
+						break;
 				}
 			}
 		}
@@ -2486,18 +2602,18 @@ void gameController::actionCommand(void)
 	case COMMAND_PLAGUE:					_findTarget = true;		break;
 
 		//BUILD1
-	case COMMAND_BUILD_HATCHERY:			_findLocation = true;	_buildingSize = BUILDSIZE_HATCHERY			;	_buildable = false; break;
-	case COMMAND_BUILD_CREEPCOLONY:			_findLocation = true;	_buildingSize = BUILDSIZE_CREEPCOLONY		;	_buildable = false; break;
-	case COMMAND_BUILD_EXTRACTOR:			_findLocation = true;	_buildingSize = BUILDSIZE_EXTRACTOR			;	_buildable = false; break;
-	case COMMAND_BUILD_SPAWNINGPOOL:		_findLocation = true;	_buildingSize = BUILDSIZE_SPAWNINGPOOL		;	_buildable = false; break;
-	case COMMAND_BUILD_EVOLUTIONCHAMBER:	_findLocation = true;	_buildingSize = BUILDSIZE_EVOLUTIONCHAMBER	;	_buildable = false; break;
-	case COMMAND_BUILD_HYDRALISKDEN:		_findLocation = true;	_buildingSize = BUILDSIZE_HYDRALISKDEN		;	_buildable = false; break;
+	case COMMAND_BUILD_HATCHERY:			_findLocation = true;	_cursorState = CURSORSTATE_BUILD_HATCHERY;		_buildingSize = BUILDSIZE_HATCHERY			;	_buildable = false; break;
+	case COMMAND_BUILD_CREEPCOLONY:			_findLocation = true;	_cursorState = CURSORSTATE_BUILD_NORMAL;		_buildingSize = BUILDSIZE_CREEPCOLONY		;	_buildable = false; break;
+	case COMMAND_BUILD_EXTRACTOR:			_findLocation = true;	_cursorState = CURSORSTATE_BUILD_EXTRACTOR;		_buildingSize = BUILDSIZE_EXTRACTOR			;	_buildable = false; break;
+	case COMMAND_BUILD_SPAWNINGPOOL:		_findLocation = true;	_cursorState = CURSORSTATE_BUILD_NORMAL;		_buildingSize = BUILDSIZE_SPAWNINGPOOL		;	_buildable = false; break;
+	case COMMAND_BUILD_EVOLUTIONCHAMBER:	_findLocation = true;	_cursorState = CURSORSTATE_BUILD_NORMAL;		_buildingSize = BUILDSIZE_EVOLUTIONCHAMBER	;	_buildable = false; break;
+	case COMMAND_BUILD_HYDRALISKDEN:		_findLocation = true;	_cursorState = CURSORSTATE_BUILD_NORMAL;		_buildingSize = BUILDSIZE_HYDRALISKDEN		;	_buildable = false; break;
 		//BUILD2
-	case COMMAND_BUILD_SPIRE:				_findLocation = true;	_buildingSize = BUILDSIZE_SPIRE				;	_buildable = false; break;
-	case COMMAND_BUILD_QUEENSNEST:			_findLocation = true;	_buildingSize = BUILDSIZE_QUEENSNEST		;	_buildable = false; break;
-	case COMMAND_BUILD_NYDUSCANAL:			_findLocation = true;	_buildingSize = BUILDSIZE_NYDUSCANAL		;	_buildable = false; break;
-	case COMMAND_BUILD_ULTRALISKCAVERN:		_findLocation = true;	_buildingSize = BUILDSIZE_ULTRALISKCAVERN	;	_buildable = false; break;
-	case COMMAND_BUILD_DEFILERMOUND:		_findLocation = true;	_buildingSize = BUILDSIZE_DEFILERMOUND		;	_buildable = false; break;
+	case COMMAND_BUILD_SPIRE:				_findLocation = true;	_cursorState = CURSORSTATE_BUILD_NORMAL;		_buildingSize = BUILDSIZE_SPIRE				;	_buildable = false; break;
+	case COMMAND_BUILD_QUEENSNEST:			_findLocation = true;	_cursorState = CURSORSTATE_BUILD_NORMAL;		_buildingSize = BUILDSIZE_QUEENSNEST		;	_buildable = false; break;
+	case COMMAND_BUILD_NYDUSCANAL:			_findLocation = true;	_cursorState = CURSORSTATE_BUILD_NORMAL;		_buildingSize = BUILDSIZE_NYDUSCANAL		;	_buildable = false; break;
+	case COMMAND_BUILD_ULTRALISKCAVERN:		_findLocation = true;	_cursorState = CURSORSTATE_BUILD_NORMAL;		_buildingSize = BUILDSIZE_ULTRALISKCAVERN	;	_buildable = false; break;
+	case COMMAND_BUILD_DEFILERMOUND:		_findLocation = true;	_cursorState = CURSORSTATE_BUILD_NORMAL;		_buildingSize = BUILDSIZE_DEFILERMOUND		;	_buildable = false; break;
 
 	case COMMAND_BUILD_LAIR:
 	case COMMAND_BUILD_HIVE:				

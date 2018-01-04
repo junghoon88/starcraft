@@ -106,6 +106,9 @@
     <Filter Include="MainGame\sceneBattle\gameController">
       <UniqueIdentifier>{4dd5d68f-1231-4de9-aae5-5ac2813c3396}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MainGame\sceneBattle\creepManager">
+      <UniqueIdentifier>{c0ea1920-b370-47c6-8936-ec92a5894b02}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -384,6 +387,12 @@
     <ClInclude Include="zuZergEgg.h">
       <Filter>MainGame\RACES\Zerg\Unit%28Ground%29</Filter>
     </ClInclude>
+    <ClInclude Include="creepManager.h">
+      <Filter>MainGame\sceneBattle\creepManager</Filter>
+    </ClInclude>
+    <ClInclude Include="creepAstar.h">
+      <Filter>MainGame\sceneBattle\creepManager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -637,6 +646,12 @@
     </ClCompile>
     <ClCompile Include="zuZergEgg.cpp">
       <Filter>MainGame\RACES\Zerg\Unit%28Ground%29</Filter>
+    </ClCompile>
+    <ClCompile Include="creepManager.cpp">
+      <Filter>MainGame\sceneBattle\creepManager</Filter>
+    </ClCompile>
+    <ClCompile Include="creepAstar.cpp">
+      <Filter>MainGame\sceneBattle\creepManager</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -61,7 +61,7 @@ void zuDefiler::initBaseStatus(void)
 	_baseStatus.maxSH = 0.0f;
 
 	_baseStatus.useMP = TRUE;
-	_baseStatus.maxMP = 200.0f; //업글시 250
+	_baseStatus.maxMP = (_player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_METASYNAPTIC_NODE].complete == false) ? 200.0f : 250.0f;
 
 	_baseStatus.sight = 10.0f;
 	_baseStatus.detector = FALSE;
@@ -86,9 +86,9 @@ void zuDefiler::initBaseStatus(void)
 	_baseStatus.commands[2] = COMMAND_NONE;
 	_baseStatus.commands[3] = COMMAND_PATROL;
 	_baseStatus.commands[4] = COMMAND_HOLD;
-	_baseStatus.commands[5] = COMMAND_NONE;
-	_baseStatus.commands[6] = COMMAND_NONE;
-	_baseStatus.commands[7] = COMMAND_NONE;
+	_baseStatus.commands[5] = COMMAND_CONSUME;
+	_baseStatus.commands[6] = COMMAND_DARKSWARM;
+	_baseStatus.commands[7] = COMMAND_PLAGUE;
 	_baseStatus.commands[8] = COMMAND_BURROW;
 }
 void zuDefiler::initBattleStatus(POINT pt)
@@ -99,7 +99,7 @@ void zuDefiler::initBattleStatus(POINT pt)
 	_battleStatus.clicked = false;
 	_battleStatus.curHP = _baseStatus.maxHP;
 	_battleStatus.maxHP = _baseStatus.maxHP;
-	_battleStatus.curMP = 50.0f; //업글시 62.5
+	_battleStatus.curMP = (_player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_METASYNAPTIC_NODE].complete == false) ? 50.0f : 62.5f;
 	_battleStatus.maxMP = _baseStatus.maxHP;
 
 	_battleStatus.pt.set((float)pt.x, (float)pt.y);
@@ -139,7 +139,8 @@ void zuDefiler::updateBattleStatus(void)
 {
 	Unit::updateBattleStatus();
 
-
+	_baseStatus.maxMP   = (_player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_METASYNAPTIC_NODE].complete == false) ? 200.0f : 250.0f;
+	_battleStatus.maxMP = (_player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_METASYNAPTIC_NODE].complete == false) ? 200.0f : 250.0f;
 }
 
 void zuDefiler::updateImageFrame(void)
@@ -150,5 +151,13 @@ void zuDefiler::updateImageFrame(void)
 void zuDefiler::procCommands(void)
 {
 	Unit::procCommands();
+
+	switch (_battleStatus.curCommand)
+	{
+	case COMMAND_CONSUME:
+	case COMMAND_DARKSWARM:
+	case COMMAND_PLAGUE:
+		break;
+	}
 
 }

@@ -25,13 +25,15 @@ public:
 	void moveCamera(DIRECTION dir);
 	void earthquake(float power);
 
+	bool moveable(DIRECTION dir);
+
+	void setCameraX(int x);
+	void setCameraY(int y);
 
 	//getter, setter
 	inline int getCameraX(void) { return _cameraX; }
 	inline int getCameraY(void) { return _cameraY; }
 	inline void setCameraPos(int x, int y) { _cameraX = x; _cameraY = y; }
-	inline void setCameraX(int x) { _cameraX = x; }
-	inline void setCameraY(int y) { _cameraY = y; }
 
 	inline void setMinMax(int minX, int minY, int maxX, int maxY) { _minX = minX; _minY = minY; _maxX = maxX; _maxY = maxY; }
 	inline void setMin(int x, int y) { _minX = x; _minY = y; }

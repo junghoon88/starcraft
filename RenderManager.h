@@ -117,8 +117,19 @@ public:
 	void insertImg(ZORDER zorder, image* img, int destX, int destY);
 	void insertImg(ZORDER zorder, image* img, int destX, int destY, int sourWidth, int sourHeight);
 	void insertImgCT(ZORDER zorder, image* img, int cx, int cy);
+
 	void insertImgFrame(ZORDER zorder, image* img, int destX, int destY, int currentFrameX, int currentFrameY);
-	void insertImgFrameCC(ZORDER zorder, image* img, int cx, int cy, int currentFrameX, int currentFrameY);
+	void insertImgFrameLC(ZORDER zorder, image* img, int left,  int cy,		int currentFrameX, int currentFrameY);
+	void insertImgFrameLB(ZORDER zorder, image* img, int left,  int bottom, int currentFrameX, int currentFrameY);
+
+	void insertImgFrameCT(ZORDER zorder, image* img, int cx,    int top,	int currentFrameX, int currentFrameY);
+	void insertImgFrameCC(ZORDER zorder, image* img, int cx,    int cy,     int currentFrameX, int currentFrameY);
+	void insertImgFrameCB(ZORDER zorder, image* img, int cx,    int bottom, int currentFrameX, int currentFrameY);
+
+	void insertImgFrameRT(ZORDER zorder, image* img, int right, int top,    int currentFrameX, int currentFrameY);
+	void insertImgFrameRC(ZORDER zorder, image* img, int right, int cy,     int currentFrameX, int currentFrameY);
+	void insertImgFrameRB(ZORDER zorder, image* img, int right, int bottom, int currentFrameX, int currentFrameY);
+
 	void insertImgLoop(ZORDER zorder, image* img, const LPRECT drawArea, int offsetX, int offsetY);
 	void insertImgAlpha(ZORDER zorder, image* img, int destX, int destY, BYTE alpha);
 	void insertImgAlpha(ZORDER zorder, image* img, int destX, int destY, int sourWidth, int sourHeight, BYTE alpha);

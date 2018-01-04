@@ -111,7 +111,7 @@ void zuDrone::initBaseStatus(void)
 	_baseStatus.sameGWAW = FALSE;						//지상공격, 공중공격이 같은지
 
 	_baseStatus.GWable = TRUE;							//지상공격 가능여부
-	_baseStatus.GWAttackType = ATTACKTYPE_ZERG_WORKER;	//공격타입(업그레이드에 사용)
+	_baseStatus.GWAttackType = ATTACKTYPE_ZERG_FIXED;	//공격타입(업그레이드에 사용)
 	_stprintf(_baseStatus.GWname, L"Spines");			//공격이름
 	_baseStatus.GWdamage = 5;							//공격데미지
 	_baseStatus.GWdamagePlus = 0;						//공격보너스데미지

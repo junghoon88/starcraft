@@ -72,7 +72,7 @@ void zbSunkenColony::initBaseStatus(void)
 	_baseStatus.sameGWAW = FALSE;
 
 	_baseStatus.GWable = TRUE;
-	_baseStatus.GWAttackType = ATTACKTYPE_ZERG_WORKER;	
+	_baseStatus.GWAttackType = ATTACKTYPE_ZERG_FIXED;	
 	_stprintf(_baseStatus.GWname, L"Subterranean Tentacle");
 	_baseStatus.GWdamage = 40;							
 	_baseStatus.GWdamagePlus = 0;						

@@ -71,7 +71,7 @@ void zbSporeColony::initBaseStatus(void)
 	_baseStatus.GWable = FALSE;
 
 	_baseStatus.AWable = TRUE;
-	_baseStatus.AWAttackType = ATTACKTYPE_ZERG_WORKER;
+	_baseStatus.AWAttackType = ATTACKTYPE_ZERG_FIXED;
 	_stprintf(_baseStatus.AWname, L"Seeker Spores");
 	_baseStatus.AWdamage = 15;
 	_baseStatus.AWdamagePlus = 0;

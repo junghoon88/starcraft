@@ -10,11 +10,11 @@
 #include "button.h"
 #include "progressBar.h"
 
+#include "gameInterface.h"
 
 //전방선언
 class player;
 
-#define SELECTUNIT_MAX	12
 
 enum CURSORSTATE
 {
@@ -84,6 +84,7 @@ private:
 	//마우스 커서 관련
 	BOOL				_isInInterface;					//인터페이스 영역 내에 있는지?
 	CURSORSTATE			_cursorState;					//커서 상태
+	CURSORSTATE			_beforeCursor;					//커서 상태
 	image*				_imgCursor;						//커서 이미지
 	UINT				_frameCursor;					//커서 이미지 프레임
 	FLOAT				_frameCursorTime;				//커서 이미지 프레임 경과 시간
@@ -116,19 +117,18 @@ private:
 	COMMAND				_commandSetUnit[COMMAND_MAX];	//유닛이 보유하고 있는 커맨드 9개
 
 	
-	tagSelectInfo		_selectInfo;	//마우스로 클릭한 유닛 혹은 건물의 정보
+	tagSelectInfo		_selectInfo;					//마우스로 클릭한 유닛 혹은 건물의 정보
 
-	progressBar*		_progressBar;
+	gameInterface*		_gameInterface;
 
 
-	hotkeys*			_hotkeys;		//단축키 클래스
-	miniMap*			_miniMap;		//미니맵 클래스
+	hotkeys*			_hotkeys;						//단축키 클래스
 
 	gameMap*			_gameMap;
 
 private:
-	player*			_myPlayer;
-	player*			_player[PLAYER_NUM]; //플레이어정보, sceneBattle 에서 받는다.
+	player*				_myPlayer;
+	player*				_player[PLAYER_NUM];			//플레이어정보, sceneBattle 에서 받는다.
 
 public:
 	gameController();
@@ -145,9 +145,8 @@ private:
 	void calcMouseRealPosition(void);
 	BOOL actionHotkeys(void);
 	void actionMouseMap(void);
-	void actionMouseMiniMap(void);
+	void checkMouseEdge(void);
 	void actionMouseCommandSet(int num);
-	void actionMouseImageFace(void);
 
 
 	void setImageCursor(void);
@@ -162,7 +161,6 @@ private:
 
 
 	void renderInterface(void);
-	void renderSelectInfo(void);
 	void renderCommands(void);
 
 	void renderBuildImage(void);
@@ -196,6 +194,10 @@ public:
 	inline void setLinkAdressMyPlayer(player* player) { _myPlayer = player; };
 	inline void setLinkAdressPlayers(player* player, PLAYER playerNum) { _player[playerNum] = player; }
 	inline void setLinkAdressGameMap(gameMap* map) { _gameMap = map; }
+
+	inline tagSelectInfo getSelectInfo(void) { return _selectInfo; }
+	inline gameInterface* getGameInterface(void) { return _gameInterface; }
+
 
 	//button callback function
 	inline static void cbCommandFunc0(void* obj) { gameController* gc = (gameController*)obj; gc->actionMouseCommandSet(0); }

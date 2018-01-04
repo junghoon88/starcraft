@@ -67,7 +67,7 @@ void zuHydralisk::initBaseStatus(void)
 	_baseStatus.detector = FALSE;
 
 	_baseStatus.isAir = FALSE;
-	_baseStatus.moveSpeed = 3.71f; //업글시 5.57
+	_baseStatus.moveSpeed = (_player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_METASYNAPTIC_NODE].complete == false) ? 3.71f : 5.57f;
 
 	_baseStatus.unitSize = UNITSIZE_MEDIUM;
 	_baseStatus.transportslots = 2;
@@ -85,7 +85,7 @@ void zuHydralisk::initBaseStatus(void)
 	_baseStatus.GWmaxHit = 1;
 	_baseStatus.GWdamageType = DAMAGETYPE_EXPLOSIVE;
 	_baseStatus.GWcooldown = 15.0;
-	_baseStatus.GWattackRange = 4.0f; //업글시 5
+	_baseStatus.GWattackRange = (_player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_GROOVED_SPINES].complete == false) ? 4.0f : 5.0f; //업글시 5
 
 	_baseStatus.AWable = TRUE;
 	_baseStatus.AWAttackType = ATTACKTYPE_ZERG_MISSILE;
@@ -154,6 +154,9 @@ void zuHydralisk::updateBattleStatus(void)
 {
 	Unit::updateBattleStatus();
 
+	_baseStatus.moveSpeed = (_player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_METASYNAPTIC_NODE].complete == false) ? 3.71f : 5.57f;
+	_battleStatus.moveSpeed = (_player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_METASYNAPTIC_NODE].complete == false) ? 3.71f : 5.57f;
+	_baseStatus.GWattackRange = (_player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_GROOVED_SPINES].complete == false) ? 4.0f : 5.0f; //업글시 5
 
 }
 

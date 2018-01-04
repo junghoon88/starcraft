@@ -47,6 +47,7 @@ HRESULT sceneBattle::init(void)
 	for (int i = 0; i < PLAYER_NUM; i++)
 	{
 		_player[i]->getGameController()->setLinkAdressPlayers(_player[i], (PLAYER)i);
+		_player[i]->getGameController()->getGameInterface()->setLinkAdressPlayers(_player[i], (PLAYER)i);
 	}
 
 	_selectPlayerNum = PLAYER1;

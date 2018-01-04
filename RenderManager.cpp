@@ -170,7 +170,72 @@ void RenderManager::insertImgFrame(ZORDER zorder, image* img, int destX, int des
 
 	_vRenderList[zorder].push_back(info);
 }
-void RenderManager::insertImgFrameCC(ZORDER zorder, image* img, int cx, int cy, int currentFrameX, int currentFrameY)
+
+void RenderManager::insertImgFrameLC(ZORDER zorder, image* img, int left,  int cy,		int currentFrameX, int currentFrameY)
+{
+	if (img == NULL)
+		return;
+
+	tagRenderInfo info;
+	ZeroMemory(&info, sizeof(tagRenderInfo));
+
+	int destX = left;
+	int destY = cy - (img->getFrameHeight() * 0.5f);
+
+	info.renderType = RENDER_TYPE_IMAGE_FRAME;
+	info.img = img;
+	info.destX = destX;
+	info.destY = destY;
+	info.curFrameX = currentFrameX;
+	info.curFrameY = currentFrameY;
+	info.rcShow = RectMake(destX, destY, img->getFrameWidth(), img->getFrameHeight());
+
+	_vRenderList[zorder].push_back(info);
+}
+void RenderManager::insertImgFrameLB(ZORDER zorder, image* img, int left,  int bottom,  int currentFrameX, int currentFrameY)
+{
+	if (img == NULL)
+		return;
+
+	tagRenderInfo info;
+	ZeroMemory(&info, sizeof(tagRenderInfo));
+
+	int destX = left;
+	int destY = bottom - img->getFrameHeight();
+
+	info.renderType = RENDER_TYPE_IMAGE_FRAME;
+	info.img = img;
+	info.destX = destX;
+	info.destY = destY;
+	info.curFrameX = currentFrameX;
+	info.curFrameY = currentFrameY;
+	info.rcShow = RectMake(destX, destY, img->getFrameWidth(), img->getFrameHeight());
+
+	_vRenderList[zorder].push_back(info);
+}
+
+void RenderManager::insertImgFrameCT(ZORDER zorder, image* img, int cx,    int top,		int currentFrameX, int currentFrameY)
+{
+	if (img == NULL)
+		return;
+
+	tagRenderInfo info;
+	ZeroMemory(&info, sizeof(tagRenderInfo));
+
+	int destX = cx - (img->getFrameWidth()  * 0.5f);
+	int destY = top;
+
+	info.renderType = RENDER_TYPE_IMAGE_FRAME;
+	info.img = img;
+	info.destX = destX;
+	info.destY = destY;
+	info.curFrameX = currentFrameX;
+	info.curFrameY = currentFrameY;
+	info.rcShow = RectMake(destX, destY, img->getFrameWidth(), img->getFrameHeight());
+
+	_vRenderList[zorder].push_back(info);
+}
+void RenderManager::insertImgFrameCC(ZORDER zorder, image* img, int cx,    int cy,      int currentFrameX, int currentFrameY)
 {
 	if (img == NULL)
 		return;
@@ -191,6 +256,93 @@ void RenderManager::insertImgFrameCC(ZORDER zorder, image* img, int cx, int cy, 
 
 	_vRenderList[zorder].push_back(info);
 }
+void RenderManager::insertImgFrameCB(ZORDER zorder, image* img, int cx,    int bottom,	int currentFrameX, int currentFrameY)
+{
+	if (img == NULL)
+		return;
+
+	tagRenderInfo info;
+	ZeroMemory(&info, sizeof(tagRenderInfo));
+
+	int destX = cx - (img->getFrameWidth()  * 0.5f);
+	int destY = bottom - img->getFrameHeight();
+
+	info.renderType = RENDER_TYPE_IMAGE_FRAME;
+	info.img = img;
+	info.destX = destX;
+	info.destY = destY;
+	info.curFrameX = currentFrameX;
+	info.curFrameY = currentFrameY;
+	info.rcShow = RectMake(destX, destY, img->getFrameWidth(), img->getFrameHeight());
+
+	_vRenderList[zorder].push_back(info);
+}
+
+void RenderManager::insertImgFrameRT(ZORDER zorder, image* img, int right, int top,     int currentFrameX, int currentFrameY)
+{
+	if (img == NULL)
+		return;
+
+	tagRenderInfo info;
+	ZeroMemory(&info, sizeof(tagRenderInfo));
+
+	int destX = right - img->getFrameWidth();
+	int destY = top;
+
+	info.renderType = RENDER_TYPE_IMAGE_FRAME;
+	info.img = img;
+	info.destX = destX;
+	info.destY = destY;
+	info.curFrameX = currentFrameX;
+	info.curFrameY = currentFrameY;
+	info.rcShow = RectMake(destX, destY, img->getFrameWidth(), img->getFrameHeight());
+
+	_vRenderList[zorder].push_back(info);
+}
+void RenderManager::insertImgFrameRC(ZORDER zorder, image* img, int right, int cy,		int currentFrameX, int currentFrameY)
+{
+	if (img == NULL)
+		return;
+
+	tagRenderInfo info;
+	ZeroMemory(&info, sizeof(tagRenderInfo));
+
+	int destX = right - img->getFrameWidth();
+	int destY = cy - (img->getFrameHeight() * 0.5f);
+
+	info.renderType = RENDER_TYPE_IMAGE_FRAME;
+	info.img = img;
+	info.destX = destX;
+	info.destY = destY;
+	info.curFrameX = currentFrameX;
+	info.curFrameY = currentFrameY;
+	info.rcShow = RectMake(destX, destY, img->getFrameWidth(), img->getFrameHeight());
+
+	_vRenderList[zorder].push_back(info);
+}
+void RenderManager::insertImgFrameRB(ZORDER zorder, image* img, int right, int bottom,  int currentFrameX, int currentFrameY)
+{
+	if (img == NULL)
+		return;
+
+	tagRenderInfo info;
+	ZeroMemory(&info, sizeof(tagRenderInfo));
+
+	int destX = right - img->getFrameWidth();
+	int destY = bottom - img->getFrameHeight();
+
+	info.renderType = RENDER_TYPE_IMAGE_FRAME;
+	info.img = img;
+	info.destX = destX;
+	info.destY = destY;
+	info.curFrameX = currentFrameX;
+	info.curFrameY = currentFrameY;
+	info.rcShow = RectMake(destX, destY, img->getFrameWidth(), img->getFrameHeight());
+
+	_vRenderList[zorder].push_back(info);
+}
+
+
 void RenderManager::insertImgLoop(ZORDER zorder, image* img, const LPRECT drawArea, int offsetX, int offsetY)
 {
 	if (img == NULL)

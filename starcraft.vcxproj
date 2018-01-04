@@ -88,6 +88,8 @@
     <ClInclude Include="camera.h" />
     <ClInclude Include="collision.h" />
     <ClInclude Include="commonMacroFunction.h" />
+    <ClInclude Include="creepAstar.h" />
+    <ClInclude Include="creepManager.h" />
     <ClInclude Include="database.h" />
     <ClInclude Include="editbox.h" />
     <ClInclude Include="editboxManager.h" />
@@ -180,6 +182,8 @@
     <ClCompile Include="button.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="collision.cpp" />
+    <ClCompile Include="creepAstar.cpp" />
+    <ClCompile Include="creepManager.cpp" />
     <ClCompile Include="database.cpp" />
     <ClCompile Include="editbox.cpp" />
     <ClCompile Include="editboxManager.cpp" />

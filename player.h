@@ -14,6 +14,8 @@
 
 #include "gameController.h"
 
+#include "creepManager.h"
+
 class player : public gameNode
 {
 private:
@@ -34,6 +36,8 @@ private:
 	vBuildings						_vBuildings;			//플레이어가 가지고 있는 건물들
 	vBuildings						_vBuildingsInCamera;	//카메라에 보여주는 건물들
 
+	BOOL							_unitBusy;
+	BOOL							_buildingBusy;
 
 
 	//플레이어 정보
@@ -45,19 +49,27 @@ private:
 	zergUpgrade*					_zergUpgrade;
 	zergProductionInfo*				_zergProductionInfo;
 
+	vector<UPGRADE_ZERG>			_vZergUpgradeComplete;
+	vector<EVOLUTION_ZERG>			_vZergEvolutionComplete;
+
+
 	//맵정보
 	gameMap*						_gameMap;				//게임맵(타일정보) -> sceneBattle 에서 링크로 받는다.
 	fog*							_fog;					//안개
+	creepManager*					_creepManager;
 
 	//A*
 	aStar*							_aStar;					//길찾기 A* 알고리즘
 	HANDLE							_hAstarThread;
-	HANDLE							_hControllerThread;
+	HANDLE							_hCreepThread;
+	HANDLE							_hCollisionThread;
+
 	BOOL							_endThread;
 
 	//interface
 	gameController*					_gameController;
-	
+
+
 
 public:
 	player();
@@ -79,11 +91,15 @@ public:
 	void checkUnitValid(void);
 	void checkBuildingVaild(void);
 
+	void addUnit(Unit* unit);
+	void addBuilding(Building* building);
 
 
 
 private:
 	void checkInCamera(void);
+	void calcResource(void);
+	void updateZergUpgrade(void);
 
 public:
 	inline void setLinkAdressGamemap(gameMap* map) { _gameMap = map; }
@@ -97,14 +113,16 @@ public:
 	inline UINT	getShowGas(void)		{ return _showGas; }
 
 
-	inline void addUnit(Unit* unit) { _vUnits.push_back(unit); }
-	inline void addBuilding(Building* building) { _vBuildings.push_back(building); }
-
 
 	inline vUnits		getUnits(void) { return _vUnits; }
 	inline vUnits		getUnitsInCamera(void)		{ return _vUnitsInCamera; }
 	inline vBuildings	getBuildings(void)			{ return _vBuildings; }
 	inline vBuildings	getBuildingsInCamera(void)	{ return _vBuildingsInCamera; }
+
+	inline BOOL getUnitBusy(void) { return _unitBusy; }
+	inline BOOL getBuildingBusy(void) { return _buildingBusy; }
+
+
 
 	inline PLAYER getPlayerNum(void) { return _playerNum; }
 
@@ -112,7 +130,13 @@ public:
 
 
 	inline zergUpgrade* getZergUpgrade(void) { return _zergUpgrade; }
+	inline void addZergUpgradeComplete(UPGRADE_ZERG upgrade)		{ _vZergUpgradeComplete.push_back(upgrade); }
+	inline void addZergEvolutionComplete(EVOLUTION_ZERG evolution)	{ _vZergEvolutionComplete.push_back(evolution); }
+
+
+
 	inline fog* getFog(void) { return _fog; }
+	inline creepManager* getCreepManager(void) { return _creepManager; }
 
 	
 	inline aStar* getAstar(void) { return _aStar; }
@@ -124,7 +148,8 @@ public:
 
 public:
 	friend unsigned CALLBACK AstarThread(void* pArguments);
-	friend unsigned CALLBACK ControllerThread(void* pArguments);
+	friend unsigned CALLBACK CreepThread(void* pArguments);
+	friend unsigned CALLBACK CollisionThread(void* pArguments);
 
 };
 

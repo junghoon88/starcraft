@@ -203,7 +203,6 @@ void zuZergEgg::initProcessing(void)
 
 void zuZergEgg::release(void)
 {
-	SAFE_RELEASEDELETE(_nextUnit);
 	
 }
 
@@ -269,6 +268,8 @@ void zuZergEgg::updateImageFrame(void)
 			}
 			else
 			{
+				_nextUnit->init(_battleStatus.pt.toPoint());
+
 				_player->addUnit(_nextUnit);
 
 				_nextObject = _nextUnit;
@@ -300,6 +301,7 @@ void zuZergEgg::procCommands(void)
 {
 	if (_battleStatus.curCommand == COMMAND_ESC)
 	{
+		//SAFE_RELEASEDELETE(_nextUnit);
 
 	}
 	else

@@ -60,8 +60,8 @@ void zuQueen::initBaseStatus(void)
 	_baseStatus.useSH = FALSE;
 	_baseStatus.maxSH = 0.0f;
 
-	_baseStatus.useMP = FALSE;
-	_baseStatus.maxMP = 0.0f;
+	_baseStatus.useMP = TRUE;
+	_baseStatus.maxMP = (_player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_GAMETE_MEIOSIS].complete == false) ? 200.0f : 250.0f;
 
 	_baseStatus.sight = 10.0f;
 	_baseStatus.detector = FALSE;
@@ -99,6 +99,8 @@ void zuQueen::initBattleStatus(POINT pt)
 	_battleStatus.clicked = false;
 	_battleStatus.curHP = _baseStatus.maxHP;
 	_battleStatus.maxHP = _baseStatus.maxHP;
+	_battleStatus.curMP = (_player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_GAMETE_MEIOSIS].complete == false) ? 50.0f : 62.5f;
+	_battleStatus.maxMP = _baseStatus.maxMP;
 
 	_battleStatus.pt.set((float)pt.x, (float)pt.y);
 	_battleStatus.moveSpeed = _baseStatus.moveSpeed;
@@ -137,6 +139,8 @@ void zuQueen::updateBattleStatus(void)
 {
 	Unit::updateBattleStatus();
 
+	_baseStatus.maxMP = (_player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_GAMETE_MEIOSIS].complete == false) ? 200.0f : 250.0f;
+	_battleStatus.maxMP = (_player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_GAMETE_MEIOSIS].complete == false) ? 200.0f : 250.0f;
 
 }
 

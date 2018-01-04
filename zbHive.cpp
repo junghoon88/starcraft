@@ -47,6 +47,8 @@ void zbHive::initBaseStatus(void)
 	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZB-hive-Stat1");
 	_baseStatus.imgStat2 = NULL;
 
+	_baseStatus.publicControl = 1.0f;
+
 	_baseStatus.maxHP = 2500.0f;
 
 	_baseStatus.useSH = FALSE;
@@ -98,6 +100,9 @@ void zbHive::update(void)
 {
 	Building::update();
 
+	larvaValidCheck();
+	responeLarva();
+
 }
 
 void zbHive::render(int imgOffsetX, int imgOffsetY)
@@ -106,6 +111,88 @@ void zbHive::render(int imgOffsetX, int imgOffsetY)
 	Building::render(imgOffset.x * TILESIZE, imgOffset.y * TILESIZE);
 
 }
+
+void zbHive::larvaValidCheck(void)
+{
+	for (int i = 0; i < _vLarva.size(); i++)
+	{
+		if (_vLarva[i]->getValid() == false)
+		{
+			//여기서 delete는 하지 않는다.
+			_vLarva.erase(_vLarva.begin() + i);
+		}
+	}
+}
+
+void zbHive::responeLarva(void)
+{
+	if (_vLarva.size() == LARVA_MAX)
+	{
+		_larvaResponeTime = 0.0f;
+		return;
+	}
+
+	_larvaResponeTime += TIMEMANAGER->getElapsedTime() * BUILDSPEEDMULTIPLY * 0.1f;
+
+	float time = _player->getZergProductionInfo()->getZUProductionInfo(UNITNUM_ZERG_LARVA).buildTime;
+
+	if (_larvaResponeTime >= time)
+	{
+		_larvaResponeTime -= time;
+
+		if (_vLarva.size() == 0)
+		{
+			POINT larvaSize = UNITSIZE_ZERG_LARVA;
+			POINT pt;
+			pt.x = _battleStatus.rcBody.left + larvaSize.x * 0.5f;
+			pt.y = _battleStatus.rcBody.bottom + larvaSize.y * 0.5f;
+
+			createLarva(pt);
+			return;
+		}
+		else
+		{
+			for (int i = 0; i < LARVA_MAX; i++)
+			{
+				POINT larvaSize = UNITSIZE_ZERG_LARVA;
+				POINT pt;
+				pt.x = _battleStatus.rcBody.left + larvaSize.x * (i + 0.5f);
+				pt.y = _battleStatus.rcBody.bottom + larvaSize.y * 0.5f;
+
+				//겹치는지 확인하고 
+				bool overlap = false;
+				for (int j = 0; j < _vLarva.size(); j++)
+				{
+					RECT rcBody = _vLarva[j]->getBattleStatus().rcBody;
+					if (PtInRect(&rcBody, pt))
+					{
+						overlap = true;
+						break;
+					}
+				}
+				//겹치지 않았으면 생성
+				if (overlap == false)
+				{
+					createLarva(pt);
+					return;
+				}
+			}
+		}
+	}
+}
+
+void zbHive::createLarva(POINT pt)
+{
+	zuLarva* larva = new zuLarva(_playerNum);
+	larva->setLinkAdressZergUpgrade(_zergUpgrade);
+	larva->setLinkAdressAstar(_aStar);
+	larva->setLinkAdressPlayer(_player);
+	larva->init(pt);
+
+	_player->addUnit(larva);
+	_vLarva.push_back(larva);
+}
+
 
 void zbHive::updateBattleStatus(void)
 {

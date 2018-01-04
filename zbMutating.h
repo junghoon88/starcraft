@@ -16,6 +16,7 @@ private:
 	FLOAT					_buildHP;
 
 	vector<zuLarva*>		_vLarva;
+	FLOAT					_larvaResponeTime;
 
 
 
@@ -24,6 +25,11 @@ private:
 	void initBaseStatus(void);
 	void initBattleStatus(POINT ptTile);
 	void initProcessing(void);
+
+	void larvaValidCheck(void);
+	void responeLarva(void);
+	void createLarva(POINT pt);
+
 
 	//상속받은 가상함수
 	void updateBattleStatus(void);
@@ -49,7 +55,10 @@ public:
 
 
 public:
-	inline vector<zuLarva*> getLarvas(void) { return _vLarva; }
+	inline vector<zuLarva*> getLarvas(void)				{ larvaValidCheck();	return _vLarva; }
+	inline void setLarvas(vector<zuLarva*> larvas)		{ _vLarva = larvas; }
+	inline FLOAT getLarvaResponeTime(void)				{ return _larvaResponeTime; }
+	inline void setLarvaResponeTime(FLOAT time)			{ _larvaResponeTime = time; }
 
 };
 

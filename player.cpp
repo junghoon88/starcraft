@@ -8,18 +8,21 @@ unsigned CALLBACK AstarThread(void* pArguments)
 	UINT num = 0;
 
 	player* p = (player*)pArguments;
-	vUnits units = p->getUnits();
 
 	while (1)
 	{
-		Sleep(10);
+		Sleep(1);
+
+		vUnits units = p->getUnits();
+
 
 		if (p->getEndThread())
-		{
 			break;
-		}
 
 		if (p->getAstar() == NULL)
+			continue;
+
+		if (p->getUnitBusy())
 			continue;
 
 		if (units.size() == 0)
@@ -61,11 +64,27 @@ unsigned CALLBACK AstarThread(void* pArguments)
 	return 0;
 }
 
-#if 0
-unsigned CALLBACK ControllerThread(void* pArguments)
+unsigned CALLBACK CreepThread(void* pArguments)
 {
 	player* p = (player*)pArguments;
-	vUnits units = p->getUnits();
+
+	while (1)
+	{
+		Sleep(500);
+
+		if (p->getEndThread())
+		{
+			break;
+		}
+
+		p->getCreepManager()->update();
+	}
+
+	return 0;
+}
+unsigned CALLBACK CollisionThread(void* pArguments)
+{
+	player* p = (player*)pArguments;
 
 	while (1)
 	{
@@ -75,21 +94,15 @@ unsigned CALLBACK ControllerThread(void* pArguments)
 		{
 			break;
 		}
-
-
-		if (p->getGameController() == NULL)
-			continue;
-
-		p->getGameController()->update();
-		//p->getGameController()->render();
-
 	}
+
 	return 0;
 }
-#endif
+
+
 
 player::player()
-	: _zergUpgrade(NULL), _gameMap(NULL), _fog(NULL), _aStar(NULL), _gameController(NULL)
+	: _zergUpgrade(NULL), _gameMap(NULL), _fog(NULL), _creepManager(NULL), _aStar(NULL), _gameController(NULL)
 {
 }
 
@@ -106,6 +119,10 @@ HRESULT player::init(PLAYER playerNum, RACES races)
 
 	_myControl = _myControlMax = 0;
 
+	_unitBusy = false;
+	_buildingBusy = false;
+
+
 	_playerNum = playerNum;
 	_races = races;
 
@@ -115,6 +132,10 @@ HRESULT player::init(PLAYER playerNum, RACES races)
 
 	_fog = new fog;
 	_fog->init();
+
+	_creepManager = new creepManager;
+	_creepManager->init(_gameMap);
+
 
 	_aStar = new aStar;
 	_aStar->setLinkAdressGameMap(_gameMap);
@@ -126,24 +147,28 @@ HRESULT player::init(PLAYER playerNum, RACES races)
 	_gameController->setLinkAdressGameMap(_gameMap);
 
 
-	unsigned int threadId = 0;
-	_hAstarThread = (HANDLE)_beginthreadex(NULL, 0, &AstarThread, this, 0, &threadId);
-	//_hControllerThread = (HANDLE)_beginthreadex(NULL, 0, &ControllerThread, this, 0, &threadId);
-	_endThread = FALSE;
-
-
-
 	//debug
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 13; i++)
 	{
 		zuDrone* drone = new zuDrone(_playerNum);
 		drone->setLinkAdressZergUpgrade(_zergUpgrade);
 		drone->setLinkAdressAstar(_aStar);
 		drone->setLinkAdressPlayer(this);
 		drone->init({ 200, 200 });
-		_vUnits.push_back(drone);
 
+		addUnit(drone);
 	}
+
+
+	unsigned int threadId = 0;
+	_hAstarThread		= (HANDLE)_beginthreadex(NULL, 0, &AstarThread, this, 0, &threadId);
+	_hCreepThread		= (HANDLE)_beginthreadex(NULL, 0, &CreepThread, this, 0, &threadId);
+	_hCollisionThread	= (HANDLE)_beginthreadex(NULL, 0, &CollisionThread, this, 0, &threadId);
+
+	_endThread = FALSE;
+
+
+
 
 
 
@@ -157,10 +182,11 @@ void player::release(void)
 	WaitForSingleObject(_hAstarThread, INFINITE);
 	CloseHandle(_hAstarThread);
 
-	//WaitForSingleObject(_hControllerThread, INFINITE);
-	//CloseHandle(_hControllerThread);
+	WaitForSingleObject(_hCreepThread, INFINITE);
+	CloseHandle(_hCreepThread);
 
-
+	WaitForSingleObject(_hCollisionThread, INFINITE);
+	CloseHandle(_hCollisionThread);
 
 	for (UINT i = 0; i < _vUnits.size(); i++)
 	{
@@ -174,6 +200,7 @@ void player::release(void)
 
 
 	SAFE_RELEASEDELETE(_fog);
+	SAFE_DELETE(_creepManager);
 
 	SAFE_RELEASEDELETE(_aStar);
 	SAFE_RELEASEDELETE(_gameController);
@@ -187,6 +214,8 @@ void player::update(void)
 	checkUnitValid();
 	checkBuildingVaild();
 
+	updateZergUpgrade();
+
 	for (UINT i = 0; i < _vUnits.size(); i++)
 	{
 		_vUnits[i]->update();
@@ -197,42 +226,7 @@ void player::update(void)
 		_vBuildings[i]->update();
 	}
 
-
-	if (_showMineral > _myMineral)
-	{
-		UINT delta = _showMineral - _myMineral;
-		delta = delta * 0.1f + 1;
-		_showMineral -= delta;
-	}
-	else if (_showMineral < _myMineral)
-	{
-		UINT delta = _myMineral - _showMineral;
-		delta = delta * 0.1f + 1;
-		_showMineral += delta;
-	}
-
-	if (_showGas > _myGas)
-	{
-		UINT delta = _showGas - _myGas;
-		delta = delta * 0.1f + 1;
-		_showGas -= delta;
-	}
-	else if (_showGas < _myGas)
-	{
-		UINT delta = _myGas - _showGas;
-		delta = delta * 0.1f + 1;
-		_showGas += delta;
-	}
-
-	if (_vBuildings.size() > 10)
-	{
-		printf("");
-	}
-	if (_vBuildingsInCamera.size() > 10)
-	{
-		printf("");
-	}
-
+	calcResource();
 
 	checkInCamera();
 
@@ -280,6 +274,146 @@ void player::checkInCamera(void)
 		}
 	}
 }
+
+void player::calcResource(void)
+{
+	if (_showMineral > _myMineral)
+	{
+		UINT delta = _showMineral - _myMineral;
+		delta = delta * 0.1f + 1;
+		_showMineral -= delta;
+	}
+	else if (_showMineral < _myMineral)
+	{
+		UINT delta = _myMineral - _showMineral;
+		delta = delta * 0.1f + 1;
+		_showMineral += delta;
+	}
+
+	if (_showGas > _myGas)
+	{
+		UINT delta = _showGas - _myGas;
+		delta = delta * 0.1f + 1;
+		_showGas -= delta;
+	}
+	else if (_showGas < _myGas)
+	{
+		UINT delta = _myGas - _showGas;
+		delta = delta * 0.1f + 1;
+		_showGas += delta;
+	}
+}
+
+void player::updateZergUpgrade(void)
+{
+	for (int i = 0; i < _vZergUpgradeComplete.size(); i++)
+	{
+		_zergUpgrade->upgradeComplete(_vZergUpgradeComplete[i]);
+
+		switch (_vZergUpgradeComplete[i])
+		{
+			case UPGRADE_ZERG_MELEEATTACKS:		//저그 지상유닛 근접 공격
+			case UPGRADE_ZERG_MISSILEATTACKS:	//저그 지상유닛 원거리 공격
+			case UPGRADE_ZERG_CARAPACE:			//저그 지상유닛 방어력
+				for (int j = 0; j < _vUnits.size(); j++)
+				{
+					if (_vUnits[j]->getBaseStatus().isAir == TRUE) continue;
+
+					_vUnits[j]->updateBattleStatus();
+				}
+			break;
+
+			case UPGRADE_ZERG_FLYERATTACKS:		//저그 공중유닛 공격
+			case UPGRADE_ZERG_FLYERCARAPACE:		//저그 공중유닛 방어력
+				for (int j = 0; j < _vUnits.size(); j++)
+				{
+					if (_vUnits[j]->getBaseStatus().isAir == FALSE) continue;
+
+					_vUnits[j]->updateBattleStatus();
+				}
+			break;
+		}
+
+		_vZergUpgradeComplete.erase(_vZergUpgradeComplete.begin() + i);
+	}
+
+	for (int i = 0; i < _vZergEvolutionComplete.size(); i++)
+	{
+		_zergUpgrade->evolutionComplete(_vZergEvolutionComplete[i]);
+
+		switch (_vZergEvolutionComplete[i])
+		{
+			//case EVOLUTION_ZERG_BURROW:					//저그 버러우 업글
+			case EVOLUTION_ZERG_METABOLICK_BOOST:			//저글링 이속업
+			case EVOLUTION_ZERG_ADRENAL_GLANDS:				//저글링 아드레날린
+				for (int j = 0; j < _vUnits.size(); j++)
+				{
+					if (_vUnits[j]->getUnitnumZerg() != UNITNUM_ZERG_ZERGLING) continue;
+
+					_vUnits[j]->updateBattleStatus();
+				}
+			break;
+
+			//case EVOLUTION_ZERG_VECTRAL_SACS:				//오버로드 수송업
+			case EVOLUTION_ZERG_ANTENNAE:					//오버로드 시야업
+			case EVOLUTION_ZERG_PNEUMATIZED_CARAPACE:		//오버로드 이속업
+				for (int j = 0; j < _vUnits.size(); j++)
+				{
+					if (_vUnits[j]->getUnitnumZerg() != UNITNUM_ZERG_OVERLORD) continue;
+
+					_vUnits[j]->updateBattleStatus();
+				}
+			break;
+
+			case EVOLUTION_ZERG_MUSCULAR_AUGMENTS:			//히드라 이속업
+			case EVOLUTION_ZERG_GROOVED_SPINES:				//히드라 사정거리업
+			//case EVOLUTION_ZERG_LURKER_ASPECT:			//럴커 업글
+				for (int j = 0; j < _vUnits.size(); j++)
+				{
+					if (_vUnits[j]->getUnitnumZerg() != UNITNUM_ZERG_OVERLORD) continue;
+
+					_vUnits[j]->updateBattleStatus();
+				}
+			break;
+			
+			//case EVOLUTION_ZERG_SPAWN_BROODLING:			//퀸 브루드링 업글
+			//case EVOLUTION_ZERG_ENSNARE:					//퀸 인스테어 업글
+			case EVOLUTION_ZERG_GAMETE_MEIOSIS:				//퀸 마나업
+				for (int j = 0; j < _vUnits.size(); j++)
+				{
+					if (_vUnits[j]->getUnitnumZerg() != UNITNUM_ZERG_QUEEN) continue;
+
+					_vUnits[j]->updateBattleStatus();
+				}
+			break;
+
+			case EVOLUTION_ZERG_ANABOLIC_SYNTHESIS:			//울트라 이속업
+			case EVOLUTION_ZERG_CHITINOUS_PLATING:			//울트라 방업(+2)
+				for (int j = 0; j < _vUnits.size(); j++)
+				{
+					if (_vUnits[j]->getUnitnumZerg() != UNITNUM_ZERG_ULTRALISK) continue;
+
+					_vUnits[j]->updateBattleStatus();
+				}
+			break;
+
+			//case EVOLUTION_ZERG_PLAGUE:						//디파일러 플레이그
+			//case EVOLUTION_ZERG_CONSUME:					//디파일러 컨슘
+			case EVOLUTION_ZERG_METASYNAPTIC_NODE:			//디파일러 마나업
+				for (int j = 0; j < _vUnits.size(); j++)
+				{
+					if (_vUnits[j]->getUnitnumZerg() != UNITNUM_ZERG_DEFILER) continue;
+
+					_vUnits[j]->updateBattleStatus();
+				}
+			break;
+		}
+
+		_vZergEvolutionComplete.erase(_vZergEvolutionComplete.begin() + i);
+	}
+}
+
+
 
 bool player::isHaveBuilding(BUILDINGNUM_ZERG num)
 {
@@ -351,25 +485,111 @@ bool player::useResource(UINT mineral, UINT gas, float control)
 
 void player::checkUnitValid(void)
 {
+	_unitBusy = true;
 	for (int i = 0; i < _vUnits.size(); )
 	{
 		if (_vUnits[i]->getValid() == false)
 		{
-			_gameController->changeSelectInfoToNextObect(_vUnits[i]);
-			_vUnits.erase(_vUnits.begin() + i);
+
+			if (_vUnits[i]->getIsBusy() == false)
+			{
+				_myControl		-= _vUnits[i]->getBaseStatus().unitControl;
+				_myControlMax	-= _vUnits[i]->getBaseStatus().publicControl;
+
+				_gameController->changeSelectInfoToNextObect(_vUnits[i]);
+				SAFE_RELEASEDELETE(_vUnits[i]);
+				_vUnits.erase(_vUnits.begin() + i);
+			}
+
+
 		}
 		else ++i;
 	}
+	_unitBusy = false;
 }
+
 void player::checkBuildingVaild(void)
 {
 	for (int i = 0; i < _vBuildings.size(); )
 	{
 		if (_vBuildings[i]->getValid() == false)
 		{
+			//크립 제거 추가
+			BUILDINGNUM_ZERG buildingNum = _vBuildings[i]->getBuildingNumZerg();
+			
+			if (buildingNum == BUILDINGNUM_ZERG_HATCHERY
+				|| buildingNum == BUILDINGNUM_ZERG_LAIR
+				|| buildingNum == BUILDINGNUM_ZERG_HIVE)
+			{
+				if (_vBuildings[i]->getNextObject() == NULL)
+				{
+					_creepManager->deleteCreep(_vBuildings[i]->getBattleStatus().ptTile, BUILDSIZE_HATCHERY);
+				}
+				else
+				{
+					if (_vBuildings[i]->getBattleStatus().curHP < 1.0f)
+					{
+						_creepManager->deleteCreep(_vBuildings[i]->getBattleStatus().ptTile, BUILDSIZE_HATCHERY);
+					}
+				}
+			}
+			else if (buildingNum == BUILDINGNUM_ZERG_CREEPCOLONY
+					|| buildingNum == BUILDINGNUM_ZERG_SUNKENCOLONY
+					|| buildingNum == BUILDINGNUM_ZERG_SPORECOLONY)
+			{
+				if (_vBuildings[i]->getNextObject() == NULL)
+				{
+					_creepManager->deleteCreep(_vBuildings[i]->getBattleStatus().ptTile, BUILDSIZE_CREEPCOLONY);
+				}
+				else
+				{
+					if (_vBuildings[i]->getBattleStatus().curHP < 1.0f)
+					{
+						_creepManager->deleteCreep(_vBuildings[i]->getBattleStatus().ptTile, BUILDSIZE_CREEPCOLONY);
+					}
+				}
+			}
+			//~크립 제거 추가
+
+			//인구수 업데이트
+			_myControlMax -= _vBuildings[i]->getBaseStatus().publicControl;
+
+			//선택된 오브젝트면 다음 오브젝트로 바꾸고
 			_gameController->changeSelectInfoToNextObect(_vBuildings[i]);
+
+			//삭제 
 			_vBuildings.erase(_vBuildings.begin() + i);
 		}
 		else ++i;
 	}
+}
+
+void player::addUnit(Unit* unit)
+{
+	_myControl += unit->getBaseStatus().unitControl;
+	_myControlMax += unit->getBaseStatus().publicControl;
+
+	_vUnits.push_back(unit); 
+}
+
+void player::addBuilding(Building* building)
+{
+	BUILDINGNUM_ZERG buildingNum = building->getBuildingNumZerg();
+	if (buildingNum == BUILDINGNUM_ZERG_HATCHERY
+		|| buildingNum == BUILDINGNUM_ZERG_LAIR
+		|| buildingNum == BUILDINGNUM_ZERG_HIVE)
+	{
+		_creepManager->addCreep(building->getBattleStatus().ptTile, BUILDSIZE_HATCHERY);
+	}
+	else if (buildingNum == BUILDINGNUM_ZERG_CREEPCOLONY
+		|| buildingNum == BUILDINGNUM_ZERG_SUNKENCOLONY
+		|| buildingNum == BUILDINGNUM_ZERG_SPORECOLONY)
+	{
+		_creepManager->addCreep(building->getBattleStatus().ptTile, BUILDSIZE_CREEPCOLONY);
+	}
+
+	_myControlMax += building->getBaseStatus().publicControl;
+
+
+	_vBuildings.push_back(building);
 }

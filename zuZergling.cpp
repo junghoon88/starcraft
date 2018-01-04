@@ -19,8 +19,6 @@ zuZergling::zuZergling(PLAYER playerNum)
 
 	//유닛 고유 번호
 	_unitNumZ = UNITNUM_ZERG_ZERGLING;
-
-	
 }
 
 
@@ -69,7 +67,7 @@ void zuZergling::initBaseStatus(void)
 	_baseStatus.detector = FALSE;				
 
 	_baseStatus.isAir = FALSE;					
-	_baseStatus.moveSpeed = 5.57f; //업글시 8.36
+	_baseStatus.moveSpeed = (_player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_METABOLICK_BOOST].complete == false) ? 5.57f : 8.36f;
 
 	_baseStatus.unitSize = UNITSIZE_SMALL;		
 	_baseStatus.transportslots = 1;				
@@ -86,7 +84,7 @@ void zuZergling::initBaseStatus(void)
 	_baseStatus.GWdamagePlus = 1;						
 	_baseStatus.GWmaxHit = 1;							
 	_baseStatus.GWdamageType = DAMAGETYPE_NORMAL;		
-	_baseStatus.GWcooldown = 8.0; //업글시 6					
+	_baseStatus.GWcooldown = (_player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_ADRENAL_GLANDS].complete == false) ? 8.0f : 6.0f; //업글시 6					
 	_baseStatus.GWattackRange = 1.0f;					
 
 	_baseStatus.AWable = FALSE;							
@@ -147,6 +145,9 @@ void zuZergling::updateBattleStatus(void)
 {
 	Unit::updateBattleStatus();
 
+	_baseStatus.moveSpeed = (_player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_METABOLICK_BOOST].complete == false) ? 5.57f : 8.36f;
+	_battleStatus.moveSpeed = (_player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_METABOLICK_BOOST].complete == false) ? 5.57f : 8.36f;
+	_baseStatus.GWcooldown = (_player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_ADRENAL_GLANDS].complete == false) ? 8.0f : 6.0f; //업글시 6					
 
 }
 

@@ -101,12 +101,8 @@ void sceneInit::initImageMaptoolTiles(void)
 	_loading->loadFrameImage(L"maptool-terrain-HighDirt-RU", L"image/maptool/tiles/terrain-HighDirt/RU2x2.bmp", TILESIZE * 2, TILESIZE * 2, 2, 2);
 
 	//terrain-Water
-	for (int i = 0; i < 1; i++)
-	{
-		_stprintf(strKey, L"maptool-terrain-Water-%02d", i);
-		_stprintf(strFile, L"image/maptool/tiles/terrain-Water/%02d.bmp", i);
-		_loading->loadFrameImage(strKey, strFile, TILESIZE, TILESIZE, 1, 1);
-	}
+
+
 
 	//icon
 	_loading->loadImage(L"maptool-icon-Mineral",	L"image/maptool/iconMineral.bmp",		TILESIZE, TILESIZE);
@@ -130,6 +126,8 @@ void sceneInit::initImageGamemapTiles(void)
 	TCHAR strFile[128] = L"";
 
 	_loading->loadImage(L"gamemap-fog", L"image/gamemap/fog.bmp", TILESIZE, TILESIZE, false, RGB(0, 0, 0), true);
+
+	_loading->loadFrameImage(L"gamemap-creep", L"image/gamemap/creep.bmp", 768, 640, 24, 20);
 
 
 }
@@ -170,7 +168,24 @@ void sceneInit::initImageInterface(void)
 	_loading->loadImage(L"interfaceT", L"image/interface/interface-T.bmp", WINSIZEX, WINSIZEY, true, RGB(255, 0, 255));
 	_loading->loadImage(L"interfaceP", L"image/interface/interface-P.bmp", WINSIZEX, WINSIZEY, true, RGB(255, 0, 255));
 
-	
+	//weapon
+	_loading->loadFrameImage(L"iconWeapon-atkBroodring",	L"image/interface/iconWeapon/atkBroodring.bmp",		ICONWEAPON_WIDTH * 4, ICONWEAPON_HEIGHT, 4, 1);
+	_loading->loadFrameImage(L"iconWeapon-atkDrone",		L"image/interface/iconWeapon/atkDrone.bmp",			ICONWEAPON_WIDTH * 1, ICONWEAPON_HEIGHT, 1, 1);
+	_loading->loadFrameImage(L"iconWeapon-atkGuadian",		L"image/interface/iconWeapon/atkGuadian.bmp",		ICONWEAPON_WIDTH * 4, ICONWEAPON_HEIGHT, 4, 1);
+	_loading->loadFrameImage(L"iconWeapon-atkHydralisk",	L"image/interface/iconWeapon/atkHydralisk.bmp",		ICONWEAPON_WIDTH * 4, ICONWEAPON_HEIGHT, 4, 1);
+	_loading->loadFrameImage(L"iconWeapon-atkInfest",		L"image/interface/iconWeapon/atkInfest.bmp",		ICONWEAPON_WIDTH * 1, ICONWEAPON_HEIGHT, 1, 1);
+	_loading->loadFrameImage(L"iconWeapon-atkLurker",		L"image/interface/iconWeapon/atkLurker.bmp",		ICONWEAPON_WIDTH * 4, ICONWEAPON_HEIGHT, 4, 1);
+	_loading->loadFrameImage(L"iconWeapon-atkMutalisk",		L"image/interface/iconWeapon/atkMutalisk.bmp",		ICONWEAPON_WIDTH * 4, ICONWEAPON_HEIGHT, 4, 1);
+	_loading->loadFrameImage(L"iconWeapon-atkScourge",		L"image/interface/iconWeapon/atkScourge.bmp",		ICONWEAPON_WIDTH * 1, ICONWEAPON_HEIGHT, 1, 1);
+	_loading->loadFrameImage(L"iconWeapon-atkUltra",		L"image/interface/iconWeapon/atkUltra.bmp",			ICONWEAPON_WIDTH * 4, ICONWEAPON_HEIGHT, 4, 1);
+	_loading->loadFrameImage(L"iconWeapon-atkZergling",		L"image/interface/iconWeapon/atkZergling.bmp",		ICONWEAPON_WIDTH * 4, ICONWEAPON_HEIGHT, 4, 1);
+
+	_loading->loadFrameImage(L"iconWeapon-depFlying",		L"image/interface/iconWeapon/depFlying.bmp",		ICONWEAPON_WIDTH * 4, ICONWEAPON_HEIGHT, 4, 1);
+	_loading->loadFrameImage(L"iconWeapon-depGround",		L"image/interface/iconWeapon/depGround.bmp",		ICONWEAPON_WIDTH * 6, ICONWEAPON_HEIGHT, 6, 1);
+
+	_loading->loadFrameImage(L"iconWeapon-atkSpore",		L"image/interface/iconWeapon/atkSpore.bmp",			ICONWEAPON_WIDTH * 1, ICONWEAPON_HEIGHT, 1, 1);
+	_loading->loadFrameImage(L"iconWeapon-atkSunken",		L"image/interface/iconWeapon/atkSunken.bmp",		ICONWEAPON_WIDTH * 1, ICONWEAPON_HEIGHT, 1, 1);
+
 	////commands
 	//COMMON
 	_loading->loadFrameImage(L"command-esc",					  L"image/interface/command/esc.bmp",						 COMMAND_WIDTH * 3, COMMAND_HEIGHT, 3, 1, true, RGB(0, 0, 0));
@@ -262,6 +277,7 @@ void sceneInit::initImageInterface(void)
 	_loading->loadFrameImage(L"command-evolution_zerg_evolve_consume",				L"image/interface/command/evolution_zerg_evolve_consume.bmp",			COMMAND_WIDTH * 3, COMMAND_HEIGHT, 3, 1, true, RGB(0, 0, 0));	//디파일러 컨슘
 	_loading->loadFrameImage(L"command-evolution_zerg_metasynaptic_node",			L"image/interface/command/evolution_zerg_metasynaptic_node.bmp",		COMMAND_WIDTH * 3, COMMAND_HEIGHT, 3, 1, true, RGB(0, 0, 0));	//디파일러 마나업
 
+	
 }
 
 void sceneInit::initImageZergUnits(void)
@@ -338,7 +354,7 @@ void sceneInit::initImageZergUnits(void)
 		//mutalisk
 		_stprintf(strKey, L"ZU-mutalisk-Body%d", i);
 		_stprintf(strFile, L"image/zerg/unit/mutalisk/Body%d.bmp", i);
-		_loading->loadFrameImage(strKey, strFile, 1024, 128, 8, 1, true, RGB(0, 255, 255));
+		_loading->loadFrameImage(strKey, strFile, 1024, 640, 8, 5, true, RGB(0, 255, 255));
 
 		//scourge
 		_stprintf(strKey, L"ZU-scourge-Body%d", i);

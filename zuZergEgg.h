@@ -4,7 +4,7 @@
 class zuZergEgg : public Unit
 {
 private:
-	Unit * _nextUnit;
+	Unit* _nextUnit;
 
 	UNITNUM_ZERG	_nextUnitNum;
 

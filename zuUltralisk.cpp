@@ -68,11 +68,11 @@ void zuUltralisk::initBaseStatus(void)
 	_baseStatus.detector = FALSE;
 
 	_baseStatus.isAir = FALSE;
-	_baseStatus.moveSpeed = 5.4f; //업글시 8.1
+	_baseStatus.moveSpeed = (_player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_ANABOLIC_SYNTHESIS].complete == false) ? 5.4f : 8.1f;
 
 	_baseStatus.unitSize = UNITSIZE_LARGE;
 	_baseStatus.transportslots = 4;
-	_baseStatus.armor = 1;		//업글시 +2
+	_baseStatus.armor = 1;
 	_baseStatus.armorPlus = 1;
 
 
@@ -148,7 +148,11 @@ void zuUltralisk::updateBattleStatus(void)
 {
 	Unit::updateBattleStatus();
 
+	_baseStatus.moveSpeed = (_player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_ANABOLIC_SYNTHESIS].complete == false) ? 5.4f : 8.1f;
+	_battleStatus.moveSpeed = (_player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_ANABOLIC_SYNTHESIS].complete == false) ? 5.4f : 8.1f;
 
+	_battleStatus.curArmor = _baseStatus.armor + _baseStatus.armorPlus * _zergUpgrade->getUpgrade()[UPGRADE_ZERG_CARAPACE].level
+												+ 2 * (int)(_player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_CHITINOUS_PLATING].complete);
 }
 
 void zuUltralisk::updateImageFrame(void)

@@ -45,7 +45,7 @@ using namespace IOTA_UTIL;
 
 #define WINNAME (LPTSTR)(TEXT("starcraft"))
 #define WINSTARTX 0
-#define WINSTARTY 0
+#define WINSTARTY 100
 
 #define WINSIZEX 640	//
 #define WINSIZEY 480	//

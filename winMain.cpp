@@ -77,6 +77,15 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmd
 		return 0;
 	}
 
+	//화면 밖으로 마우스가 나가지 않도록 한다.
+	RECT Clip;
+	GetClientRect(_hWnd, &Clip);
+	ClientToScreen(_hWnd, (LPPOINT)&Clip);
+	ClientToScreen(_hWnd, (LPPOINT)(&Clip.right));
+	ClipCursor(&Clip);
+
+
+
 	//Font, Brush 생성
 	_gTools.setFontAll();
 	_gTools.setBrushAll();
