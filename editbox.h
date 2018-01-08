@@ -22,10 +22,12 @@ public:
 	~editbox();
 
 	HRESULT init(void);
-	virtual void release(void);
-	virtual void update(void);
-	virtual void render(int textOffsetX = 0, int textOffsetY = 0);
-	virtual void getChar(WPARAM wParam);
+	void release(void);
+	void update(void);
+	void render(int textOffsetX = 0, int textOffsetY = 0);
+	void Zrender(ZORDER zorder, int offsetX);
+	void getChar(WPARAM wParam);
+	void getChar(WPARAM wParam, BOOL ignoreReturn);
 
 	bool scanNum(void);
 	bool scanChar(void);

@@ -144,13 +144,14 @@ void zbHatchery::render(int imgOffsetX, int imgOffsetY)
 
 void zbHatchery::larvaValidCheck(void)
 {
-	for (int i = 0; i < _vLarva.size(); i++)
+	for (int i = 0; i < _vLarva.size();)
 	{
 		if (_vLarva[i]->getValid() == false)
 		{
 			//여기서 delete는 하지 않는다.
 			_vLarva.erase(_vLarva.begin() + i);
 		}
+		else ++i;
 	}
 }
 
@@ -298,10 +299,7 @@ void zbHatchery::procCommands(void)
 
 				evolution.isProcessing = true;
 			}
-			else
-			{
-				//실패
-			}
+
 			_battleStatus.curCommand = COMMAND_NONE;
 		}
 		break;
@@ -328,11 +326,8 @@ void zbHatchery::procCommands(void)
 				_nextObject = nextBuilding;
 				_valid = false;
 			}
-			else
-			{
-				//실패
-				_battleStatus.curCommand = COMMAND_NONE;
-			}
+
+			_battleStatus.curCommand = COMMAND_NONE;
 		}
 		break;
 

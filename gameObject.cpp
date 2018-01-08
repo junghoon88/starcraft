@@ -27,6 +27,10 @@ gameObject::gameObject()
 	_buildingNumT = BUILDINGNUM_TERRAN_NONE;
 	_buildingNumP = BUILDINGNUM_PROTOSS_NONE;
 
+	//자원인지
+	_isNrMineral = false;
+	_isNrGas = false;
+
 
 	//BaseStatus
 	ZeroMemory(&_baseStatus, sizeof(tagBaseStatus));
@@ -42,6 +46,9 @@ gameObject::gameObject()
 
 	_aStar = NULL;
 	_vCloseList.clear();	//A* 에서 계산되서 받은 타일들
+
+	_amountMineral = 0;
+	_amountGas = 0;
 }
 
 
@@ -61,6 +68,7 @@ void gameObject::updateImageFrame(void) {}
 
 void gameObject::receiveCommand(COMMAND cmd)
 {
+	_battleStatus.oldCommand = _battleStatus.curCommand;
 	_battleStatus.curCommand = cmd;
 	_battleStatus.useAstar = false;
 	_battleStatus.calcAstar = false;
@@ -71,6 +79,7 @@ void gameObject::receiveCommand(COMMAND cmd)
 }
 void gameObject::receiveCommand(COMMAND cmd, POINT pt)
 {
+	_battleStatus.oldCommand = _battleStatus.curCommand;
 	_battleStatus.curCommand = cmd;
 	_battleStatus.useAstar = true;
 	_battleStatus.calcAstar = false;
@@ -78,10 +87,10 @@ void gameObject::receiveCommand(COMMAND cmd, POINT pt)
 	_battleStatus.targetObject = NULL;
 
 	_vCloseList.clear();
-	//_aStar->clearTiles();
 }
 void gameObject::receiveCommand(COMMAND cmd, POINT pt, POINT ptTile)
 {
+	_battleStatus.oldCommand = _battleStatus.curCommand;
 	_battleStatus.curCommand = cmd;
 	_battleStatus.useAstar = true;
 	_battleStatus.calcAstar = false;
@@ -93,12 +102,116 @@ void gameObject::receiveCommand(COMMAND cmd, POINT pt, POINT ptTile)
 }
 void gameObject::receiveCommand(COMMAND cmd, gameObject* object)
 {
+	_battleStatus.oldCommand = _battleStatus.curCommand;
 	_battleStatus.curCommand = cmd;
 	_battleStatus.useAstar = true;
 	_battleStatus.calcAstar = false;
-	_battleStatus.ptTarget = { 0, 0 };
+	_battleStatus.ptTarget = object->getBattleStatus().pt.toPoint();
 	_battleStatus.targetObject = object;
 
 	_vCloseList.clear();
-	//_aStar->clearTiles();
+}
+
+UINT gameObject::gatherMineral(void)
+{
+	if (_amountMineral > 8)
+	{
+		_amountMineral -= 8;
+		return 8;
+	}
+	else
+	{
+		UINT remain = _amountMineral;
+		_amountMineral = 0;
+
+		return remain;
+	}
+}
+UINT gameObject::gatherGas(void)
+{
+	if (_amountGas > 8)
+	{
+		_amountGas -= 8;
+		return 8;
+	}
+	else if(_amountGas > 0)
+	{
+		UINT remain = _amountGas;
+		_amountGas = 0;
+
+		return remain;
+	}
+	else
+	{
+		return 2;
+	}
+}
+
+
+void gameObject::hitDamage(gameObject* object)
+{
+	float damage = 0.0f;
+	DAMAGETYPE dmgType = DAMAGETYPE_NORMAL;
+
+	if (_baseStatus.isAir)
+	{
+		//내가 공중유닛일 때
+		damage = object->getBattleStatus().curAWdamage;
+		dmgType = object->getBaseStatus().AWdamageType;
+	}
+	else
+	{
+		//내가 지상유닛일 때
+		damage = object->getBattleStatus().curGWdamage;
+		dmgType = object->getBaseStatus().GWdamageType;
+	}
+
+
+
+	//데미지 유형, 내 유닛 사이즈에 따라 데미지를 변경해준다. 
+	switch (dmgType)
+	{
+	case DAMAGETYPE_NORMAL:
+		damage = damage;
+		break;
+	case DAMAGETYPE_CONCUSSIVE:
+	{
+		switch (_baseStatus.unitSize)
+		{
+		case UNITSIZE_SMALL:
+			damage = damage;
+			break;
+		case UNITSIZE_MEDIUM:
+			damage = damage * 0.5f;
+			break;
+		case UNITSIZE_LARGE:
+			damage = damage * 0.25f;
+			break;
+		}
+	}
+	break;
+	case DAMAGETYPE_EXPLOSIVE:
+	{
+		switch (_baseStatus.unitSize)
+		{
+		case UNITSIZE_SMALL:
+			damage = damage * 0.5f;
+			break;
+		case UNITSIZE_MEDIUM:
+			damage = damage * 0.75f;
+			break;
+		case UNITSIZE_LARGE:
+			damage = damage;
+			break;
+		}
+	}
+	break;
+	}
+
+	//HP 계산
+	_battleStatus.curHP -= damage;
+	if (_battleStatus.curHP < 1.0f)
+	{
+		_battleStatus.isDead = true;
+	}
 }

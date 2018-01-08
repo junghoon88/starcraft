@@ -32,11 +32,11 @@ void effectManager::release()
 		{
 			if (mIter->second.size() != 0)
 			{
-				iterEffects vArrIter = mIter->second.begin();
-				for (; vArrIter != mIter->second.end(); ++vArrIter)
+				iterEffects vArrIter = (mIter->second).begin();
+
+				for (; vArrIter != mIter->second.end(); /*++vArrIter*/)
 				{
-					(*vArrIter)->release();
-					delete *vArrIter;
+					SAFE_RELEASEDELETE(*vArrIter);
 					vArrIter = mIter->second.erase(vArrIter);
 				}
 			}
@@ -109,6 +109,28 @@ void effectManager::addEffect(wstring effectName, const TCHAR* imageName, int im
 
 	_vTotalEffect.push_back(mArrEffect);
 }
+
+void effectManager::addEffect(wstring effectName, const TCHAR* imageName, ZORDER zorder, int fps, float elapsedTime, int buffer)
+{
+	arrEffects vEffectBuffer;
+	arrEffect mArrEffect;
+
+	image* img = IMAGEMANAGER->findImage(imageName);
+
+	if (!img) return;
+
+	for (int i = 0; i < buffer; i++)
+	{
+		vEffectBuffer.push_back(new effect);
+		vEffectBuffer[i]->init(img, fps, elapsedTime);
+		vEffectBuffer[i]->setZorder(zorder);
+	}
+
+	mArrEffect.insert(pair<wstring, arrEffects>(effectName, vEffectBuffer));
+
+	_vTotalEffect.push_back(mArrEffect);
+}
+
 
 
 void effectManager::play(wstring effectName, int x, int y)

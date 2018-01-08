@@ -114,6 +114,8 @@ void zuOverlord::release(void)
 void zuOverlord::update(void)
 {
 	Unit::update();
+
+
 }
 
 void zuOverlord::render(void)
@@ -145,6 +147,41 @@ void zuOverlord::updateBattleStatus(void)
 void zuOverlord::updateImageFrame(void)
 {
 	Unit::setImageFrameForAngle();
+
+	float tick = TIMEMANAGER->getElapsedTime();
+
+	if (_battleStatus.isMoving)
+	{
+		_battleStatus.bodyFrameTime += tick;
+		if (_battleStatus.bodyFrameTime >= UNIT_BODY_FPS_TIME)
+		{
+			_battleStatus.bodyFrameTime -= UNIT_BODY_FPS_TIME;
+
+			_battleStatus.bodyFrame.y++;
+			if (_battleStatus.bodyFrame.y > _baseStatus.imgBody->getMaxFrameY())
+			{
+				_battleStatus.bodyFrame.y = 0;
+			}
+		}
+	}
+	else
+	{
+		if (_battleStatus.bodyFrame.y != 0)
+		{
+			_battleStatus.bodyFrameTime += tick;
+			if (_battleStatus.bodyFrameTime >= UNIT_BODY_FPS_TIME)
+			{
+				_battleStatus.bodyFrameTime -= UNIT_BODY_FPS_TIME;
+
+				_battleStatus.bodyFrame.y++;
+				if (_battleStatus.bodyFrame.y > _baseStatus.imgBody->getMaxFrameY())
+				{
+					_battleStatus.bodyFrame.y = 0;
+					_battleStatus.bodyFrameTime = 0;
+				}
+			}
+		}
+	}
 }
 
 void zuOverlord::procCommands(void)

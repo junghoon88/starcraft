@@ -169,5 +169,8 @@ public:
 
 	inline void nextFrameX(void) { _imageInfo->currentFrameX = _imageInfo->currentFrameX == _imageInfo->maxFrameX ? 0 : _imageInfo->currentFrameX + 1; }
 	inline void nextFrameY(void) { _imageInfo->currentFrameY = _imageInfo->currentFrameY == _imageInfo->maxFrameY ? 0 : _imageInfo->currentFrameY + 1; }
+
+
+	bool image::HDCToFile(const char* FilePath, uint16_t BitsPerPixel = 24);
 };
 

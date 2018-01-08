@@ -66,7 +66,7 @@ void editbox::render(int textOffsetX, int textOffsetY)
 {
 	if (_img)
 	{
-		_img->frameRender(getMemDC(), _rc.left, _rc.top, 0, (int)_clicked);
+		_img->frameRender(getMemDC(), _rc.left, _rc.top, 0, 0);
 	}
 	else
 	{
@@ -89,6 +89,26 @@ void editbox::render(int textOffsetX, int textOffsetY)
 	DeleteObject(oldFont);
 
 }
+
+void editbox::Zrender(ZORDER zorder, int offsetX)
+{
+	if (_img)
+	{
+		RENDERMANAGER->insertImg(zorder, _img, _rc.left, _rc.top);
+	}
+	else
+	{
+		RENDERMANAGER->insertRectangle(zorder, _rc, PENVERSION_BLACK);
+	}
+
+	RECT rcTemp = _rc;
+	rcTemp.left  += offsetX;
+	rcTemp.right -= offsetX;
+
+	RENDERMANAGER->insertText(zorder, rcTemp, _str, TEXTCOLOR_UNITNAME);
+}
+
+
 
 #if 0 //»¹ÁþÀÇÇöÈ²
 bool editbox::scanNum(void)
@@ -222,6 +242,59 @@ void editbox::getChar(WPARAM wParam)
 			else if (this->getStrNum() > _maxNum)
 			{
 				_stprintf(_str, L"%d", _maxNum);
+			}
+		}
+		return;
+	}
+	else
+	{
+		if (_onlyNum)
+		{
+			if ((wParam >= '0' && wParam <= '9') /*|| (wParam >= VK_NUMPAD0 && wParam <= VK_NUMPAD9)*/)
+			{
+				_str[len] = wParam;
+				_str[len + 1] = 0;
+			}
+		}
+		else
+		{
+			_str[len] = wParam;
+			_str[len + 1] = 0;
+		}
+	}
+}
+
+void editbox::getChar(WPARAM wParam, BOOL ignoreReturn)
+{
+	if (!_clicked) return;
+
+	int len = _tcslen(_str);
+
+
+	if (wParam == VK_BACK)// || wParam == VK_DELETE) //VK_DELETE¶û '.'ÀÌ¶û °ªÀÌ °°´Ù..;;
+	{
+		if (len == 0) return;
+
+		TCHAR str[128] = L"";
+		_tcsncpy(str, _str, len - 1);
+		_tcscpy(_str, str);
+	}
+	else if (wParam == VK_RETURN)
+	{
+		if (ignoreReturn == FALSE)
+		{
+			_clicked = false;
+
+			if (_onlyNum)
+			{
+				if (this->getStrNum() < _minNum)
+				{
+					_stprintf(_str, L"%d", _minNum);
+				}
+				else if (this->getStrNum() > _maxNum)
+				{
+					_stprintf(_str, L"%d", _maxNum);
+				}
 			}
 		}
 		return;

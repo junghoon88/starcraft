@@ -35,6 +35,7 @@
 #define ATTR_UNMOVE		0x00000001	//
 #define ATTR_UNBUILD	0x00000002	//
 #define ATTR_CREEP		0x00000004
+#define ATTR_UNITSTOP	0x00000008
 
 
 
@@ -87,7 +88,13 @@ enum OBJECT
 	//여기까지는 맵툴에서만 사용
 
 	//여기부터는 게임맵에서 추가될 수 있음
+	OBJECT_BUILDING_PLAYER1,			//플레이어 건물
+	OBJECT_BUILDING_PLAYER2,			//플레이어 건물
 
+	OBJECT_BUILDING_GAS_START_PLAYER1,	//플레이어 건물 가스 시작위치
+	OBJECT_BUILDING_GAS_START_PLAYER2,	//
+	OBJECT_BUILDING_GAS_PLAYER1,		//플레이어 건물 가스 
+	OBJECT_BUILDING_GAS_PLAYER2,		//
 };
 
 enum FOGLEVEL
@@ -140,5 +147,4 @@ struct tagFog
 {
 	RECT		rcFog;
 	FOGLEVEL	level;
-	BYTE		alpha;
 };

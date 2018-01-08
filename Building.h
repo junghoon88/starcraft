@@ -28,6 +28,7 @@ public:
 	virtual void updateImageFrame(void);
 	virtual void updateProcessing(void);
 	virtual void updateCommandSet(void);
+	virtual void checkDead(void);
 
 	virtual void procCommands(void);
 

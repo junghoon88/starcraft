@@ -168,7 +168,7 @@ void zuMutalisk::updateImageFrame(void)
 		_battleStatus.bodyFrameTime -= UNIT_BODY_FPS_TIME;
 
 		_battleStatus.bodyFrame.y++;
-		if (_battleStatus.bodyFrame.y >= _baseStatus.imgBody->getMaxFrameY())
+		if (_battleStatus.bodyFrame.y > _baseStatus.imgBody->getMaxFrameY())
 		{
 			_battleStatus.bodyFrame.y = 0;
 		}

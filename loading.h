@@ -89,7 +89,7 @@ public:
 	void loadImage(const TCHAR* keyName, const TCHAR* fileName, float x, float y, int width, int height, BOOL trans = FALSE, COLORREF transColor = FALSE, bool blend = FALSE);
 	void loadFrameImage(const TCHAR* keyName, const TCHAR* fileName, int width, int height, int frameX, int frameY, BOOL trans = FALSE, COLORREF transColor = FALSE, bool blend = FALSE);
 	void loadFrameImage(const TCHAR* keyName, const TCHAR* fileName, float x, float y, int width, int height, int frameX, int frameY, BOOL trans = FALSE, COLORREF transColor = FALSE, bool blend = FALSE);
-	void loadSound(const TCHAR* keyName, const TCHAR* fileName, bool bgm, bool loop);
+	void loadSound(const TCHAR* keyName, const TCHAR* fileName, bool bgm = false, bool loop = false);
 
 	BOOL loadingImageDone();
 

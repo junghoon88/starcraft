@@ -2,11 +2,7 @@
 #include "gameNode.h"
 
 #include "zergUpgrade.h"
-
 #include "aStar.h"
-
-
-
 
 //전방선언
 class Unit;
@@ -19,7 +15,7 @@ enum UNITSTATE
 	UNITSTATE_STOP,
 	UNITSTATE_MOVE,
 	UNITSTATE_ATTACK,
-	//UNITSTATE_ATTACK
+	UNITSTATE_SPELL
 };
 
 enum PROCESSING
@@ -98,10 +94,11 @@ struct tagBaseStatus
 struct tagBattleStatus
 {
 	BOOL				isDead;			//
-	BOOL				isBusy;			//AStarThread 에서 계산중일때 죽어서 Delete 되는것 방지
+	INT					isBusy;			//AStarThread 에서 계산중일때 죽어서 Delete 되는것 방지
 	UNITSTATE			unitState;		//
 
 	COMMAND				curCommand;		//
+	COMMAND				oldCommand;		//
 	BOOL				useAstar;		//
 	BOOL				calcAstar;		//
 	POINT				ptTarget;		//이동할때 가려는 위치
@@ -132,6 +129,12 @@ struct tagBattleStatus
 	DIRECTION			direction;		//움직일때 이동방향
 
 	FLOAT				moveSpeed;		//이동속도
+
+	BOOL				isCollision;	//충돌했는지?
+
+	BOOL				isMoving;
+	MYPOINT				ptold;			//이전위치
+	POINT				ptTileOccupy;	//정지상태일때 자리를 차지하고 있는 타일(맵에 등록함)
 
 
 	BOOL				isBurrow;
@@ -168,7 +171,7 @@ protected:
 	PLAYER					_playerNum;
 
 	//종족
-	RACES					_race;			
+	RACES					_race;
 
 	//유닛인지 건물인지
 	BOOL					_isBuilding;
@@ -182,6 +185,10 @@ protected:
 	BUILDINGNUM_TERRAN		_buildingNumT;
 	BUILDINGNUM_PROTOSS		_buildingNumP;
 
+	BOOL					_isNrMineral;
+	BOOL					_isNrGas;
+
+
 
 	//기본속성과 실시간속성으로 나누자!
 	tagBaseStatus			_baseStatus;
@@ -189,11 +196,15 @@ protected:
 
 	//현재 진행중인 작업
 	tagProcessing			_processing;
-	
+
 	zergUpgrade*			_zergUpgrade;
 
 	aStar*					_aStar;
 	vTile					_vCloseList;	//A* 에서 계산되서 받은 타일들
+
+	//resource
+	UINT					_amountMineral;
+	UINT					_amountGas;
 
 public:
 	gameObject();
@@ -215,7 +226,10 @@ public:
 	void receiveCommand(COMMAND cmd, POINT pt, POINT ptTile);
 	void receiveCommand(COMMAND cmd, gameObject* object);
 
+	UINT gatherMineral(void);
+	UINT gatherGas(void);
 
+	void hitDamage(gameObject* object);
 
 public:
 	inline BOOL getValid(void) { return _valid; }
@@ -229,23 +243,33 @@ public:
 	inline void setLinkAdressAstar(aStar* astar) { _aStar = astar; }
 	inline void setLinkAdressPlayer(player* player) { _player = player; }
 
-	inline UNITNUM_ZERG		getUnitnumZerg(void)	{ return _unitNumZ; }
-	inline UNITNUM_TERRAN	getUnitnumTerran(void)	{ return _unitNumT; }
+	inline UNITNUM_ZERG		getUnitnumZerg(void) { return _unitNumZ; }
+	inline UNITNUM_TERRAN	getUnitnumTerran(void) { return _unitNumT; }
 	inline UNITNUM_PROTOSS	getUnitnumProtoss(void) { return _unitNumP; }
 
-	inline BUILDINGNUM_ZERG		getBuildingNumZerg(void)	{ return _buildingNumZ; }
-	inline BUILDINGNUM_TERRAN	getBuildingNumTerran(void)	{ return _buildingNumT; }
+	inline BUILDINGNUM_ZERG		getBuildingNumZerg(void) { return _buildingNumZ; }
+	inline BUILDINGNUM_TERRAN	getBuildingNumTerran(void) { return _buildingNumT; }
 	inline BUILDINGNUM_PROTOSS	getBuildingNumProtoss(void) { return _buildingNumP; }
+
+	inline BOOL getIsNrMineral(void) { return _isNrMineral; }
+	inline BOOL getIsNrGas(void) { return _isNrGas; }
+
 
 	inline tagBaseStatus getBaseStatus(void) { return _baseStatus; }
 	inline tagBattleStatus getBattleStatus(void) { return _battleStatus; }
 	inline void setBattleStatus(tagBattleStatus status) { _battleStatus = status; }
 	inline tagProcessing getProcessing(void) { return _processing; }
 
+	inline UINT getAmountMineral(void) { return _amountMineral; }
+	inline UINT getAmountGas(void) { return _amountGas; }
+	inline void setAmountGas(UINT gas) { _amountGas = gas; }
+
 
 	//A* 관련
-	inline BOOL getIsBusy(void) { return _battleStatus.isBusy; }
-	inline void setIsBusy(BOOL busy) { _battleStatus.isBusy = busy; }
+	inline INT getIsBusy(void) { return _battleStatus.isBusy; }
+	inline void addIsBusy(INT busy) { _battleStatus.isBusy |= busy; }
+	inline void deleteIsBusy(INT busy) { _battleStatus.isBusy &= ~busy; }
+
 	inline void setCalcAstar(BOOL calc) { _battleStatus.calcAstar = calc; }
 	inline void setVCloseList(vTile list) { _vCloseList = list; }
 
@@ -255,6 +279,6 @@ public:
 	inline void setClicked(BOOL clicked) { _battleStatus.clicked = clicked; }
 	inline BOOL getClicked(void) { return _battleStatus.clicked; }
 	inline void setCurHP(float curHP) { _battleStatus.curHP = curHP; }
-
+	inline void setIsCollision(bool collision) { _battleStatus.isCollision = collision; }
 };
 

@@ -1,6 +1,10 @@
 #include "stdafx.h"
 #include "gameMap.h"
 
+#include "nrMineral.h"
+#include "nrGas.h"
+
+
 gameMap::gameMap()
 {
 	ZeroMemory(&_tiles, sizeof(tagTile) * TILEX * TILEY);
@@ -8,6 +12,8 @@ gameMap::gameMap()
 
 	_locationP1 = { 0, 0 };
 	_locationP2 = { 0, 0 };
+
+	_miniMapBackground = NULL;
 }
 
 gameMap::~gameMap()
@@ -28,10 +34,32 @@ HRESULT gameMap::init(void)
 
 void gameMap::release(void)
 {
+	IMAGEMANAGER->deleteImage(L"minimap-background");
 }
 
 void gameMap::update(void)
 {
+	//미네랄을 다 팠으면 제거
+	for (int i = 0; i < _vMineral.size(); i++)
+	{
+		if (_vMineral[i]->getAmountMineral() == 0)
+		{
+			RECT rcMineral = _vMineral[i]->getRectTile();
+
+			for (int x = 0; x < OBJ_MINERAL_WIDTH; x++)
+			{
+				for (int y = 0; y < OBJ_MINERAL_HEIGHT; y++)
+				{
+					int idx = rcMineral.left + x;
+					int idy = rcMineral.top + y;
+					_tiles[idx][idy].obj = OBJECT_NONE;
+				}
+			}
+
+			SAFE_RELEASEDELETE(_vMineral[i]);
+			_vMineral.erase(_vMineral.begin() + i);
+		}
+	}
 }
 
 void gameMap::render(void)
@@ -47,7 +75,7 @@ void gameMap::loadData(void)
 
 	//실제 맵 데이터를 불러온다.
 	TCHAR strMapName[100];
-	_stprintf(strMapName, L"MapData/test.map");
+	_stprintf(strMapName, L"MapData/test3.map");
 
 	file = CreateFile(strMapName, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 
@@ -55,6 +83,18 @@ void gameMap::loadData(void)
 
 
 	CloseHandle(file);
+
+
+	//미니맵 불러오기
+	//1. path 에서 확장자만 bmp 로 변경
+	char szDrv[_MAX_DRIVE], szDir[_MAX_DIR], szFname[_MAX_FNAME], szExt[_MAX_EXT];
+	_splitpath(convert_mb(strMapName), szDrv, szDir, szFname, szExt);
+	sprintf(szExt, ".bmp");
+	//2. bmp로 바꾼걸 다시 합체
+	char newpath[MAXCHAR];
+	_makepath_s(newpath, szDrv, szDir, szFname, szExt);
+
+	_miniMapBackground = IMAGEMANAGER->addImage(L"minimap-background", convert_wc(newpath), TILEX, TILEY);
 }
 
 void gameMap::setTileImage(void)
@@ -94,25 +134,29 @@ void gameMap::createNeutralResource(void)
 			{
 			case OBJECT_MINERAL1_START:
 			{
-				nrMineral* mineral = new nrMineral(x, y, _tiles[x][y].nrAmount, 1);
+				nrMineral* mineral = new nrMineral(x, y, 1);
+				mineral->init(_tiles[x][y].nrAmount);
 				_vMineral.push_back(mineral);
 			}
 			break;
 			case OBJECT_MINERAL2_START:
 			{
-				nrMineral* mineral = new nrMineral(x, y, _tiles[x][y].nrAmount, 2);
+				nrMineral* mineral = new nrMineral(x, y, 2);
+				mineral->init(_tiles[x][y].nrAmount);
 				_vMineral.push_back(mineral);
 			}
 			break;
 			case OBJECT_MINERAL3_START:
 			{
-				nrMineral* mineral = new nrMineral(x, y, _tiles[x][y].nrAmount, 3);
+				nrMineral* mineral = new nrMineral(x, y, 3);
+				mineral->init(_tiles[x][y].nrAmount);
 				_vMineral.push_back(mineral);
 			}
 			break;
 			case OBJECT_GAS_START:
 			{
-				nrGas* gas = new nrGas(x, y, _tiles[x][y].nrAmount);
+				nrGas* gas = new nrGas(x, y);
+				gas->init(_tiles[x][y].nrAmount);
 				_vGas.push_back(gas);
 			}
 			break;
@@ -187,12 +231,20 @@ void gameMap::renderObject(void)
 		if(IntersectRect(&temp, &rcCamera, &_vMineral[i]->getRectBody()))
 		{
 			int mineralFrameY = 0;
-			int nrAmount = _vMineral[i]->getAmount();
+			int nrAmount = _vMineral[i]->getAmountMineral();
 			if (nrAmount >= 1500)	mineralFrameY = 0;
 			else					mineralFrameY = 3 - nrAmount / 500;
 
-			//_vMineral[i]->getImage()->frameRender(getMemDC(), _vMineral[i]->getRectBody().left - cameraX, _vMineral[i]->getRectBody().top - TILESIZE - cameraY, 0, mineralFrameY);
-			RENDERMANAGER->insertImgFrame(ZORDER_GAMEOBJECT, _vMineral[i]->getImage(), _vMineral[i]->getRectBody().left - cameraX, _vMineral[i]->getRectBody().top - TILESIZE - cameraY, 0, mineralFrameY, _vMineral[i]->getRectBody());
+			RECT rcBodyOffset = _vMineral[i]->getRectBody();
+			OffsetRect(&rcBodyOffset, -cameraX, -cameraY);
+
+			RENDERMANAGER->insertImgFrame(ZORDER_GAMEOBJECT, _vMineral[i]->getImage(), rcBodyOffset.left, rcBodyOffset.top - TILESIZE, 0, mineralFrameY, rcBodyOffset);
+
+			if (_vMineral[i]->getBattleStatus().clicked)
+			{
+				//rcBodyOffset.top = (rcBodyOffset.top + rcBodyOffset.bottom) / 2;
+				RENDERMANAGER->insertEllipse(ZORDER_GAMEOBJECT, rcBodyOffset, PENVERSION_RESOURCECLICK);
+			}
 		}
 	}
 
@@ -200,8 +252,31 @@ void gameMap::renderObject(void)
 	{
 		if (IntersectRect(&temp, &rcCamera, &_vGas[i]->getRectBody()))
 		{
-			//_vGas[i]->getImage()->render(getMemDC(), _vGas[i]->getRectBody().left - cameraX, _vGas[i]->getRectBody().top - cameraY);
-			RENDERMANAGER->insertImg(ZORDER_GAMEOBJECT, _vGas[i]->getImage(), _vGas[i]->getRectBody().left - cameraX, _vGas[i]->getRectBody().top - cameraY);
+			RECT rcBodyOffset = _vGas[i]->getRectBody();
+			OffsetRect(&rcBodyOffset, -cameraX, -cameraY);
+
+			RENDERMANAGER->insertImg(ZORDER_GAMEOBJECT, _vGas[i]->getImage(), rcBodyOffset.left, rcBodyOffset.top);
+
+			if (_vGas[i]->getBattleStatus().clicked)
+			{
+				//rcBodyOffset.top = (rcBodyOffset.top + rcBodyOffset.bottom) / 2;
+				RENDERMANAGER->insertEllipse(ZORDER_GAMEOBJECT, rcBodyOffset, PENVERSION_RESOURCECLICK);
+			}
 		}
 	}
+}
+
+nrGas* gameMap::findGas(POINT ptTile)
+{
+	for (int i = 0; i < _vGas.size(); i++)
+	{
+		RECT rcTile = _vGas[i]->getRectTile();
+
+		if (ptTile.x == rcTile.left && ptTile.y == rcTile.top)
+		{
+			return _vGas[i];
+		}
+	}
+
+	return NULL;
 }

@@ -42,6 +42,9 @@ public:
 	void render(void);
 	void getChar(WPARAM wParam);
 
+private:
+	void initEffects(void);
+
 
 	
 };

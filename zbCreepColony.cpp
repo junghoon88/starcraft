@@ -154,12 +154,8 @@ void zbCreepColony::procCommands(void)
 				_nextObject = nextBuilding;
 				_valid = false;
 			}
-			else
-			{
-				//실패
-				_battleStatus.curCommand = COMMAND_NONE;
-			}
 
+			_battleStatus.curCommand = COMMAND_NONE;
 		}
 
 		break;
@@ -181,12 +177,8 @@ void zbCreepColony::procCommands(void)
 				_nextObject = nextBuilding;
 				_valid = false;
 			}
-			else
-			{
-				//실패
-				_battleStatus.curCommand = COMMAND_NONE;
-			}
 
+			_battleStatus.curCommand = COMMAND_NONE;
 		}
 
 		break;

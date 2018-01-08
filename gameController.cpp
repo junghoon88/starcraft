@@ -4,9 +4,12 @@
 
 #include <functional>
 
+#include "nrMineral.h"
+#include "nrGas.h"
+
 
 gameController::gameController()
-	: _imgInterface(NULL), _imgCursor(NULL), _hotkeys(NULL), _myPlayer(NULL), _gameInterface(NULL), _gameMap(NULL)
+	: _imgInterface(NULL), _imgCursor(NULL), _hotkeys(NULL), _myPlayer(NULL), _gameInterface(NULL), _gameMap(NULL), _miniMap(NULL)
 {
 	_cursorState = CURSORSTATE_IDLE;
 	_beforeCursor = CURSORSTATE_IDLE;
@@ -28,18 +31,14 @@ gameController::gameController()
 	_cursorTile = { 0, 0 };
 
 
+	_editboxChat = NULL;
+
+
 }
 
 
 gameController::~gameController()
 {
-	SAFE_RELEASEDELETE(_gameInterface);
-	SAFE_RELEASEDELETE(_hotkeys);
-
-	for (int i = 0; i < COMMAND_MAX; i++)
-	{
-		SAFE_RELEASEDELETE(_commandSet[i].button);
-	}
 }
 
 HRESULT gameController::init(PLAYER playerNum, RACES races)
@@ -69,6 +68,14 @@ HRESULT gameController::init(PLAYER playerNum, RACES races)
 	_gameInterface->setLinkAdressGameController(this);
 	_gameInterface->init();
 
+	_miniMap = new miniMap;
+	_miniMap->setLinkAdressGameController(this);
+	_miniMap->init();
+
+	_editboxChat = new editbox;
+	_editboxChat->init();
+	_editboxChat->setRect(RectMakeCenter(WINSIZEX/2, 330, 300, 29));
+	_editboxChat->setImage(IMAGEMANAGER->findImage(L"interface-editchat"));
 
 
 	//debug
@@ -86,12 +93,40 @@ HRESULT gameController::init(PLAYER playerNum, RACES races)
 
 void gameController::release(void)
 {
+	SAFE_RELEASEDELETE(_miniMap);
+	SAFE_RELEASEDELETE(_gameInterface);
+	SAFE_RELEASEDELETE(_hotkeys);
 
+	for (int i = 0; i < COMMAND_MAX; i++)
+	{
+		SAFE_RELEASEDELETE(_commandSet[i].button);
+	}
 }
 
 void gameController::update(void)
 {
 	calcMouseRealPosition();
+
+	if (KEYMANAGER->isOnceKeyDown(VK_RETURN))
+	{
+		if (_editboxChat->getClicked())
+		{
+			TCHAR* strLwr = _tcslwr(_editboxChat->getStr());
+			if (_tcscmp(strLwr, L"show me the money") == 0)
+			{
+				_myPlayer->addResource(10000, 10000);
+			}
+
+			_editboxChat->clearStr();
+			_editboxChat->setClicked(false);
+		}
+		else
+		{
+			_editboxChat->setClicked(true);
+		}
+	}
+
+
 
 	//키보드입력 먼저 확인하고
 	if (actionHotkeys() == FALSE)
@@ -121,6 +156,9 @@ void gameController::update(void)
 	actionMouseMap();
 
 	_gameInterface->update();
+	
+	//minimap 에서 프레임드랍생김
+	_miniMap->update();
 
 
 	actionCommand();
@@ -138,13 +176,31 @@ void gameController::render(void)
 		RENDERMANAGER->insertLineRectangle(ZORDER_GAMEMOUSEDRAG, rc, PENVERSION_MOUSEDRAG);
 	}
 
+	if (_editboxChat->getClicked())
+	{
+		_editboxChat->Zrender(ZORDER_INTERFACE2, 15);
+	}
+
+
 	renderBuildImage();
 
 
 	renderInterface();
+
+	//미니맵을 보여준다.
+	_miniMap->render();
+
 	renderCursor();
 
 	renderMyResouce();
+}
+
+void gameController::getChar(WPARAM wParam)
+{
+	if (_editboxChat->getClicked())
+	{
+		_editboxChat->getChar(wParam, TRUE);
+	}
 }
 
 void gameController::initCommandSet(void)
@@ -238,7 +294,7 @@ void gameController::actionMouseMap(void)
 			if (_isClicked)
 			{
 				//위치가 달라지면 드래그상태로 바꾼다.
-				if (_ptDragStart.x != _ptMouse.x || _ptDragStart.y != _ptMouse.y)
+				if (getDistance(_ptDragStart.x, _ptDragStart.y, _ptMouse.x, _ptMouse.y) > 10.0f)
 				{
 					_isDraging = true;
 					_cursorState = CURSORSTATE_DRAGING;
@@ -262,10 +318,12 @@ void gameController::actionMouseMap(void)
 						if (_selectInfo.object[i]->getIsBuilding())
 						{
 							_selectInfo.object[i]->receiveCommand(COMMAND_SETRALLYPOINT, ptMouseReal);
+							EFFECTMANAGER->play(L"마우스우클릭", _ptMouse.x, _ptMouse.y);
 						}
 						else
 						{
 							_selectInfo.object[i]->receiveCommand(COMMAND_MOVE, ptMouseReal);
+							EFFECTMANAGER->play(L"마우스우클릭", _ptMouse.x, _ptMouse.y);
 						}
 					}
 				}
@@ -278,6 +336,7 @@ void gameController::actionMouseMap(void)
 						if (_selectInfo.object[i]->getIsBuilding())
 						{
 							_selectInfo.object[i]->receiveCommand(COMMAND_SETRALLYPOINT, ptMouseReal);
+							EFFECTMANAGER->play(L"마우스우클릭", _ptMouse.x, _ptMouse.y);
 						}
 						else
 						{
@@ -357,6 +416,7 @@ void gameController::actionMouseMap(void)
 					if (_selectInfo.object[i] == NULL) continue;
 
 					_selectInfo.object[i]->receiveCommand(_curCommand, ptMouseReal);
+					EFFECTMANAGER->play(L"마우스우클릭", _ptMouse.x, _ptMouse.y);
 				}
 			}
 			else
@@ -409,11 +469,16 @@ void gameController::actionMouseMap(void)
 		else if (KEYMANAGER->isStayKeyDown(VK_LBUTTON))
 		{
 			//위치가 달라지면 드래그상태로 바꾼다.
-			if (_ptDragStart.x != _ptMouse.x || _ptDragStart.y != _ptMouse.y)
+			if (getDistance(_ptDragStart.x, _ptDragStart.y, _ptMouse.x, _ptMouse.y) > 10.0f)
 			{
 				_isDraging = true;
 				_cursorState = CURSORSTATE_DRAGING;
 			}
+			//if (_ptDragStart.x != _ptMouse.x || _ptDragStart.y != _ptMouse.y)
+			//{
+			//	_isDraging = true;
+			//	_cursorState = CURSORSTATE_DRAGING;
+			//}
 		}
 		else if (KEYMANAGER->isOnceKeyDown(VK_RBUTTON))
 		{
@@ -432,10 +497,12 @@ void gameController::actionMouseMap(void)
 						if (_selectInfo.object[i]->getIsBuilding())
 						{
 							_selectInfo.object[i]->receiveCommand(COMMAND_SETRALLYPOINT, ptMouseReal);
+							EFFECTMANAGER->play(L"마우스우클릭", _ptMouse.x, _ptMouse.y);
 						}
 						else
 						{
 							_selectInfo.object[i]->receiveCommand(COMMAND_MOVE, ptMouseReal);
+							EFFECTMANAGER->play(L"마우스우클릭", _ptMouse.x, _ptMouse.y);
 						}
 					}
 				}
@@ -538,7 +605,6 @@ void gameController::actionMouseMap(void)
 		{
 			if (_buildable)
 			{
-				bool findDrone = false;
 				for (int i = 0; i < SELECTUNIT_MAX; i++)
 				{
 					if (_selectInfo.object[i] == NULL) continue;
@@ -555,7 +621,6 @@ void gameController::actionMouseMap(void)
 						ptCenter.y = ((float)ptTileMouseReal.y + (float)buildsize.y * 0.5f) * TILESIZE;
 
 						_selectInfo.object[i]->receiveCommand(_curCommand, ptCenter, ptTileMouseReal);
-						findDrone = true;
 						break;
 					}
 				}
@@ -586,7 +651,6 @@ void gameController::actionMouseMap(void)
 		{
 			if (_buildable)
 			{
-				bool findDrone = false;
 				for (int i = 0; i < SELECTUNIT_MAX; i++)
 				{
 					if (_selectInfo.object[i] == NULL) continue;
@@ -603,7 +667,6 @@ void gameController::actionMouseMap(void)
 						ptCenter.y = ((float)ptTileMouseReal.y + (float)buildsize.y * 0.5f) * TILESIZE;
 
 						_selectInfo.object[i]->receiveCommand(_curCommand, ptCenter, ptTileMouseReal);
-						findDrone = true;
 						break;
 					}
 				}
@@ -630,6 +693,42 @@ void gameController::actionMouseMap(void)
 			_isClicked = false;
 			_findLocation = false;
 		}
+		else if (KEYMANAGER->isOnceKeyDown(VK_LBUTTON))
+		{
+			if (_buildable)
+			{
+				for (int i = 0; i < SELECTUNIT_MAX; i++)
+				{
+					if (_selectInfo.object[i] == NULL) continue;
+
+					if (_selectInfo.object[i]->getUnitnumZerg() == UNITNUM_ZERG_DRONE)
+					{
+						POINT ptTileMouseReal;
+						ptTileMouseReal.x = (_ptMouse.x + MAINCAMERA->getCameraX()) / TILESIZE;
+						ptTileMouseReal.y = (_ptMouse.y + MAINCAMERA->getCameraY()) / TILESIZE;
+
+						POINT ptCenter;
+						POINT buildsize = BUILDSIZE_EXTRACTOR;
+						ptCenter.x = ((float)ptTileMouseReal.x + (float)buildsize.x * 0.5f) * TILESIZE;
+						ptCenter.y = ((float)ptTileMouseReal.y + (float)buildsize.y * 0.5f) * TILESIZE;
+
+						_selectInfo.object[i]->receiveCommand(_curCommand, ptCenter, ptTileMouseReal);
+						break;
+					}
+				}
+
+				//드론에게 전달했으면, 드론이 없어도 어차피 초기화 해야됨
+				_curCommand = COMMAND_NONE;
+				_cursorState = CURSORSTATE_IDLE;
+				_isClicked = false;
+				_findLocation = false;
+			}
+			else
+			{
+				//빌드 실패 사운드
+			}
+		}
+
 		break;
 
 	}
@@ -810,6 +909,9 @@ void gameController::calcMouseRealPosition(void)
 
 BOOL gameController::actionHotkeys(void)
 {
+	if (_editboxChat->getClicked())
+		return false;
+
 	for (int i = 0; i < COMMAND_MAX; i++)
 	{
 		if (_commandSet[i].command == COMMAND_NONE) continue;
@@ -906,8 +1008,14 @@ BOOL gameController::checkBuildable(void)
 		{
 			for (int j = 0; j < _buildingSize.y; j++)
 			{
+				DWORD obj = _gameMap->getTiles()[ptTileMouseReal.x + i][ptTileMouseReal.y + j].obj;
 				DWORD attribute = _gameMap->getTiles()[ptTileMouseReal.x + i][ptTileMouseReal.y + j].attribute;
+				
 				if ((attribute & ATTR_UNBUILD) == ATTR_UNBUILD)
+				{
+					_buildingPlaceable[i][j] = BUILDSTATE_OVERLAP;
+				}
+				else if (obj != OBJECT_NONE)
 				{
 					_buildingPlaceable[i][j] = BUILDSTATE_OVERLAP;
 				}
@@ -924,14 +1032,16 @@ BOOL gameController::checkBuildable(void)
 		{
 			for (int j = 0; j < _buildingSize.y; j++)
 			{
+				DWORD obj = _gameMap->getTiles()[ptTileMouseReal.x + i][ptTileMouseReal.y + j].obj;
 				DWORD attribute = _gameMap->getTiles()[ptTileMouseReal.x + i][ptTileMouseReal.y + j].attribute;
-				if ((attribute & ATTR_UNBUILD) == ATTR_UNBUILD)
+
+				if (obj == OBJECT_GAS_START || obj == OBJECT_GAS_BODY)
 				{
-					_buildingPlaceable[i][j] = BUILDSTATE_OVERLAP;
+					_buildingPlaceable[i][j] = BUILDSTATE_PLACEABLE;
 				}
 				else
 				{
-					_buildingPlaceable[i][j] = BUILDSTATE_PLACEABLE;
+					_buildingPlaceable[i][j] = BUILDSTATE_OVERLAP;
 				}
 			}
 		}
@@ -942,7 +1052,9 @@ BOOL gameController::checkBuildable(void)
 		{
 			for (int j = 0; j < _buildingSize.y; j++)
 			{
+				DWORD obj = _gameMap->getTiles()[ptTileMouseReal.x + i][ptTileMouseReal.y + j].obj;
 				DWORD attribute = _gameMap->getTiles()[ptTileMouseReal.x + i][ptTileMouseReal.y + j].attribute;
+
 				if ((attribute & ATTR_UNBUILD) == ATTR_UNBUILD)
 				{
 					_buildingPlaceable[i][j] = BUILDSTATE_OVERLAP;
@@ -950,6 +1062,10 @@ BOOL gameController::checkBuildable(void)
 				else if ((attribute & ATTR_CREEP) == 0)
 				{
 					//크립이 없어도 건물 설치 불가
+					_buildingPlaceable[i][j] = BUILDSTATE_OVERLAP;
+				}
+				else if (obj != OBJECT_NONE)
+				{
 					_buildingPlaceable[i][j] = BUILDSTATE_OVERLAP;
 				}
 				else
@@ -1083,6 +1199,29 @@ void gameController::renderBuildImage(void)
 			}
 		}
 	}
+
+
+	//가스지을때는 가스 자리를 표시해준다.
+	if (_cursorState == CURSORSTATE_BUILD_EXTRACTOR)
+	{
+		for (int i = 0; i < _gameMap->getVGas().size(); i++)
+		{
+			RECT temp;
+			RECT rcBody = _gameMap->getVGas()[i]->getRectBody();
+			if (IntersectRect(&temp, &rcBody, &MAINCAMERA->getRectCamera()))
+			{
+				OffsetRect(&rcBody, -MAINCAMERA->getCameraX(), -MAINCAMERA->getCameraY());
+
+				rcBody.left   -= 2 + 1;
+				rcBody.top    -= 2 + 1;
+				rcBody.right  += 2;
+				rcBody.bottom += 2;
+
+
+				RENDERMANAGER->insertLineRectangle(ZORDER_GAMEMOUSEDRAG, rcBody, PENVERSION_SHOWGASRECT);
+			}
+		}
+	}
 }
 
 
@@ -1213,8 +1352,40 @@ TEAM gameController::searchObject(void)
 	//TARGETTYPE targetType = TARGETTYPE_GROUND;
 	//void* res = getTargetInfo(ptMouseReal, targetType);
 
+
+	//내 오브젝트 먼저 체크
+	{
+		player* player = _myPlayer;
+		vUnits vUnitsInCamera = player->getUnitsInCamera();
+		vBuildings vBuildingsInCamera = player->getBuildingsInCamera();
+
+		//유닛먼저 체크
+		for (int j = 0; j < vUnitsInCamera.size(); j++)
+		{
+			RECT rcBody = vUnitsInCamera[j]->getBattleStatus().rcBody;
+			if (PtInRect(&rcBody, ptMouseReal))
+			{
+				return TEAM_MYTEAM;
+			}
+		}
+
+		//유닛 체크 안되면 건물 체크
+		for (int j = 0; j < vBuildingsInCamera.size(); j++)
+		{
+			RECT rcBody = vBuildingsInCamera[j]->getBattleStatus().rcBody;
+			if (PtInRect(&rcBody, ptMouseReal))
+			{
+				return TEAM_MYTEAM;
+			}
+		}
+	}
+
+
+	//적 오브젝트 체크
 	for (int i = 0; i < PLAYER_NUM; i++)
 	{
+		if (_myPlayer == _player[i]) continue;
+
 		player* player = _player[i];
 		vUnits vUnitsInCamera = player->getUnitsInCamera();
 		vBuildings vBuildingsInCamera = player->getBuildingsInCamera();
@@ -1225,14 +1396,7 @@ TEAM gameController::searchObject(void)
 			RECT rcBody = vUnitsInCamera[j]->getBattleStatus().rcBody;
 			if (PtInRect(&rcBody, ptMouseReal))
 			{
-				if (i == PLAYER1)
-				{
-					return TEAM_MYTEAM;
-				}
-				else
-				{
-					return TEAM_ENEMY;
-				}
+				return TEAM_ENEMY;
 			}
 		}
 
@@ -1242,17 +1406,31 @@ TEAM gameController::searchObject(void)
 			RECT rcBody = vBuildingsInCamera[j]->getBattleStatus().rcBody;
 			if (PtInRect(&rcBody, ptMouseReal))
 			{
-				if (i == PLAYER1)
-				{
-					return TEAM_MYTEAM;
-				}
-				else
-				{
-					return TEAM_ENEMY;
-				}
+				return TEAM_ENEMY;
+			}
+		}
+	}
+
+	
+	//적도 없으면 자원체크
+	{
+		for (int i = 0; i < _gameMap->getVMineral().size(); i++)
+		{
+			RECT rcBody = _gameMap->getVMineral()[i]->getRectBody();
+			if (PtInRect(&rcBody, ptMouseReal))
+			{
+				return TEAM_NEUTRAL;
 			}
 		}
 
+		for (int i = 0; i < _gameMap->getVGas().size(); i++)
+		{
+			RECT rcBody = _gameMap->getVGas()[i]->getRectBody();
+			if (PtInRect(&rcBody, ptMouseReal))
+			{
+				return TEAM_NEUTRAL;
+			}
+		}
 	}
 	return TEAM_NONE;
 }
@@ -1263,8 +1441,54 @@ TEAM gameController::clickObject(void)
 	ptMouseReal.x = _ptMouse.x + MAINCAMERA->getCameraX();
 	ptMouseReal.y = _ptMouse.y + MAINCAMERA->getCameraY();
 
+	//내 오브젝트 먼저 체크
+	{
+		player* player = _myPlayer;
+		vUnits vUnitsInCamera = player->getUnitsInCamera();
+		vBuildings vBuildingsInCamera = player->getBuildingsInCamera();
+
+		//유닛먼저 체크
+		for (int j = 0; j < vUnitsInCamera.size(); j++)
+		{
+			RECT rcBody = vUnitsInCamera[j]->getBattleStatus().rcBody;
+			if (PtInRect(&rcBody, ptMouseReal))
+			{
+				clearSelectInfo();
+
+				vUnitsInCamera[j]->setClicked(true);
+
+				_selectInfo.isSelected = true;
+				_selectInfo.num = 1;
+				_selectInfo.object[0] = vUnitsInCamera[j];
+
+				return TEAM_MYTEAM;
+			}
+		}
+
+		//유닛없으면 건물 체크
+		for (int j = 0; j < vBuildingsInCamera.size(); j++)
+		{
+			RECT rcBody = vBuildingsInCamera[j]->getBattleStatus().rcBody;
+			if (PtInRect(&rcBody, ptMouseReal))
+			{
+				clearSelectInfo();
+
+				vBuildingsInCamera[j]->setClicked(true);
+
+				_selectInfo.isSelected = true;
+				_selectInfo.num = 1;
+				_selectInfo.object[0] = vBuildingsInCamera[j];
+
+				return TEAM_MYTEAM;
+			}
+		}
+	}
+
+	//적 오브젝트 체크
 	for (int i = 0; i < PLAYER_NUM; i++)
 	{
+		if (_myPlayer == _player[i])  continue;
+
 		player* player = _player[i];
 		vUnits vUnitsInCamera = player->getUnitsInCamera();
 		vBuildings vBuildingsInCamera = player->getBuildingsInCamera();
@@ -1275,18 +1499,15 @@ TEAM gameController::clickObject(void)
 			RECT rcBody = vUnitsInCamera[j]->getBattleStatus().rcBody;
 			if (PtInRect(&rcBody, ptMouseReal))
 			{
-				if (i == PLAYER1)
-				{
-					clearSelectInfo();
+				clearSelectInfo();
 
-					vUnitsInCamera[j]->setClicked(true);
+				vUnitsInCamera[j]->setClicked(true);
 
-					_selectInfo.isSelected = true;
-					_selectInfo.num = 1;
-					_selectInfo.object[0] = vUnitsInCamera[j];
+				_selectInfo.isSelected = true;
+				_selectInfo.num = 1;
+				_selectInfo.object[0] = vUnitsInCamera[j];
 
-					return TEAM_MYTEAM;
-				}
+				return TEAM_ENEMY;
 			}
 		}
 
@@ -1296,21 +1517,55 @@ TEAM gameController::clickObject(void)
 			RECT rcBody = vBuildingsInCamera[j]->getBattleStatus().rcBody;
 			if (PtInRect(&rcBody, ptMouseReal))
 			{
-				if (i == PLAYER1)
-				{
-					clearSelectInfo();
+				clearSelectInfo();
 
-					vBuildingsInCamera[j]->setClicked(true);
+				vBuildingsInCamera[j]->setClicked(true);
 
-					_selectInfo.isSelected = true;
-					_selectInfo.num = 1;
-					_selectInfo.object[0] = vBuildingsInCamera[j];
+				_selectInfo.isSelected = true;
+				_selectInfo.num = 1;
+				_selectInfo.object[0] = vBuildingsInCamera[j];
 
-					return TEAM_MYTEAM;
-				}
+				return TEAM_MYTEAM;
+			}
+		}
+	}
+
+
+	//적도 없으면 자원체크
+	{
+		for (int i = 0; i < _gameMap->getVMineral().size(); i++)
+		{
+			RECT rcBody = _gameMap->getVMineral()[i]->getRectBody();
+			if (PtInRect(&rcBody, ptMouseReal))
+			{
+				clearSelectInfo();
+
+				_selectInfo.isSelected = true;
+				_selectInfo.num = 1;
+				_selectInfo.object[0] = _gameMap->getVMineral()[i];
+
+				_gameMap->getVMineral()[i]->setClicked(true);
+
+				return TEAM_NEUTRAL;
 			}
 		}
 
+		for (int i = 0; i < _gameMap->getVGas().size(); i++)
+		{
+			RECT rcBody = _gameMap->getVGas()[i]->getRectBody();
+			if (PtInRect(&rcBody, ptMouseReal))
+			{
+				clearSelectInfo();
+
+				_selectInfo.isSelected = true;
+				_selectInfo.num = 1;
+				_selectInfo.object[0] = _gameMap->getVGas()[i];
+
+				_gameMap->getVGas()[i]->setClicked(true);
+
+				return TEAM_NEUTRAL;
+			}
+		}
 	}
 
 	return TEAM_NONE;
@@ -1344,8 +1599,109 @@ TEAM gameController::dragObjects(RECT rcDrag)
 	bool find = false;
 	UINT findNum = 0;
 
+	//내 오브젝트 먼저 체크
+	{
+		player* player = _myPlayer;
+		vUnits vUnitsInCamera = player->getUnitsInCamera();
+		vBuildings vBuildingsInCamera = player->getBuildingsInCamera();
+
+		//유닛먼저 체크
+		for (int j = 0; j < vUnitsInCamera.size(); j++)
+		{
+			//에그는 유닛이 아예 없으면 찾는다.
+			if (vUnitsInCamera[j]->getUnitnumZerg() == UNITNUM_ZERG_ZERGEGG) continue;
+
+			RECT rcBody = vUnitsInCamera[j]->getBattleStatus().rcBody;
+			if (IntersectRect(&temp, &rcBody, &rcDrag))
+			{
+				if (find == false)
+				{
+					find = true;
+					clearSelectInfo();
+				}
+
+				vUnitsInCamera[j]->setClicked(true);
+
+				_selectInfo.isSelected = true;
+				_selectInfo.object[findNum] = vUnitsInCamera[j];
+				findNum++;
+
+				if (findNum == SELECTUNIT_MAX)
+					break;
+			}
+		}
+
+		if (find)
+		{
+			_selectInfo.num = findNum;
+			return TEAM_MYTEAM;
+		}
+
+
+		//에그만 따로 체크
+		for (int j = 0; j < vUnitsInCamera.size(); j++)
+		{
+			if (vUnitsInCamera[j]->getUnitnumZerg() != UNITNUM_ZERG_ZERGEGG) continue;
+
+			RECT rcBody = vUnitsInCamera[j]->getBattleStatus().rcBody;
+			if (IntersectRect(&temp, &rcBody, &rcDrag))
+			{
+				if (find == false)
+				{
+					find = true;
+					clearSelectInfo();
+				}
+
+				vUnitsInCamera[j]->setClicked(true);
+
+				_selectInfo.isSelected = true;
+				_selectInfo.object[findNum] = vUnitsInCamera[j];
+				findNum++;
+
+				if (findNum == SELECTUNIT_MAX)
+					break;
+			}
+		}
+
+		if (find)
+		{
+			_selectInfo.num = findNum;
+			return TEAM_MYTEAM;
+		}
+
+		//건물 체크
+		for (int j = 0; j < vBuildingsInCamera.size(); j++)
+		{
+			RECT rcBody = vBuildingsInCamera[j]->getBattleStatus().rcBody;
+			if (IntersectRect(&temp, &rcBody, &rcDrag))
+			{
+				if (find == false)
+				{
+					find = true;
+					clearSelectInfo();
+				}
+
+				vBuildingsInCamera[j]->setClicked(true);
+
+				_selectInfo.isSelected = true;
+				_selectInfo.object[findNum] = vBuildingsInCamera[j];
+				findNum = 1;
+				break;
+			}
+		}
+
+		if (find)
+		{
+			_selectInfo.num = findNum;
+			return TEAM_MYTEAM;
+		}
+	}
+
+	//적 오브젝트 체크
 	for (int i = 0; i < PLAYER_NUM; i++)
 	{
+		if (_myPlayer == _player[i]) continue;
+
 		player* player = _player[i];
 		vUnits vUnitsInCamera = player->getUnitsInCamera();
 		vBuildings vBuildingsInCamera = player->getBuildingsInCamera();
@@ -1362,35 +1718,22 @@ TEAM gameController::dragObjects(RECT rcDrag)
 					clearSelectInfo();
 				}
 
-				if (i == PLAYER1)
-				{
-					vUnitsInCamera[j]->setClicked(true);
+				vUnitsInCamera[j]->setClicked(true);
 
-					_selectInfo.isSelected = true;
-					_selectInfo.object[findNum] = vUnitsInCamera[j];
-					findNum++;
-
-					if (findNum == SELECTUNIT_MAX)
-						break;
-				}
+				_selectInfo.isSelected = true;
+				_selectInfo.object[findNum] = vUnitsInCamera[j];
+				findNum = 1;
+				break;
 			}
 		}
 
 		if (find)
 		{
 			_selectInfo.num = findNum;
-
-			if (_player[i] == _myPlayer)
-			{
-				return TEAM_MYTEAM;
-			}
-			else
-			{
-				return TEAM_ENEMY;
-			}
+			return TEAM_ENEMY;
 		}
 
-		//유닛먼저 체크
+		//건물 체크
 		for (int j = 0; j < vBuildingsInCamera.size(); j++)
 		{
 			RECT rcBody = vBuildingsInCamera[j]->getBattleStatus().rcBody;
@@ -1402,32 +1745,60 @@ TEAM gameController::dragObjects(RECT rcDrag)
 					clearSelectInfo();
 				}
 
-				if (i == PLAYER1)
-				{
-					vBuildingsInCamera[j]->setClicked(true);
+				vBuildingsInCamera[j]->setClicked(true);
 
-					_selectInfo.isSelected = true;
-					_selectInfo.object[findNum] = vBuildingsInCamera[j];
-					findNum = 1;
-					break;
-				}
+				_selectInfo.isSelected = true;
+				_selectInfo.object[findNum] = vBuildingsInCamera[j];
+				findNum = 1;
+				break;
 			}
 		}
 
 		if (find)
 		{
 			_selectInfo.num = findNum;
+			return TEAM_ENEMY;
+		}
+	}
 
-			if (_player[i] == _myPlayer)
+	//적도 없으면 자원체크
+	{
+		for (int i = 0; i < _gameMap->getVMineral().size(); i++)
+		{
+			RECT rcBody = _gameMap->getVMineral()[i]->getRectBody();
+			if (IntersectRect(&temp, &rcBody, &rcDrag))
 			{
-				return TEAM_MYTEAM;
+				clearSelectInfo();
+
+				_selectInfo.isSelected = true;
+				_selectInfo.num = 1;
+				_selectInfo.object[0] = _gameMap->getVMineral()[i];
+
+				_gameMap->getVMineral()[i]->setClicked(true);
+
+				return TEAM_NEUTRAL;
 			}
-			else
+		}
+
+		for (int i = 0; i < _gameMap->getVGas().size(); i++)
+		{
+			RECT rcBody = _gameMap->getVGas()[i]->getRectBody();
+			if (IntersectRect(&temp, &rcBody, &rcDrag))
 			{
-				return TEAM_ENEMY;
+				clearSelectInfo();
+				
+				_selectInfo.isSelected = true;
+				_selectInfo.num = 1;
+				_selectInfo.object[0] = _gameMap->getVGas()[i];
+
+				_gameMap->getVGas()[i]->setClicked(true);
+
+
+				return TEAM_NEUTRAL;
 			}
 		}
 	}
+
 
 	return TEAM_NONE;
 }
@@ -1465,6 +1836,28 @@ gameObject* gameController::getTargetInfo(void)
 			}
 		}
 	}
+
+	//자원체크
+	{
+		for (int i = 0; i < _gameMap->getVMineral().size(); i++)
+		{
+			RECT rcBody = _gameMap->getVMineral()[i]->getRectBody();
+			if (PtInRect(&rcBody, ptMouseReal))
+			{
+				return _gameMap->getVMineral()[i];
+			}
+		}
+
+		for (int i = 0; i < _gameMap->getVGas().size(); i++)
+		{
+			RECT rcBody = _gameMap->getVGas()[i]->getRectBody();
+			if (PtInRect(&rcBody, ptMouseReal))
+			{
+				return _gameMap->getVGas()[i];
+			}
+		}
+	}
+
 	return NULL;
 }
 
@@ -1497,7 +1890,61 @@ void gameController::clearSelectInfo(gameObject* object)
 		}
 	}
 
-	checkSelectInfo();
+	refreshSelectInfo();
+}
+
+void gameController::deleteSelectInfo(UINT num)
+{
+	if (_selectInfo.object[num] == NULL)
+		return;
+
+	_selectInfo.object[num]->setClicked(false);
+	_selectInfo.object[num] = NULL;
+	_selectInfo.num--;
+
+	refreshSelectInfo();
+}
+
+void gameController::filterSelectInfo(UINT num)
+{
+	if (_selectInfo.object[num] == NULL)
+		return;
+
+	UNITNUM_ZERG unitNumZ = _selectInfo.object[num]->getUnitnumZerg();
+
+	for (int i = 0; i < SELECTUNIT_MAX; i++)
+	{
+		if (_selectInfo.object[i] == NULL) continue;
+
+		if (unitNumZ != _selectInfo.object[i]->getUnitnumZerg())
+		{
+			_selectInfo.object[i]->setClicked(false);
+			_selectInfo.object[i] = NULL;
+			_selectInfo.num--;
+		}
+	}
+
+	refreshSelectInfo();
+}
+
+void gameController::onlySelecInfo(UINT num)
+{
+	if (_selectInfo.object[num] == NULL)
+		return;
+
+	for (int i = 0; i < SELECTUNIT_MAX; i++)
+	{
+		if (i == num) continue;
+
+		if (_selectInfo.object[i] == NULL) continue;
+
+		_selectInfo.object[i]->setClicked(false);
+		_selectInfo.object[i] = NULL;
+	}
+
+	_selectInfo.num = 1;
+
+	refreshSelectInfo();
 }
 
 void gameController::checkSelectInfo(void)
@@ -1546,9 +1993,11 @@ void gameController::refreshSelectInfo(void)
 		{
 			for (int j = i + 1; j < SELECTUNIT_MAX; j++)
 			{
+				if (_selectInfo.object[j] == NULL) continue;
+
 				_selectInfo.object[i] = _selectInfo.object[j];
 				_selectInfo.object[j] = NULL;
-				printf("");
+				break;
 			}
 		}
 	}
@@ -1723,7 +2172,7 @@ void gameController::matchingCommandImage(void)
 			}
 			case COMMAND_RETURNCARGO:
 			{
-				_commandSet[i].button->setImage(L"command-return");
+				_commandSet[i].button->setImage(L"command-returncargo");
 
 				_commandSet[i].button->setDisable(false);
 				
@@ -2513,7 +2962,11 @@ void gameController::actionCommand(void)
 	case COMMAND_ATTACK:
 	case COMMAND_PATROL:
 	case COMMAND_GATHER:
-		_findTarget = true;
+		_findTarget = true;	
+		if(_cursorState != CURSORSTATE_FOCUS_TO_ME
+			&& _cursorState != CURSORSTATE_FOCUS_TO_NEUTRAL
+			&& _cursorState != CURSORSTATE_FOCUS_TO_ENEMY)
+			_cursorState = CURSORSTATE_FOCUS_TO_ME;
 		break;
 	case COMMAND_STOP:
 	case COMMAND_HOLD:
@@ -2588,32 +3041,219 @@ void gameController::actionCommand(void)
 		}
 		_curCommand = COMMAND_NONE;
 		break;
+
 	case COMMAND_SETRALLYPOINT:
+		_findTarget = true;
+		_cursorState = CURSORSTATE_FOCUS_TO_ME;
 		break;
 
 
 		//ZERG
-	case COMMAND_INFEST:					_findTarget = true;		break;
-	case COMMAND_PARASITE:					_findTarget = true;		break;
-	case COMMAND_BROODRING:					_findTarget = true;		break;
-	case COMMAND_ENSNARE:					_findTarget = true;		break;
-	case COMMAND_CONSUME:					_findTarget = true;		break;
-	case COMMAND_DARKSWARM:					_findTarget = true;		break;
-	case COMMAND_PLAGUE:					_findTarget = true;		break;
+	case COMMAND_INFEST:					_findTarget = true;		_cursorState = CURSORSTATE_FOCUS_TO_ME;	break;
+	case COMMAND_PARASITE:					_findTarget = true;		_cursorState = CURSORSTATE_FOCUS_TO_ME;	break;
+	case COMMAND_BROODRING:					_findTarget = true;		_cursorState = CURSORSTATE_FOCUS_TO_ME;	break;
+	case COMMAND_ENSNARE:					_findTarget = true;		_cursorState = CURSORSTATE_FOCUS_TO_ME;	break;
+	case COMMAND_CONSUME:					_findTarget = true;		_cursorState = CURSORSTATE_FOCUS_TO_ME;	break;
+	case COMMAND_DARKSWARM:					_findTarget = true;		_cursorState = CURSORSTATE_FOCUS_TO_ME;	break;
+	case COMMAND_PLAGUE:					_findTarget = true;		_cursorState = CURSORSTATE_FOCUS_TO_ME;	break;
 
 		//BUILD1
-	case COMMAND_BUILD_HATCHERY:			_findLocation = true;	_cursorState = CURSORSTATE_BUILD_HATCHERY;		_buildingSize = BUILDSIZE_HATCHERY			;	_buildable = false; break;
-	case COMMAND_BUILD_CREEPCOLONY:			_findLocation = true;	_cursorState = CURSORSTATE_BUILD_NORMAL;		_buildingSize = BUILDSIZE_CREEPCOLONY		;	_buildable = false; break;
-	case COMMAND_BUILD_EXTRACTOR:			_findLocation = true;	_cursorState = CURSORSTATE_BUILD_EXTRACTOR;		_buildingSize = BUILDSIZE_EXTRACTOR			;	_buildable = false; break;
-	case COMMAND_BUILD_SPAWNINGPOOL:		_findLocation = true;	_cursorState = CURSORSTATE_BUILD_NORMAL;		_buildingSize = BUILDSIZE_SPAWNINGPOOL		;	_buildable = false; break;
-	case COMMAND_BUILD_EVOLUTIONCHAMBER:	_findLocation = true;	_cursorState = CURSORSTATE_BUILD_NORMAL;		_buildingSize = BUILDSIZE_EVOLUTIONCHAMBER	;	_buildable = false; break;
-	case COMMAND_BUILD_HYDRALISKDEN:		_findLocation = true;	_cursorState = CURSORSTATE_BUILD_NORMAL;		_buildingSize = BUILDSIZE_HYDRALISKDEN		;	_buildable = false; break;
+	case COMMAND_BUILD_HATCHERY:			
+	{
+		tagProduction buildCost = _myPlayer->getZergProductionInfo()->getZBProductionInfo(BUILDINGNUM_ZERG_HATCHERY);
+
+		if (_myPlayer->canResource(buildCost.costMinerals, buildCost.costGas))
+		{
+			_findLocation = true;	
+			_cursorState = CURSORSTATE_BUILD_HATCHERY;		
+			_buildingSize = BUILDSIZE_HATCHERY;	
+			_buildable = false; 
+		}
+		else
+		{
+			_curCommand = COMMAND_BUILD1;
+		}
+
+		break;
+	}
+	case COMMAND_BUILD_CREEPCOLONY:			
+	{
+		tagProduction buildCost = _myPlayer->getZergProductionInfo()->getZBProductionInfo(BUILDINGNUM_ZERG_CREEPCOLONY);
+
+		if (_myPlayer->canResource(buildCost.costMinerals, buildCost.costGas))
+		{
+			_findLocation = true;	
+			_cursorState = CURSORSTATE_BUILD_NORMAL;		
+			_buildingSize = BUILDSIZE_CREEPCOLONY;	
+			_buildable = false; 
+		}
+		else
+		{
+			_curCommand = COMMAND_BUILD1;
+		}
+		break;
+	}
+	case COMMAND_BUILD_EXTRACTOR:			
+	{
+		tagProduction buildCost = _myPlayer->getZergProductionInfo()->getZBProductionInfo(BUILDINGNUM_ZERG_EXTRACTOR);
+
+		if (_myPlayer->canResource(buildCost.costMinerals, buildCost.costGas))
+		{
+			_findLocation = true;	
+			_cursorState = CURSORSTATE_BUILD_EXTRACTOR;		
+			_buildingSize = BUILDSIZE_EXTRACTOR;	
+			_buildable = false; 
+		}
+		else
+		{
+			_curCommand = COMMAND_BUILD1;
+		}
+
+		break;
+	}
+	case COMMAND_BUILD_SPAWNINGPOOL:		
+	{
+		tagProduction buildCost = _myPlayer->getZergProductionInfo()->getZBProductionInfo(BUILDINGNUM_ZERG_SPAWNINGPOOL);
+
+		if (_myPlayer->canResource(buildCost.costMinerals, buildCost.costGas))
+		{
+			_findLocation = true;	
+			_cursorState = CURSORSTATE_BUILD_NORMAL;		
+			_buildingSize = BUILDSIZE_SPAWNINGPOOL;	
+			_buildable = false; 
+		}
+		else
+		{
+			_curCommand = COMMAND_BUILD1;
+		}
+
+		break;
+	}
+	case COMMAND_BUILD_EVOLUTIONCHAMBER:	
+	{
+		tagProduction buildCost = _myPlayer->getZergProductionInfo()->getZBProductionInfo(BUILDINGNUM_ZERG_EVOLUTIONCHAMBER);
+
+		if (_myPlayer->canResource(buildCost.costMinerals, buildCost.costGas))
+		{
+			_findLocation = true;	
+			_cursorState = CURSORSTATE_BUILD_NORMAL;		
+			_buildingSize = BUILDSIZE_EVOLUTIONCHAMBER;	
+			_buildable = false; 
+		}
+		else
+		{
+			_curCommand = COMMAND_BUILD1;
+		}
+
+		break;
+	}
+	case COMMAND_BUILD_HYDRALISKDEN:		
+	{
+		tagProduction buildCost = _myPlayer->getZergProductionInfo()->getZBProductionInfo(BUILDINGNUM_ZERG_HYDRALISKDEN);
+
+		if (_myPlayer->canResource(buildCost.costMinerals, buildCost.costGas))
+		{
+			_findLocation = true;	
+			_cursorState = CURSORSTATE_BUILD_NORMAL;		
+			_buildingSize = BUILDSIZE_HYDRALISKDEN;	
+			_buildable = false; 
+		}
+		else
+		{
+			_curCommand = COMMAND_BUILD1;
+		}
+
+		break;
+	}
 		//BUILD2
-	case COMMAND_BUILD_SPIRE:				_findLocation = true;	_cursorState = CURSORSTATE_BUILD_NORMAL;		_buildingSize = BUILDSIZE_SPIRE				;	_buildable = false; break;
-	case COMMAND_BUILD_QUEENSNEST:			_findLocation = true;	_cursorState = CURSORSTATE_BUILD_NORMAL;		_buildingSize = BUILDSIZE_QUEENSNEST		;	_buildable = false; break;
-	case COMMAND_BUILD_NYDUSCANAL:			_findLocation = true;	_cursorState = CURSORSTATE_BUILD_NORMAL;		_buildingSize = BUILDSIZE_NYDUSCANAL		;	_buildable = false; break;
-	case COMMAND_BUILD_ULTRALISKCAVERN:		_findLocation = true;	_cursorState = CURSORSTATE_BUILD_NORMAL;		_buildingSize = BUILDSIZE_ULTRALISKCAVERN	;	_buildable = false; break;
-	case COMMAND_BUILD_DEFILERMOUND:		_findLocation = true;	_cursorState = CURSORSTATE_BUILD_NORMAL;		_buildingSize = BUILDSIZE_DEFILERMOUND		;	_buildable = false; break;
+	case COMMAND_BUILD_SPIRE:				
+	{
+		tagProduction buildCost = _myPlayer->getZergProductionInfo()->getZBProductionInfo(BUILDINGNUM_ZERG_SPIRE);
+
+		if (_myPlayer->canResource(buildCost.costMinerals, buildCost.costGas))
+		{
+			_findLocation = true;	
+			_cursorState = CURSORSTATE_BUILD_NORMAL;		
+			_buildingSize = BUILDSIZE_SPIRE;	
+			_buildable = false; 
+		}
+		else
+		{
+			_curCommand = COMMAND_BUILD2;
+		}
+
+		break;
+	}
+	case COMMAND_BUILD_QUEENSNEST:			
+	{
+		tagProduction buildCost = _myPlayer->getZergProductionInfo()->getZBProductionInfo(BUILDINGNUM_ZERG_QUEENSNEST);
+
+		if (_myPlayer->canResource(buildCost.costMinerals, buildCost.costGas))
+		{
+			_findLocation = true;	
+			_cursorState = CURSORSTATE_BUILD_NORMAL;		
+			_buildingSize = BUILDSIZE_QUEENSNEST;	
+			_buildable = false; 
+		}
+		else
+		{
+			_curCommand = COMMAND_BUILD2;
+		}
+
+		break;
+	}
+	case COMMAND_BUILD_NYDUSCANAL:			
+	{
+		tagProduction buildCost = _myPlayer->getZergProductionInfo()->getZBProductionInfo(BUILDINGNUM_ZERG_NYDUSCANAL);
+
+		if (_myPlayer->canResource(buildCost.costMinerals, buildCost.costGas))
+		{
+			_findLocation = true;	
+			_cursorState = CURSORSTATE_BUILD_NORMAL;		
+			_buildingSize = BUILDSIZE_NYDUSCANAL;	
+			_buildable = false; 
+		}
+		else
+		{
+			_curCommand = COMMAND_BUILD2;
+		}
+
+		break;
+	}
+	case COMMAND_BUILD_ULTRALISKCAVERN:		
+	{
+		tagProduction buildCost = _myPlayer->getZergProductionInfo()->getZBProductionInfo(BUILDINGNUM_ZERG_ULTRALISKCAVERN);
+
+		if (_myPlayer->canResource(buildCost.costMinerals, buildCost.costGas))
+		{
+			_findLocation = true;	
+			_cursorState = CURSORSTATE_BUILD_NORMAL;		
+			_buildingSize = BUILDSIZE_ULTRALISKCAVERN;	
+			_buildable = false; 
+		}
+		else
+		{
+			_curCommand = COMMAND_BUILD2;
+		}
+		break;
+	}
+	case COMMAND_BUILD_DEFILERMOUND:		
+	{
+		tagProduction buildCost = _myPlayer->getZergProductionInfo()->getZBProductionInfo(BUILDINGNUM_ZERG_DEFILERMOUND);
+
+		if (_myPlayer->canResource(buildCost.costMinerals, buildCost.costGas))
+		{
+			_findLocation = true;	
+			_cursorState = CURSORSTATE_BUILD_NORMAL;		
+			_buildingSize = BUILDSIZE_DEFILERMOUND;	
+			_buildable = false; 
+		}
+		else
+		{
+			_curCommand = COMMAND_BUILD2;
+		}
+		break;
+	}
 
 	case COMMAND_BUILD_LAIR:
 	case COMMAND_BUILD_HIVE:				
@@ -2694,7 +3334,14 @@ void gameController::actionCommand(void)
 void gameController::setCommandSet(void)
 {
 	if (_selectInfo.isSelected == FALSE)
+	{
+		for (int i = 0; i < COMMAND_MAX; i++)
+		{
+			_commandSet[i].command = COMMAND_NONE;
+		}
+
 		return;
+	}
 
 	
 
@@ -2709,10 +3356,75 @@ void gameController::setCommandSet(void)
 		//유닛이 복수일 경우
 		//0. 라바, 에그, 일반유닛 구분
 		//1. 모두 같은 유닛인지 체크 (->TRUE : 커맨드 모두 그대로 감 (드론은 빌드 제외))
-		//2. 다른 유닛일 경우 모두 지상유닛인지 체크 (->TRUE : 버러우 가능한 유닛이 있으면 버러우 커맨드 추가)
-		//3. 공격 불가능한 유닛들만 있는지 체크 (-> 공격 커맨드 빼야됨)
-		//4. 
+		bool isSameUnits = true;
+		UNITNUM_ZERG unitnum0 = _selectInfo.object[0]->getUnitnumZerg();
 
+		for (int i = 1; i < COMMAND_MAX; i++)
+		{
+			if (_selectInfo.object[i] == NULL) continue;
+
+			if (_selectInfo.object[i]->getUnitnumZerg() == unitnum0) continue;
+
+			isSameUnits = false;
+			break;
+		}
+
+		if (isSameUnits)
+		{
+			if (unitnum0 == UNITNUM_ZERG_DRONE)
+			{
+				_unitCommandInfo = _selectInfo.object[0]->getBattleStatus().curCommand;
+				memcpy(_commandSetUnit, _selectInfo.object[0]->getBaseStatus().commands, sizeof(COMMAND)*COMMAND_MAX);
+				_commandSetUnit[6] = COMMAND_NONE;
+				_commandSetUnit[7] = COMMAND_NONE;
+			}
+			else
+			{
+				//_unitCommandInfo = _selectInfo.object[0]->getBattleStatus().curCommand;
+				_unitCommandInfo = _curCommand;
+				memcpy(_commandSetUnit, _selectInfo.object[0]->getBaseStatus().commands, sizeof(COMMAND)*COMMAND_MAX);
+			}
+		}
+		else
+		{
+			//2. 다른 유닛일 경우 모두 지상유닛인지 체크 (->TRUE : 버러우 가능한 유닛이 있으면 버러우 커맨드 추가)
+			//3. 공격 불가능한 유닛들만 있는지 체크 (-> 공격 커맨드 빼야됨)
+			bool isBurrowable = true;
+			bool isAttackagble = false;
+
+			for (int i = 1; i < COMMAND_MAX; i++)
+			{
+				if (_selectInfo.object[i] == NULL) continue;
+
+				if (_selectInfo.object[i]->getBaseStatus().isAir)
+				{
+					isBurrowable = false;
+				}
+				else
+				{
+					if (_selectInfo.object[i]->getBaseStatus().commands[8] != COMMAND_BURROW)
+					{
+						isBurrowable = false;
+					}
+				}
+
+				if (_selectInfo.object[i]->getBaseStatus().commands[2] == COMMAND_ATTACK)
+				{
+					isAttackagble = true;
+				}
+			}
+
+			_unitCommandInfo = _curCommand;
+			_commandSetUnit[0] = COMMAND_MOVE;
+			_commandSetUnit[1] = COMMAND_STOP;
+			_commandSetUnit[2] = isAttackagble ? COMMAND_ATTACK : COMMAND_NONE;
+			_commandSetUnit[3] = COMMAND_PATROL;
+			_commandSetUnit[4] = COMMAND_HOLD;
+			_commandSetUnit[5] = COMMAND_NONE;
+			_commandSetUnit[6] = COMMAND_NONE;
+			_commandSetUnit[7] = COMMAND_NONE;
+			_commandSetUnit[8] = isBurrowable ? COMMAND_BURROW : COMMAND_NONE;
+		}
 	}
 
 
@@ -2720,7 +3432,6 @@ void gameController::setCommandSet(void)
 
 
 
-	//debug
 	switch (_curCommand)
 	{
 	case COMMAND_BUILD1:

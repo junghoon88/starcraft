@@ -9,6 +9,8 @@
 #include "miniMap.h"
 #include "button.h"
 #include "progressBar.h"
+#include "editbox.h"
+
 
 #include "gameInterface.h"
 
@@ -125,6 +127,11 @@ private:
 	hotkeys*			_hotkeys;						//단축키 클래스
 
 	gameMap*			_gameMap;
+	miniMap*			_miniMap;
+
+	BOOL				_isChating;
+	editbox*			_editboxChat;
+
 
 private:
 	player*				_myPlayer;
@@ -138,6 +145,7 @@ public:
 	void release(void);
 	void update(void);
 	void render(void);
+	void getChar(WPARAM wParam);
 
 private:
 	void initCommandSet(void);
@@ -175,19 +183,20 @@ private:
 
 	gameObject* getTargetInfo(void);
 
-	void clearSelectInfo(void);
-	void clearSelectInfo(gameObject* object);
-	void checkSelectInfo(void);
-	void refreshSelectInfo(void);
 
 
 
 public:
 	//현재 선택한 정보를 다음 오브젝트로 변경해주는 함수 (예:드론->해처리)
 	void changeSelectInfoToNextObect(gameObject* object);
-	//라바를 선택하는 함수(해처리, 레어, 하이브 3개 다 써야되서 void* 로 함.)
-	void changeSelectInfoToLarva(void* hatchery, BUILDINGNUM_ZERG buildingNum); 
 
+	void clearSelectInfo(void);
+	void clearSelectInfo(gameObject* object);
+	void deleteSelectInfo(UINT num);
+	void filterSelectInfo(UINT num);
+	void onlySelecInfo(UINT num);
+	void checkSelectInfo(void);
+	void refreshSelectInfo(void);
 
 
 public:
@@ -195,8 +204,10 @@ public:
 	inline void setLinkAdressPlayers(player* player, PLAYER playerNum) { _player[playerNum] = player; }
 	inline void setLinkAdressGameMap(gameMap* map) { _gameMap = map; }
 
+	inline player* getMyPlayer(void) { return _myPlayer; };
 	inline tagSelectInfo getSelectInfo(void) { return _selectInfo; }
 	inline gameInterface* getGameInterface(void) { return _gameInterface; }
+	inline miniMap* getMiniMap(void) { return _miniMap; }
 
 
 	//button callback function

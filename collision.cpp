@@ -246,6 +246,7 @@ namespace IOTA_UTIL
 		return true;
 	}
 
+
 	int isCollisionOffset(const RECT& rcHold, RECT& rcMove)
 	{
 		RECT rcInter;

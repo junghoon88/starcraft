@@ -24,6 +24,7 @@
 #include "zbSunkenColony.h"
 #include "zbUltraliskCavern.h"
 
+#include "nrMineral.h"
 
 
 zuDrone::zuDrone(PLAYER playerNum)
@@ -44,14 +45,17 @@ zuDrone::zuDrone(PLAYER playerNum)
 
 
 
-	//private:
-	//_workState = WORKSTATE_IDLE;
-	//_hangingMineral = 0;	//0이면 안들고 있는 것.
-	//_hangingGas = 0;		//0이면 안들고 있는 것.
+	_workState = WORKSTATE_IDLE;
+	_hangingMineral = 0;	//0이면 안들고 있는 것.
+	_hangingGas = 0;		//0이면 안들고 있는 것.
 
+	_targetMineral = NULL;
+	_targetGas = NULL;
 
-	
-
+	_mineralGatheringTime = 0.0f;
+	_mineralGatheringTimeMax = 3.0f;
+	_gasGatheringTime = 0.0f;
+	_gasGatheringTimeMax = 1.0f;
 
 }
 
@@ -127,7 +131,7 @@ void zuDrone::initBaseStatus(void)
 	_baseStatus.commands[2] = COMMAND_ATTACK;
 	_baseStatus.commands[3] = COMMAND_NONE;
 	_baseStatus.commands[4] = COMMAND_GATHER;
-	_baseStatus.commands[5] = COMMAND_NONE;// COMMAND_RETURNCARGO;
+	_baseStatus.commands[5] = COMMAND_NONE;
 	_baseStatus.commands[6] = COMMAND_BUILD1;
 	_baseStatus.commands[7] = COMMAND_BUILD2;
 	_baseStatus.commands[8] = COMMAND_BURROW;
@@ -156,19 +160,14 @@ void zuDrone::update(void)
 {
 	Unit::update();
 
-	if (KEYMANAGER->isOnceKeyDown(VK_SPACE))
-	{
-		_battleStatus.bodyFrame.x++;
-		if (_battleStatus.bodyFrame.x > _baseStatus.imgBody->getMaxFrameX())
-		{
-			_battleStatus.bodyFrame.x = 0;
-		}
-	}
 }
 
 void zuDrone::render(void)
 {
-	Unit::render();
+	if (_workState != WORKSTATE_GATHERING_GAS)
+	{
+		Unit::render();
+	}
 
 }
 
@@ -197,6 +196,21 @@ void zuDrone::updateImageFrame(void)
 	Unit::setImageFrameForAngle();
 }
 
+void zuDrone::updateCommandSet(void)
+{
+	if (_hangingMineral == 0 && _hangingGas == 0)
+	{
+		_baseStatus.commands[4] = COMMAND_GATHER;
+		_baseStatus.commands[5] = COMMAND_NONE;
+	}
+	else
+	{
+		_baseStatus.commands[4] = COMMAND_NONE;
+		_baseStatus.commands[5] = COMMAND_RETURNCARGO;
+	}
+}
+
+
 void zuDrone::procCommands(void)
 {
 	Unit::procCommands();
@@ -205,6 +219,46 @@ void zuDrone::procCommands(void)
 
 	switch (_battleStatus.curCommand)
 	{
+	case COMMAND_GATHER:
+		if (_battleStatus.targetObject == NULL)
+		{
+			_battleStatus.curCommand = _battleStatus.oldCommand;
+			break;
+		}
+
+		if (_targetMineral == _battleStatus.targetObject)
+		{
+			gatheringMineral();
+		}
+		else if(_targetGas == _battleStatus.targetObject)
+		{
+			gatheringGas();
+		}
+		else
+		{
+			if (_battleStatus.targetObject->getIsNrMineral() == FALSE
+				//&& _battleStatus.targetObject->getIsNrGas() == FALSE
+				&& _battleStatus.targetObject->getBuildingNumZerg() != BUILDINGNUM_ZERG_EXTRACTOR)
+			{
+				//자원이 아니면 무효처리
+				_battleStatus.curCommand = _battleStatus.oldCommand;
+			}
+			else if (_battleStatus.targetObject->getIsNrMineral() == TRUE)
+			{
+				_targetMineral = _battleStatus.targetObject;
+				gatheringMineral();
+			}
+			else if (_battleStatus.targetObject->getBuildingNumZerg() == BUILDINGNUM_ZERG_EXTRACTOR)
+			{
+				_targetGas = _battleStatus.targetObject;
+				gatheringGas();
+			}
+		}
+		break;
+	case COMMAND_RETURNCARGO:
+		returnCargo();
+		break;
+
 		//BUILD1
 	case COMMAND_BUILD_HATCHERY:					buildingNum = BUILDINGNUM_ZERG_HATCHERY;			break;
 	case COMMAND_BUILD_CREEPCOLONY:					buildingNum = BUILDINGNUM_ZERG_CREEPCOLONY;			break;
@@ -220,38 +274,396 @@ void zuDrone::procCommands(void)
 	case COMMAND_BUILD_DEFILERMOUND:				buildingNum = BUILDINGNUM_ZERG_DEFILERMOUND;		break;
 	}
 
+	if (_battleStatus.curCommand != COMMAND_GATHER
+		&& _battleStatus.curCommand != COMMAND_RETURNCARGO)
+	{
+		if (_targetMineral)
+		{
+			_targetMineral->deleteIsBusy(0x10);
+			_targetMineral = NULL;
+		}
+
+		if (_targetGas)
+		{
+			_targetGas->deleteIsBusy(0x10);
+			_targetGas = NULL;
+		}
+
+
+		_workState = WORKSTATE_IDLE;
+	}
 
 	if (buildingNum != BUILDINGNUM_ZERG_NONE)
 	{
-		if (Unit::isInTargetPoint())
+		if (buildingNum == BUILDINGNUM_ZERG_EXTRACTOR)
 		{
-			tagProduction buildCost = _player->getZergProductionInfo()->getZBProductionInfo(buildingNum);
-
-			if (_player->useResource(buildCost.costMinerals, buildCost.costGas))
+			if (Unit::isInTargetPoint())
 			{
-				//성공
-				zbMutating* nextBuilding = new zbMutating(_playerNum, buildingNum);
-				nextBuilding->setLinkAdressZergUpgrade(_zergUpgrade);
-				nextBuilding->setLinkAdressAstar(_aStar);
-				nextBuilding->setLinkAdressPlayer(_player);
-				nextBuilding->init(_battleStatus.ptTileTarget);
+				tagProduction buildCost = _player->getZergProductionInfo()->getZBProductionInfo(buildingNum);
 
-				_player->addBuilding(nextBuilding);
+				if (_player->useResource(buildCost.costMinerals, buildCost.costGas))
+				{
+					//성공
+					zbMutating* nextBuilding = new zbMutating(_playerNum, buildingNum);
+					nextBuilding->setLinkAdressZergUpgrade(_zergUpgrade);
+					nextBuilding->setLinkAdressAstar(_aStar);
+					nextBuilding->setLinkAdressPlayer(_player);
+					nextBuilding->init(_battleStatus.ptTileTarget);
 
-				_nextObject = nextBuilding;
-				_valid = false;
+					_player->addBuilding(nextBuilding);
+
+					_nextObject = nextBuilding;
+					_valid = false;
+				}
+				else
+				{
+					//실패
+					_battleStatus.curCommand = COMMAND_STOP;
+					_battleStatus.unitState = UNITSTATE_STOP;
+				}
 			}
 			else
 			{
-				//실패
-				_battleStatus.curCommand = COMMAND_STOP;
-				_battleStatus.unitState = UNITSTATE_STOP;
+				Unit::moveGround();
 			}
 		}
 		else
 		{
-			Unit::moveGround();
+			if (Unit::isInTargetPoint())
+			{
+				tagProduction buildCost = _player->getZergProductionInfo()->getZBProductionInfo(buildingNum);
+
+				if (_player->useResource(buildCost.costMinerals, buildCost.costGas))
+				{
+					//성공
+					zbMutating* nextBuilding = new zbMutating(_playerNum, buildingNum);
+					nextBuilding->setLinkAdressZergUpgrade(_zergUpgrade);
+					nextBuilding->setLinkAdressAstar(_aStar);
+					nextBuilding->setLinkAdressPlayer(_player);
+					nextBuilding->init(_battleStatus.ptTileTarget);
+
+					_player->addBuilding(nextBuilding);
+
+					_nextObject = nextBuilding;
+					_valid = false;
+				}
+				else
+				{
+					//실패
+					_battleStatus.curCommand = COMMAND_STOP;
+					_battleStatus.unitState = UNITSTATE_STOP;
+				}
+			}
+			else
+			{
+				Unit::moveGround();
+			}
+		}
+	
+	}
+
+}
+
+
+
+void zuDrone::gatheringMineral(void)
+{
+	switch (_workState)
+	{
+	case WORKSTATE_IDLE:
+		_workState = WORKSTATE_MOVETO_MINERAL;
+		break;
+	case WORKSTATE_MOVETO_MINERAL:
+		Unit::moveGround();
+		if (Unit::isInTargetPoint())
+		{
+			//미네랄을 향해 바라본다.
+			rotateToTarget(_targetMineral);
+
+			//미네랄의 busy 상태를 체크한다.
+			if (_targetMineral->getIsBusy() == 0)
+			{
+				_targetMineral->addIsBusy(0x10);
+				_workState = WORKSTATE_GATHERING_MINERAL;
+			}
+			else
+			{
+				//10%확률로 다른 미네랄을 찾는다.
+				if (RND->getInt(10) < 5)
+				{
+					gameObject* otherMineral = findOtherMineral();
+					if (otherMineral == NULL)
+					{
+						//못찾았으면 기다린다.
+						_workState = WORKSTATE_WAITING_MINERAL;
+					}
+					else
+					{
+						_workState = WORKSTATE_IDLE;
+						receiveCommand(COMMAND_GATHER, otherMineral);
+					}
+				}
+				else
+				{
+					_workState = WORKSTATE_WAITING_MINERAL;
+				}
+			}
+		}
+		break;
+	case WORKSTATE_WAITING_MINERAL:
+		if (_targetMineral->getIsBusy() == 0)
+		{
+			_targetMineral->addIsBusy(0x10);
+			_workState = WORKSTATE_GATHERING_MINERAL;
+			_battleStatus.bodyFrame.y = 4;
+			_mineralGatheringTime = 0.0f;
+		}
+		break;
+	case WORKSTATE_GATHERING_MINERAL:
+		updateWorkState();
+		if (_hangingMineral > 0)
+		{
+			_targetMineral->deleteIsBusy(0x10);
+			_workState = WORKSTATE_RETURN_MINERAL;
+		}
+		break;
+	case WORKSTATE_RETURN_MINERAL:
+		gameObject* cargo = findCargo();
+		if (cargo == NULL)
+		{
+			_battleStatus.curCommand = COMMAND_STOP;
+		}
+		else
+		{
+			receiveCommand(COMMAND_RETURNCARGO, cargo);
+		}
+		break;
+	}
+}
+
+void zuDrone::gatheringGas(void)
+{
+	switch (_workState)
+	{
+	case WORKSTATE_IDLE:
+		_workState = WORKSTATE_MOVETO_GAS;
+		break;
+	case WORKSTATE_MOVETO_GAS:
+		Unit::moveGround();
+		if (Unit::isInTargetPoint())
+		{
+			//가스를 향해 바라본다.
+			rotateToTarget(_targetGas);
+
+			if (_targetGas->getIsBusy() == 0)
+			{
+				_targetGas->addIsBusy(0x10);
+				_workState = WORKSTATE_GATHERING_GAS;
+			}
+			else
+			{
+				_workState = WORKSTATE_WAITING_GAS;
+			}
+		}
+		break;
+	case WORKSTATE_WAITING_GAS:
+		if (_targetGas->getIsBusy() == 0)
+		{
+			_targetGas->addIsBusy(0x10);
+			_workState = WORKSTATE_GATHERING_GAS;
+		}
+		break;
+	case WORKSTATE_GATHERING_GAS:
+		updateWorkState();
+		if (_hangingGas > 0)
+		{
+			_targetGas->deleteIsBusy(0x10);
+			_workState = WORKSTATE_RETURN_GAS;
+			_gasGatheringTime = 0.0f;
+		}
+		break;
+	case WORKSTATE_RETURN_GAS:
+		gameObject* cargo = findCargo();
+		if (cargo == NULL)
+		{
+			_battleStatus.curCommand = COMMAND_STOP;
+		}
+		else
+		{
+			receiveCommand(COMMAND_RETURNCARGO, cargo);
+		}
+		break;
+	}
+}
+
+void zuDrone::returnCargo(void)
+{
+	if (_battleStatus.targetObject == NULL)
+	{
+		gameObject* cargo = findCargo();
+		if (cargo == NULL)
+		{
+			_battleStatus.curCommand = COMMAND_STOP;
+		}
+		else
+		{
+			receiveCommand(COMMAND_RETURNCARGO, cargo);
+		}
+	}
+	else
+	{
+		Unit::moveGround();
+		if (Unit::isInTargetPoint())
+		{
+			_player->addResource(_hangingMineral, _hangingGas);
+			_hangingMineral = 0;
+			_hangingGas = 0;
+			_battleStatus.bodyFrame.y = 0;
+
+			if (_targetMineral)
+			{
+				_workState = WORKSTATE_IDLE;
+
+				if (_targetMineral)
+				{
+					receiveCommand(COMMAND_GATHER, _targetMineral);
+				}
+				else
+				{
+					receiveCommand(COMMAND_STOP);
+				}
+			}
+			else if(_targetGas)
+			{
+				_workState = WORKSTATE_IDLE;
+				if (_targetGas)
+				{
+					receiveCommand(COMMAND_GATHER, _targetGas);
+				}
+				else
+				{
+					_battleStatus.curCommand = COMMAND_STOP;
+				}
+			}
+			else
+			{
+				_battleStatus.curCommand = COMMAND_STOP;
+			}
+		}
+	}
+}
+
+gameObject* zuDrone::findOtherMineral(void)
+{
+	int index = -1;
+	float distMin = 300;
+
+	for (int i = 0; i < _player->getGamemap()->getVMineral().size(); i++)
+	{
+		nrMineral* mn = _player->getGamemap()->getVMineral()[i];
+
+		if (mn->getIsBusy() != 0) continue;
+
+		float dist = getDistance(_battleStatus.pt.x, _battleStatus.pt.y,
+						mn->getBattleStatus().pt.x, mn->getBattleStatus().pt.y);
+
+		if (distMin > dist)
+		{
+			distMin = dist;
+			index = i;
 		}
 	}
 
+	if (index >= 0)
+	{
+		return _player->getGamemap()->getVMineral()[index];
+	}
+
+
+	return NULL;
+}
+gameObject* zuDrone::findCargo(void)
+{
+	int index = -1;
+	float distMin = TILEX * TILEY * TILESIZE;
+
+	for (int i = 0; i < _player->getBuildings().size(); i++)
+	{
+		Building* bd = _player->getBuildings()[i];
+		if (bd->getBuildingNumZerg() != BUILDINGNUM_ZERG_HATCHERY
+			&& bd->getBuildingNumZerg() != BUILDINGNUM_ZERG_LAIR
+			&& bd->getBuildingNumZerg() != BUILDINGNUM_ZERG_HIVE)
+		{
+			continue;
+		}
+
+		float dist = getDistance(_battleStatus.pt.x, _battleStatus.pt.y,
+								bd->getBattleStatus().pt.x, bd->getBattleStatus().pt.y);
+
+		if (distMin > dist)
+		{
+			distMin = dist;
+			index = i;
+		}
+	}
+
+	if (index >= 0)
+	{
+		return _player->getBuildings()[index];
+	}
+
+	return NULL;
+}
+
+void zuDrone::updateWorkState(void)
+{
+	if (_workState == WORKSTATE_GATHERING_MINERAL)
+	{
+		_mineralGatheringTime += TIMEMANAGER->getElapsedTime();
+
+		if (_mineralGatheringTime >= _mineralGatheringTimeMax)
+		{
+			_mineralGatheringTime = 0.0f;
+			_hangingMineral = _targetMineral->gatherMineral();
+			_battleStatus.bodyFrame.y = 10;
+
+			if (_targetMineral->getAmountMineral() == 0)
+			{
+				_targetMineral = findOtherMineral();
+				if (_targetMineral == NULL)
+				{
+					_battleStatus.targetObject = NULL;
+				}
+			}
+			return;
+		}
+
+		_battleStatus.bodyFrameTime += TIMEMANAGER->getElapsedTime();
+		if (_battleStatus.bodyFrameTime >= UNIT_BODY_FPS_TIME)
+		{
+			_battleStatus.bodyFrameTime -= UNIT_BODY_FPS_TIME;
+			_battleStatus.bodyFrame.y++;
+			if (_battleStatus.bodyFrame.y > 9)
+				_battleStatus.bodyFrame.y = 4;
+		}
+	}
+	else if (_workState == WORKSTATE_GATHERING_GAS)
+	{
+		_gasGatheringTime += TIMEMANAGER->getElapsedTime();
+
+		if (_gasGatheringTime >= _gasGatheringTimeMax)
+		{
+			_gasGatheringTime = 0.0f;
+			_hangingGas = _targetGas->gatherGas();
+			_battleStatus.bodyFrame.y = 11;
+		}
+	}
+}
+
+void zuDrone::rotateToTarget(gameObject* obj)
+{
+	_battleStatus.angleDeg = getAngleDeg(_battleStatus.pt.x, _battleStatus.pt.y,
+		obj->getBattleStatus().pt.x, obj->getBattleStatus().pt.y);
+
+	Unit::setImageFrameForAngle();
 }

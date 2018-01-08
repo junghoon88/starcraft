@@ -5,7 +5,7 @@
 #include "player.h"
 
 gameInterface::gameInterface()
-	: _progressBar(NULL), _miniMap(NULL), _gameController(NULL)
+	: _progressBar(NULL), _gameController(NULL)
 {
 	_imgIconWeapon[0] = NULL;
 	_imgIconWeapon[1] = NULL;
@@ -29,13 +29,6 @@ HRESULT gameInterface::init(void)
 	_progressBar->init(L"Mutating");
 	_progressBar->setPointLT(263, 427);
 
-	_miniMap = new miniMap;
-	_miniMap->init();
-
-
-
-
-
 	return S_OK;
 }
 
@@ -44,47 +37,14 @@ HRESULT gameInterface::init(void)
 void gameInterface::release(void)
 {
 	SAFE_RELEASEDELETE(_progressBar);
-	SAFE_RELEASEDELETE(_miniMap);
-
 }
 
 void gameInterface::update(void) 
 {
-	//minimap
-	RECT rcMinimap = _miniMap->getRect();
-	if (PtInRect(&rcMinimap, _ptMouse))
-	{
-		actionMouseMiniMap();
-	}
-
-	if (PtInRect(&_rcFace, _ptMouse))
-	{
-		tagSelectInfo selectInfo = _gameController->getSelectInfo();
-
-		if (selectInfo.isSelected && KEYMANAGER->isStayKeyDown(VK_LBUTTON))
-		{
-			int index = 0;
-			int topUnit = UNITNUM_ZERG_NONE;
-
-			//Stat2
-			for (int i = 0; i < SELECTUNIT_MAX; i++)
-			{
-				if (selectInfo.object[i] == NULL) continue;
-
-				//유닛중에 제일 높은애를 찾는다.
-				if (topUnit < selectInfo.object[i]->getUnitnumZerg())
-				{
-					topUnit = selectInfo.object[i]->getUnitnumZerg();
-					index = i;
-				}
-			}
-			POINT pt = selectInfo.object[index]->getBattleStatus().pt.toPoint();
-			MAINCAMERA->setCameraX(pt.x - WINSIZEX / 2);
-			MAINCAMERA->setCameraY(pt.y - WINSIZEY / 2);
-		}
-	}
-
+	updateFace();
 	updateIconWeapon();
+
+	updateSelectInfo();
 }
 
 void gameInterface::render(void) 
@@ -92,8 +52,6 @@ void gameInterface::render(void)
 	//선택된 유닛, 건물의 정보를 보여준다.
 	renderSelectInfo();
 
-	//미니맵을 보여준다.
-	_miniMap->render();
 
 }
 
@@ -119,9 +77,44 @@ void gameInterface::initVariables(void)
 	}
 }
 
-void gameInterface::actionMouseMiniMap(void)
+void gameInterface::updateFace(void)
 {
+	if (PtInRect(&_rcFace, _ptMouse) == FALSE)
+		return;
 
+	tagSelectInfo selectInfo = _gameController->getSelectInfo();
+
+	if (selectInfo.isSelected && KEYMANAGER->isStayKeyDown(VK_LBUTTON))
+	{
+		bool valid = false;
+
+		int index = 0;
+		int topUnit = UNITNUM_ZERG_NONE;
+
+		for (int i = 0; i < SELECTUNIT_MAX; i++)
+		{
+			if (selectInfo.object[i] == NULL) continue;
+
+			if (selectInfo.object[i]->getValid())
+			{
+				valid = true;
+			}
+
+			//유닛중에 제일 높은애를 찾는다.
+			if (topUnit < selectInfo.object[i]->getUnitnumZerg())
+			{
+				topUnit = selectInfo.object[i]->getUnitnumZerg();
+				index = i;
+			}
+		}
+
+		if (valid)
+		{
+			POINT pt = selectInfo.object[index]->getBattleStatus().pt.toPoint();
+			MAINCAMERA->setCameraX(pt.x - WINSIZEX / 2);
+			MAINCAMERA->setCameraY(pt.y - WINSIZEY / 2);
+		}
+	}
 }
 
 void gameInterface::updateIconWeapon(void)
@@ -349,6 +342,43 @@ void gameInterface::updateIconWeapon(void)
 	}
 }
 
+void gameInterface::updateSelectInfo(void)
+{
+	tagSelectInfo selectInfo = _gameController->getSelectInfo();
+	
+	if (selectInfo.isSelected == FALSE)
+		return;
+
+	if (selectInfo.num == 1)
+		return;
+
+	for (int i = 0; i < SELECTUNIT_MAX; i++)
+	{
+		if (PtInRect(&_rcStat2[i], _ptMouse) == FALSE) continue;
+
+		if (selectInfo.object[i])
+		{
+			if (KEYMANAGER->isOnceKeyDown(VK_LBUTTON))
+			{
+				if (KEYMANAGER->isStayKeyDown(VK_SHIFT))
+				{
+					_gameController->deleteSelectInfo(i);
+				}
+				else if (KEYMANAGER->isStayKeyDown(VK_CONTROL))
+				{
+					_gameController->filterSelectInfo(i);
+				}
+				else
+				{
+					_gameController->onlySelecInfo(i);
+				}
+			}
+		}
+		break;
+	}
+}
+
+
 
 void gameInterface::renderSelectInfo(void)
 {
@@ -384,10 +414,13 @@ void gameInterface::renderSelectInfo(void)
 		renderIconWeapon();
 
 
-		//HP
-		TCHAR strHP[100];
-		_stprintf(strHP, L"%d / %d", (INT)battleStatus.curHP, (INT)battleStatus.maxHP);
-		RENDERMANAGER->insertTextCenter(ZORDER_INTERFACE2, RectMake(153, 453, 89, 12), strHP, TEXTCOLOR_UNITHP);
+		if ((INT)battleStatus.maxHP > 0)
+		{
+			//HP
+			TCHAR strHP[100];
+			_stprintf(strHP, L"%d / %d", (INT)battleStatus.curHP, (INT)battleStatus.maxHP);
+			RENDERMANAGER->insertTextCenter(ZORDER_INTERFACE2, RectMake(153, 453, 89, 12), strHP, TEXTCOLOR_UNITHP);
+		}
 
 		if (baseStatus.useMP)
 		{
@@ -421,9 +454,24 @@ void gameInterface::renderSelectInfo(void)
 			RENDERMANAGER->insertTextCenter(ZORDER_INTERFACE2, RectMake(309, 410, 50, 16), L"Evolving", TEXTCOLOR_UNITNAME);
 			break;
 		}
+
+		if (selectInfo.object[0]->getIsNrMineral())
+		{
+			TCHAR strMineral[100];
+			_stprintf(strMineral, L"Minerals: %d", selectInfo.object[0]->getAmountMineral());
+			RENDERMANAGER->insertTextCenter(ZORDER_INTERFACE2, RectMake(273, 430, 120, 16), strMineral, TEXTCOLOR_UNITNAME);
+		}
+		else if (selectInfo.object[0]->getIsNrGas())
+		{
+			TCHAR strGas[100];
+			_stprintf(strGas, L"Vespene Gas: %d", selectInfo.object[0]->getAmountGas());
+			RENDERMANAGER->insertTextCenter(ZORDER_INTERFACE2, RectMake(273, 430, 120, 16), strGas, TEXTCOLOR_UNITNAME);
+		}
 	}
 	else
 	{
+		bool valid = false;
+		
 		int index = 0;
 		int topUnit = UNITNUM_ZERG_NONE;
 
@@ -431,6 +479,11 @@ void gameInterface::renderSelectInfo(void)
 		for (int i = 0; i < SELECTUNIT_MAX; i++)
 		{
 			if (selectInfo.object[i] == NULL) continue;
+
+			if (selectInfo.object[i]->getValid())
+			{
+				valid = true;
+			}
 
 			//유닛중에 제일 높은애를 찾는다.
 			if (topUnit < selectInfo.object[i]->getUnitnumZerg())
@@ -443,7 +496,10 @@ void gameInterface::renderSelectInfo(void)
 		}
 
 		//Face
-		RENDERMANAGER->insertImg(ZORDER_INTERFACE2, selectInfo.object[index]->getBaseStatus().imgFace, _rcFace.left, _rcFace.top);
+		if (valid)
+		{
+			RENDERMANAGER->insertImg(ZORDER_INTERFACE2, selectInfo.object[index]->getBaseStatus().imgFace, _rcFace.left, _rcFace.top);
+		}
 	}
 }
 

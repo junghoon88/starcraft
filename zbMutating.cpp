@@ -341,13 +341,14 @@ void zbMutating::render(int imgOffsetX, int imgOffsetY)
 
 void zbMutating::larvaValidCheck(void)
 {
-	for (int i = 0; i < _vLarva.size(); i++)
+	for (int i = 0; i < _vLarva.size();)
 	{
 		if (_vLarva[i]->getValid() == false)
 		{
 			//여기서 delete는 하지 않는다.
 			_vLarva.erase(_vLarva.begin() + i);
 		}
+		else ++i;
 	}
 }
 
@@ -479,7 +480,21 @@ void zbMutating::updateImageFrame(void)
 				hive->setLarvas(_vLarva);
 				hive->setLarvaResponeTime(_larvaResponeTime);
 			}
-			//_nextBuilding->setCurHP(_battleStatus.curHP);
+			else if (_nextBuilding->getBuildingNumZerg() == BUILDINGNUM_ZERG_EXTRACTOR)
+			{
+				zbExtractor* ext = (zbExtractor*)_nextBuilding;
+				ext->findNrGas();
+			}
+
+			//다음건물 HP가 낮을 경우(성큰콜로니)
+			if (_beforeBuildingNum != BUILDINGNUM_ZERG_NONE)
+			{
+				if (_nextBuilding->getBattleStatus().maxHP < _battleStatus.maxHP)
+				{
+					float ratio = _nextBuilding->getBattleStatus().maxHP / _battleStatus.maxHP;
+					temp.curHP = temp.curHP * ratio;
+				}
+			}
 
 
 			_nextBuilding->setBattleStatus(temp);

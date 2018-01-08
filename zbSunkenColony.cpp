@@ -44,10 +44,10 @@ void zbSunkenColony::initBaseStatus(void)
 	_stprintf(_baseStatus.name, L"Zerg Sunken Colony");
 
 	TCHAR strKey[100];
-	_stprintf(strKey, L"ZB-sunkenColony-Body%d", _playerNum);
+	_stprintf(strKey, L"ZB-sunkencolony-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);
 	_baseStatus.imgFace = IMAGEMANAGER->findImage(L"ZB-Face");
-	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZB-sunkenColony-Stat1");
+	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZB-sunkencolony-Stat1");
 	_baseStatus.imgStat2 = NULL;
 
 	_baseStatus.maxHP = 300.0f;
@@ -100,6 +100,9 @@ void zbSunkenColony::initBattleStatus(POINT ptTile)
 	_battleStatus.pt.set((_battleStatus.rcBody.left + _battleStatus.rcBody.right) * 0.5f, (_battleStatus.rcBody.top + _battleStatus.rcBody.bottom) * 0.5f);
 	_battleStatus.rcTile = RectMake(ptTile.x, ptTile.y, buildTileSize.x, buildTileSize.y);
 	_battleStatus.rcEllipse = _battleStatus.rcBody;
+
+
+	_battleStatus.curGWdamage = _baseStatus.GWdamage;
 }
 
 void zbSunkenColony::release(void)

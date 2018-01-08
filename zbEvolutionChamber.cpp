@@ -194,10 +194,7 @@ void zbEvolutionChamber::procCommands(void)
 
 				upgMelee.isProcessing = true;
 			}
-			else
-			{
-				//실패
-			}
+
 			_battleStatus.curCommand = COMMAND_NONE;
 		}
 		break;
@@ -218,10 +215,7 @@ void zbEvolutionChamber::procCommands(void)
 
 				upgMissile.isProcessing = true;
 			}
-			else
-			{
-				//실패
-			}
+
 			_battleStatus.curCommand = COMMAND_NONE;
 		}
 		break;
@@ -242,10 +236,7 @@ void zbEvolutionChamber::procCommands(void)
 
 				upgCarapace.isProcessing = true;
 			}
-			else
-			{
-				//실패
-			}
+
 			_battleStatus.curCommand = COMMAND_NONE;
 		}
 		break;

@@ -1,7 +1,7 @@
 #pragma once
 #include "gameNode.h"
 #include "progressBar.h"
-#include "miniMap.h"
+
 
 class player;
 class gameController;
@@ -17,23 +17,21 @@ private:
 	image*				_imgIconWeapon[3];
 	UINT				_imgIconFrameX[3];
 
-
-
-
-
 	progressBar*		_progressBar;
-	miniMap*			_miniMap;
-	gameController*		_gameController;
 
+
+
+
+	gameController*		_gameController;
 	player*				_player[PLAYER_NUM];			//플레이어정보, sceneBattle 에서 받는다.
 
 
 private:
 	void initVariables(void);
 
-
-	void actionMouseMiniMap(void);
+	void updateFace(void);
 	void updateIconWeapon(void);
+	void updateSelectInfo(void);
 	
 	void renderSelectInfo(void);
 	void renderIconWeapon(void);

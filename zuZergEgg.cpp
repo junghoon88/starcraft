@@ -36,6 +36,7 @@ zuZergEgg::zuZergEgg(PLAYER playerNum, UNITNUM_ZERG nextUnitNum)
 	
 
 	_nextUnit = NULL;
+	_nextUnit2 = NULL;
 }
 
 
@@ -75,6 +76,7 @@ void zuZergEgg::initNextUnit(POINT pt)
 		break;
 	case UNITNUM_ZERG_ZERGLING:
 		_nextUnit = new zuZergling(_playerNum);
+		_nextUnit2 = new zuZergling(_playerNum);
 		break;
 	case UNITNUM_ZERG_OVERLORD:
 		_nextUnit = new zuOverlord(_playerNum);
@@ -87,6 +89,7 @@ void zuZergEgg::initNextUnit(POINT pt)
 		break;
 	case UNITNUM_ZERG_SCOURGE:
 		_nextUnit = new zuScourge(_playerNum);
+		_nextUnit2 = new zuScourge(_playerNum);
 		break;
 	case UNITNUM_ZERG_QUEEN:
 		_nextUnit = new zuQueen(_playerNum);
@@ -110,6 +113,31 @@ void zuZergEgg::initNextUnit(POINT pt)
 	_nextUnit->setLinkAdressPlayer(_player);
 	_nextUnit->init(pt);
 
+	if (_nextUnit2 == NULL)
+	{
+		_nextUnit->setLinkAdressZergUpgrade(_zergUpgrade);
+		_nextUnit->setLinkAdressAstar(_aStar);
+		_nextUnit->setLinkAdressPlayer(_player);
+		_nextUnit->init(pt);
+	}
+	else
+	{
+		POINT pt1 = pt;
+		POINT pt2 = pt;
+
+		pt1.x -= 10;
+		pt2.x += 10;
+
+		_nextUnit->setLinkAdressZergUpgrade(_zergUpgrade);
+		_nextUnit->setLinkAdressAstar(_aStar);
+		_nextUnit->setLinkAdressPlayer(_player);
+		_nextUnit->init(pt1);
+
+		_nextUnit2->setLinkAdressZergUpgrade(_zergUpgrade);
+		_nextUnit2->setLinkAdressAstar(_aStar);
+		_nextUnit2->setLinkAdressPlayer(_player);
+		_nextUnit2->init(pt2);
+	}
 }
 
 
@@ -181,17 +209,14 @@ void zuZergEgg::initProcessing(void)
 	{
 	case UNITNUM_ZERG_DRONE:				_processing.command = COMMAND_UNIT_DRONE;				_processing.img = IMAGEMANAGER->findImage(L"command-unit_drone");			break;
 	case UNITNUM_ZERG_ZERGLING:				_processing.command = COMMAND_UNIT_ZERGLING;			_processing.img = IMAGEMANAGER->findImage(L"command-unit_zergling");		break;
-	case UNITNUM_ZERG_HYDRALISK:			_processing.command = COMMAND_UNIT_HYDRALISK;			_processing.img = IMAGEMANAGER->findImage(L"command-unit_hydralisk");		break;
-	case UNITNUM_ZERG_LURKER:				_processing.command = COMMAND_UNIT_LURKER;				_processing.img = IMAGEMANAGER->findImage(L"command-unit_lurker");			break;
-	case UNITNUM_ZERG_ULTRALISK:			_processing.command = COMMAND_UNIT_ULTRALISK;			_processing.img = IMAGEMANAGER->findImage(L"command-unit_ultralisk");		break;
-	case UNITNUM_ZERG_DEFILER:				_processing.command = COMMAND_UNIT_DEFILER;				_processing.img = IMAGEMANAGER->findImage(L"command-unit_defiler");			break;
-	case UNITNUM_ZERG_INFESTEDTERRAN:		_processing.command = COMMAND_UNIT_INFESTEDTERRAN;		_processing.img = IMAGEMANAGER->findImage(L"command-unit_infestedterran");	break;
 	case UNITNUM_ZERG_OVERLORD:				_processing.command = COMMAND_UNIT_OVERLORD;			_processing.img = IMAGEMANAGER->findImage(L"command-unit_overlord");		break;
+	case UNITNUM_ZERG_HYDRALISK:			_processing.command = COMMAND_UNIT_HYDRALISK;			_processing.img = IMAGEMANAGER->findImage(L"command-unit_hydralisk");		break;
 	case UNITNUM_ZERG_MUTALISK:				_processing.command = COMMAND_UNIT_MUTALISK;			_processing.img = IMAGEMANAGER->findImage(L"command-unit_mutalisk");		break;
 	case UNITNUM_ZERG_SCOURGE:				_processing.command = COMMAND_UNIT_SCOURGE;				_processing.img = IMAGEMANAGER->findImage(L"command-unit_scourge");			break;
 	case UNITNUM_ZERG_QUEEN:				_processing.command = COMMAND_UNIT_QUEEN;				_processing.img = IMAGEMANAGER->findImage(L"command-unit_queen");			break;
-	case UNITNUM_ZERG_GUADIAN:				_processing.command = COMMAND_UNIT_GUADIAN;				_processing.img = IMAGEMANAGER->findImage(L"command-unit_guadian");			break;
-	case UNITNUM_ZERG_DEVOURER:				_processing.command = COMMAND_UNIT_DEVOURER;			_processing.img = IMAGEMANAGER->findImage(L"command-unit_devourer");		break;
+	case UNITNUM_ZERG_ULTRALISK:			_processing.command = COMMAND_UNIT_ULTRALISK;			_processing.img = IMAGEMANAGER->findImage(L"command-unit_ultralisk");		break;
+	case UNITNUM_ZERG_DEFILER:				_processing.command = COMMAND_UNIT_DEFILER;				_processing.img = IMAGEMANAGER->findImage(L"command-unit_defiler");			break;
+//	case UNITNUM_ZERG_LURKER:				_processing.command = COMMAND_UNIT_LURKER;				_processing.img = IMAGEMANAGER->findImage(L"command-unit_lurker");			break;
 	}
 
 	_processing.curTime = 0.0f;
@@ -222,7 +247,7 @@ void zuZergEgg::render(void)
 
 }
 
-void zuZergEgg::updateBattleStatus(void)
+void zuZergEgg::updatePosition(void)
 {
 	POINT pt = _battleStatus.pt.toPoint();
 	_battleStatus.ptTile = { pt.x / TILESIZE, pt.y / TILESIZE };			//현재위치한 타일
@@ -234,11 +259,12 @@ void zuZergEgg::updateBattleStatus(void)
 	_battleStatus.rcEllipse.top += unitsize.y / 4;
 	_battleStatus.rcEllipse.bottom -= unitsize.y / 4;
 }
-void zuZergEgg::updatePosition(void)
+
+void zuZergEgg::updateBattleStatus(void)
 {
 	Unit::updateBattleStatus();
-
 }
+
 void zuZergEgg::updateImageFrame(void)
 {
 	//중간 반복
@@ -269,10 +295,18 @@ void zuZergEgg::updateImageFrame(void)
 			else
 			{
 				_nextUnit->init(_battleStatus.pt.toPoint());
-
 				_player->addUnit(_nextUnit);
-
 				_nextObject = _nextUnit;
+
+				if (_nextUnit2)
+				{
+					_nextUnit2->init(_battleStatus.pt.toPoint());
+					_player->addUnit(_nextUnit2);
+					_nextObject = _nextUnit2;
+				}
+
+
+
 				_valid = false;
 			}
 		}
@@ -302,6 +336,7 @@ void zuZergEgg::procCommands(void)
 	if (_battleStatus.curCommand == COMMAND_ESC)
 	{
 		//SAFE_RELEASEDELETE(_nextUnit);
+		//SAFE_RELEASEDELETE(_nextUnit2);
 
 	}
 	else

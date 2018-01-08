@@ -1,7 +1,13 @@
 #pragma once
 #include "Building.h"
+
+class nrGas;
+
 class zbExtractor : public Building
 {
+private:
+	nrGas*		_nrGas;
+
 private:
 	void initBaseStatus(void);
 	void initBattleStatus(POINT ptTile);
@@ -23,6 +29,8 @@ public:
 	void release(void);
 	void update(void);
 	void render(int imgOffsetX = 0, int imgOffsetY = 0);
+
+	void findNrGas(void);
 
 };
 

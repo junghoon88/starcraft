@@ -14,6 +14,8 @@ protected:
 	BOOL _isRunning;
 	float _elapsedTime;
 
+	ZORDER _zorder;
+
 public:
 	HRESULT init(image* effectImage, int frameW, int frameH, int fps, float elapsedTime);
 	HRESULT init(image* effectImage, int fps, float elapsedTime);
@@ -21,6 +23,7 @@ public:
 	void update(void);
 	void render(void);
 	void render(ZORDER zorder);
+	void Zrender(void);
 
 	void startEffect(int x, int y);
 	void startEffect(POINT pt);
@@ -32,5 +35,9 @@ public:
 
 	effect();
 	~effect();
+
+
+	inline void setZorder(ZORDER zorder) { _zorder = zorder; };
+
 };
 

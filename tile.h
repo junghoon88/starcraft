@@ -24,7 +24,7 @@ private:
 
 	tile* _parentNode;
 
-
+	DWORD _obj;
 	DWORD _attribute;
 
 
@@ -46,6 +46,9 @@ public:
 
 	void setCenter(POINT center) { _center = center; }
 	POINT getCenter() { return _center; }
+
+	void setObject(DWORD obj) { _obj = obj; }
+	DWORD getObject(void) { return _obj; }
 
 	void setAttribute(DWORD attr) { _attribute = attr; }
 	DWORD getAttribute() { return _attribute; }

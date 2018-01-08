@@ -51,8 +51,6 @@ void creepManager::updateSpread(void)
 				_vCreeps[i].isSpreading = FALSE;
 			}
 		}
-
-		Sleep(1);
 	}
 
 }
@@ -61,6 +59,9 @@ void creepManager::updateDisappear(void)
 	for (int i = 0; i < _vCreeps.size(); i++)
 	{
 		if (_vCreeps[i].isDisappearing == FALSE) continue;
+
+		bool erase = false;
+
 
 		_aStar->clearTiles();
 		_aStar->updateTileAttr();	//속성값 업데이트
@@ -81,11 +82,9 @@ void creepManager::updateDisappear(void)
 				//더이상 못찾으면 벡터에서지운다.
 				_vCreeps[i].isSpreading = FALSE;
 				_vCreeps.erase(_vCreeps.begin() + i);
+				i--;
 			}
 		}
-
-		Sleep(1);
-
 	}
 }
 

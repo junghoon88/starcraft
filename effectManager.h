@@ -28,6 +28,7 @@ public:
 	void render();
 
 	void addEffect(wstring effectName, const TCHAR* imageName, int imageWidth, int imageHeight, int effectWidth, int effectHeight, int fps, float elapsedTime, int buffer);
+	void addEffect(wstring effectName, const TCHAR* imageName, ZORDER zorder, int fps, float elapsedTime, int buffer);
 
 	void play(wstring effectName, int x, int y);
 

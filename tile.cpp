@@ -50,6 +50,5 @@ void tile::update()
 
 void tile::render()
 {
-	//FillRect(getMemDC(), &_rc, );
 	RectangleMake(getMemDC(), _rc.left, _rc.top, TILESIZE, TILESIZE);
 }

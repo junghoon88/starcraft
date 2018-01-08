@@ -26,7 +26,7 @@ enum SAMPLETERRAIN
 	SAMPLETERRAIN_NONE = -1,
 	SAMPLETERRAIN_DIRT,
 	SAMPLETERRAIN_HIGTDIRT,
-	SAMPLETERRAIN_WATER,
+	//SAMPLETERRAIN_WATER,
 
 	SAMPLETERRAIN_MAX
 };
@@ -100,9 +100,10 @@ private:
 	RECT		_rcMiniMap;
 	RECT		_rcMiniMapCamera;
 	COLORREF	_colorMiniMap[TILEX][TILEY];
+	COLORREF	_colorMiniMapObj[TILEX][TILEY];
 
 	//¹öÆ°
-	button* _btnCtrl[BTNCTRL_MAX];
+	button*		_btnCtrl[BTNCTRL_MAX];
 
 
 public:

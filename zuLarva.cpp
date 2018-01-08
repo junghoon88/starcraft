@@ -174,16 +174,22 @@ void zuLarva::procCommands(void)
 
 	if (unitNum != UNITNUM_ZERG_NONE)
 	{
-		zuZergEgg* egg = new zuZergEgg(_playerNum, unitNum);
-		egg->setLinkAdressZergUpgrade(_zergUpgrade);
-		egg->setLinkAdressAstar(_aStar);
-		egg->setLinkAdressPlayer(_player);
-		egg->init(_battleStatus.pt.toPoint());
+		tagProduction buildCost = _player->getZergProductionInfo()->getZUProductionInfo(unitNum);
 
-		_nextObject = egg;
-		_valid = false;
+		if (_player->useResource(buildCost.costMinerals, buildCost.costGas, buildCost.control))
+		{
+			//¼º°ø
+			zuZergEgg* egg = new zuZergEgg(_playerNum, unitNum);
+			egg->setLinkAdressZergUpgrade(_zergUpgrade);
+			egg->setLinkAdressAstar(_aStar);
+			egg->setLinkAdressPlayer(_player);
+			egg->init(_battleStatus.pt.toPoint());
 
-		_player->addUnit(egg);
+			_nextObject = egg;
+			_valid = false;
+
+			_player->addUnit(egg);
+		}
 
 		_battleStatus.curCommand = COMMAND_NONE;
 	}

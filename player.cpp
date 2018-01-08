@@ -22,9 +22,6 @@ unsigned CALLBACK AstarThread(void* pArguments)
 		if (p->getAstar() == NULL)
 			continue;
 
-		if (p->getUnitBusy())
-			continue;
-
 		if (units.size() == 0)
 			continue;
 
@@ -43,22 +40,37 @@ unsigned CALLBACK AstarThread(void* pArguments)
 		if (battleStatus.calcAstar == TRUE)
 			continue;
 
-		units[num]->setIsBusy(TRUE);
+		if (units[num]->getIsBusy() != 0)
+			continue;
+
+		units[num]->addIsBusy(0x01);
 
 		POINT ptStartTile, ptEndTile;
 		ptStartTile.x = battleStatus.pt.toPoint().x / TILESIZE;
 		ptStartTile.y = battleStatus.pt.toPoint().y / TILESIZE;
-		ptEndTile.x = battleStatus.ptTarget.x / TILESIZE;
-		ptEndTile.y = battleStatus.ptTarget.y / TILESIZE;
+	
+		if (battleStatus.targetObject == NULL)
+		{
+			ptEndTile.x = battleStatus.ptTarget.x / TILESIZE;
+			ptEndTile.y = battleStatus.ptTarget.y / TILESIZE;
+		}
+		else
+		{
+			POINT ptTarget = battleStatus.targetObject->getBattleStatus().pt.toPoint();
+			ptEndTile.x = ptTarget.x / TILESIZE;
+			ptEndTile.y = ptTarget.y / TILESIZE;
+		}
+		
 
 
 		p->getAstar()->clearTiles();
+		p->getAstar()->updateMapInfo();
 		p->getAstar()->setTiles(ptStartTile, ptEndTile);
 		p->getAstar()->pathFinder(p->getAstar()->getStartTile());
 		units[num]->setVCloseList(p->getAstar()->getCloseList());
 
 		units[num]->setCalcAstar(TRUE);
-		units[num]->setIsBusy(FALSE);
+		units[num]->deleteIsBusy(0x01);
 	}
 
 	return 0;
@@ -78,6 +90,7 @@ unsigned CALLBACK CreepThread(void* pArguments)
 		}
 
 		p->getCreepManager()->update();
+		p->getGameController()->getMiniMap()->updateMiniMap();
 	}
 
 	return 0;
@@ -86,14 +99,63 @@ unsigned CALLBACK CollisionThread(void* pArguments)
 {
 	player* p = (player*)pArguments;
 
+	UINT num = 0;
+
 	while (1)
 	{
-		Sleep(10);
+		Sleep(1);
 
 		if (p->getEndThread())
-		{
 			break;
+
+		continue;
+
+
+		if (p->getUnits().size() == 0)
+			continue;
+
+		if (++num >= p->getUnits().size())
+			num = 0;
+
+		Unit* unitMove = p->getUnits()[num];
+
+		if (unitMove->getIsBusy() != 0)
+			continue;
+
+		unitMove->addIsBusy(0x02);
+
+
+		if (unitMove->getUnitnumZerg() == UNITNUM_ZERG_LARVA
+			|| unitMove->getUnitnumZerg() == UNITNUM_ZERG_ZERGEGG
+			|| unitMove->getBaseStatus().isAir == TRUE)
+		{
+			unitMove->deleteIsBusy(0x02);
+			continue;
 		}
+
+
+		//유닛 끼리 충돌
+		for (int i = 0; i < p->getUnits().size(); i++)
+		{
+			if (unitMove == p->getUnits()[i]) continue;
+
+			Unit* unitHold = p->getUnits()[i];
+
+
+
+			if (unitHold) unitHold->addIsBusy(0x02);
+
+			if (unitHold) p->getUnitCollision()->isCollision(unitMove, unitHold);
+
+			if (unitHold) unitHold->deleteIsBusy(0x02);
+		}
+
+		//유닛-건물 충돌
+
+		//유닛-중립오브젝트 충돌
+
+
+		unitMove->deleteIsBusy(0x02);
 	}
 
 	return 0;
@@ -103,6 +165,7 @@ unsigned CALLBACK CollisionThread(void* pArguments)
 
 player::player()
 	: _zergUpgrade(NULL), _gameMap(NULL), _fog(NULL), _creepManager(NULL), _aStar(NULL), _gameController(NULL)
+	, _UnitCollision(NULL)
 {
 }
 
@@ -114,14 +177,10 @@ player::~player()
 
 HRESULT player::init(PLAYER playerNum, RACES races)
 {
-	_myMineral = _showMineral = 10000;
-	_myGas = _showGas = 10000;
+	_myMineral = _showMineral = 50;
+	_myGas = _showGas = 0;
 
 	_myControl = _myControlMax = 0;
-
-	_unitBusy = false;
-	_buildingBusy = false;
-
 
 	_playerNum = playerNum;
 	_races = races;
@@ -131,6 +190,8 @@ HRESULT player::init(PLAYER playerNum, RACES races)
 	_zergUpgrade = new zergUpgrade;
 
 	_fog = new fog;
+	_fog->setLinkAdressMyPlayer(this);
+	_fog->setLinkAdressGameMap(_gameMap);
 	_fog->init();
 
 	_creepManager = new creepManager;
@@ -145,19 +206,14 @@ HRESULT player::init(PLAYER playerNum, RACES races)
 	_gameController->init(playerNum, _races);
 	_gameController->setLinkAdressMyPlayer(this);
 	_gameController->setLinkAdressGameMap(_gameMap);
+	_gameController->getMiniMap()->setLinkAdressGameMap(_gameMap);
+
+	_UnitCollision = new UnitCollision;
 
 
-	//debug
-	for (int i = 0; i < 13; i++)
-	{
-		zuDrone* drone = new zuDrone(_playerNum);
-		drone->setLinkAdressZergUpgrade(_zergUpgrade);
-		drone->setLinkAdressAstar(_aStar);
-		drone->setLinkAdressPlayer(this);
-		drone->init({ 200, 200 });
 
-		addUnit(drone);
-	}
+	//초기 유닛
+	initStartUnit();
 
 
 	unsigned int threadId = 0;
@@ -190,19 +246,22 @@ void player::release(void)
 
 	for (UINT i = 0; i < _vUnits.size(); i++)
 	{
-		while (_vUnits[i]->getIsBusy() == true)
-		{
-			Sleep(1);
-		}
 		SAFE_RELEASEDELETE(_vUnits[i]);
 	}
 	_vUnits.clear();
+
+	for (UINT i = 0; i < _vBuildings.size(); i++)
+	{
+		SAFE_RELEASEDELETE(_vBuildings[i]);
+	}
+	_vBuildings.clear();
+
 
 
 	SAFE_RELEASEDELETE(_fog);
 	SAFE_DELETE(_creepManager);
 
-	SAFE_RELEASEDELETE(_aStar);
+	SAFE_DELETE(_aStar);
 	SAFE_RELEASEDELETE(_gameController);
 
 
@@ -211,23 +270,37 @@ void player::release(void)
 
 void player::update(void) 
 {
+	//치트키
+	
+
+
+	//죽거나 없어져서 무효화된 유닛, 건물 체크
 	checkUnitValid();
 	checkBuildingVaild();
 
+	//완료된 업그레이드가 있는지 체크
 	updateZergUpgrade();
 
+	//유닛 업데이트
 	for (UINT i = 0; i < _vUnits.size(); i++)
 	{
+		if (_vUnits[i]->getValid() == FALSE) continue;
+
 		_vUnits[i]->update();
 	}
 
+	//건물 업데이트
 	for (UINT i = 0; i < _vBuildings.size(); i++)
 	{
+		if (_vBuildings[i]->getValid() == FALSE) continue;
+
 		_vBuildings[i]->update();
 	}
 
+	//현재 자원계산
 	calcResource();
 
+	//카메라안에 보이는 유닛, 건물만 따로 모으기
 	checkInCamera();
 
 	_fog->update();
@@ -244,8 +317,55 @@ void player::render(fog* fog)
 		_vBuildings[i]->render();
 	}
 
-	//_fog->render();
+	_fog->render();
 }
+
+void player::initStartUnit(void)
+{
+	POINT ptLocation = { 0, 0 };
+	if (_playerNum == PLAYER1)
+	{
+		ptLocation = _gameMap->getLocationP1();
+	}
+
+	zbHatchery* hatchery = new zbHatchery(_playerNum);
+	hatchery->setLinkAdressZergUpgrade(_zergUpgrade);
+	hatchery->setLinkAdressAstar(_aStar);
+	hatchery->setLinkAdressPlayer(this);
+	hatchery->init(ptLocation, 3);
+	addBuilding(hatchery);
+
+	POINT hatcherySize = BUILDSIZE_HATCHERY;
+
+	ptLocation.y += hatcherySize.y;
+
+	ptLocation.x *= TILESIZE;
+	ptLocation.y *= TILESIZE;
+
+	POINT droneSize = UNITSIZE_ZERG_DRONE;
+
+	ptLocation.x += droneSize.x / 2;
+	//ptLocation.y += droneSize.y;
+
+	for (int i = 0; i < 4; i++)
+	{
+		zuDrone* drone = new zuDrone(_playerNum);
+		drone->setLinkAdressZergUpgrade(_zergUpgrade);
+		drone->setLinkAdressAstar(_aStar);
+		drone->setLinkAdressPlayer(this);
+		drone->init({ ptLocation.x + i * droneSize.x, ptLocation.y });
+		addUnit(drone);
+	}
+
+	zuOverlord* overlord = new zuOverlord(_playerNum);
+	overlord->setLinkAdressZergUpgrade(_zergUpgrade);
+	overlord->setLinkAdressAstar(_aStar);
+	overlord->setLinkAdressPlayer(this);
+	overlord->init({ ptLocation.x + 100, ptLocation.y - 50});
+	addUnit(overlord);
+
+}
+
 
 
 void player::checkInCamera(void)
@@ -306,11 +426,11 @@ void player::calcResource(void)
 
 void player::updateZergUpgrade(void)
 {
-	for (int i = 0; i < _vZergUpgradeComplete.size(); i++)
+	while (_vZergUpgradeComplete.size() > 0)
 	{
-		_zergUpgrade->upgradeComplete(_vZergUpgradeComplete[i]);
+		_zergUpgrade->upgradeComplete(_vZergUpgradeComplete[0]);
 
-		switch (_vZergUpgradeComplete[i])
+		switch (_vZergUpgradeComplete[0])
 		{
 			case UPGRADE_ZERG_MELEEATTACKS:		//저그 지상유닛 근접 공격
 			case UPGRADE_ZERG_MISSILEATTACKS:	//저그 지상유닛 원거리 공격
@@ -334,14 +454,14 @@ void player::updateZergUpgrade(void)
 			break;
 		}
 
-		_vZergUpgradeComplete.erase(_vZergUpgradeComplete.begin() + i);
+		_vZergUpgradeComplete.erase(_vZergUpgradeComplete.begin());
 	}
 
-	for (int i = 0; i < _vZergEvolutionComplete.size(); i++)
+	while (_vZergEvolutionComplete.size() > 0)
 	{
-		_zergUpgrade->evolutionComplete(_vZergEvolutionComplete[i]);
+		_zergUpgrade->evolutionComplete(_vZergEvolutionComplete[0]);
 
-		switch (_vZergEvolutionComplete[i])
+		switch (_vZergEvolutionComplete[0])
 		{
 			//case EVOLUTION_ZERG_BURROW:					//저그 버러우 업글
 			case EVOLUTION_ZERG_METABOLICK_BOOST:			//저글링 이속업
@@ -409,7 +529,7 @@ void player::updateZergUpgrade(void)
 			break;
 		}
 
-		_vZergEvolutionComplete.erase(_vZergEvolutionComplete.begin() + i);
+		_vZergEvolutionComplete.erase(_vZergEvolutionComplete.begin());
 	}
 }
 
@@ -430,6 +550,33 @@ bool player::isHaveBuilding(BUILDINGNUM_ZERG num)
 	return false;
 }
 
+bool player::canResource(UINT mineral, UINT gas)
+{
+	if (_myMineral >= mineral && _myGas >= gas)
+	{
+		return true;
+	}
+
+	if (_myMineral < mineral)
+	{
+		//미네랄 부족
+		if (SOUNDMANAGER->isPlaySound(L"zaderr00") == FALSE)
+		{
+			SOUNDMANAGER->play(L"zaderr00");
+		}
+	}
+	else if (_myGas < gas)
+	{
+		if (SOUNDMANAGER->isPlaySound(L"zaderr01") == FALSE)
+		{
+			//가스 부족
+			SOUNDMANAGER->play(L"zaderr01");
+		}
+	}
+
+	return false;
+}
+
 bool player::useResource(UINT mineral, UINT gas)
 {
 	if (_myMineral >= mineral && _myGas >= gas)
@@ -438,15 +585,21 @@ bool player::useResource(UINT mineral, UINT gas)
 		_myGas -= gas;
 		return true;
 	}
-	else
+
+	if (_myMineral < mineral)
 	{
-		if (_myMineral < mineral)
+		//미네랄 부족
+		if (SOUNDMANAGER->isPlaySound(L"zaderr00") == FALSE)
 		{
-			//미네랄 부족
+			SOUNDMANAGER->play(L"zaderr00");
 		}
-		else if (_myGas < gas)
+	}
+	else if (_myGas < gas)
+	{
+		if (SOUNDMANAGER->isPlaySound(L"zaderr01") == FALSE)
 		{
 			//가스 부족
+			SOUNDMANAGER->play(L"zaderr01");
 		}
 	}
 
@@ -466,14 +619,27 @@ bool player::useResource(UINT mineral, UINT gas, float control)
 		if (_myMineral < mineral)
 		{
 			//미네랄 부족
+			if (SOUNDMANAGER->isPlaySound(L"zaderr00") == FALSE)
+			{
+				SOUNDMANAGER->play(L"zaderr00");
+			}
 		}
 		else if (_myGas < gas)
 		{
 			//가스 부족
+			if (SOUNDMANAGER->isPlaySound(L"zaderr01") == FALSE)
+			{
+				//가스 부족
+				SOUNDMANAGER->play(L"zaderr01");
+			}
 		}
 		else if ((_myControl + control) > _myControlMax)
 		{
 			//인구수 부족
+			if (SOUNDMANAGER->isPlaySound(L"zaderr02") == FALSE)
+			{
+				SOUNDMANAGER->play(L"zaderr02");
+			}
 		}
 	}
 
@@ -485,13 +651,40 @@ bool player::useResource(UINT mineral, UINT gas, float control)
 
 void player::checkUnitValid(void)
 {
-	_unitBusy = true;
 	for (int i = 0; i < _vUnits.size(); )
 	{
 		if (_vUnits[i]->getValid() == false)
 		{
+			if (_vUnits[i]->getBattleStatus().isDead)
+			{
+				UNITNUM_ZERG unitNumZ = _vUnits[i]->getUnitnumZerg();
 
-			if (_vUnits[i]->getIsBusy() == false)
+				POINT pt = _vUnits[i]->getBattleStatus().pt.toPoint();
+
+				switch (unitNumZ)
+				{
+				case UNITNUM_ZERG_LARVA:			EFFECTMANAGER->play(L"ZU-larva-Death",		pt.x, pt.y);	break;
+				case UNITNUM_ZERG_ZERGEGG:			EFFECTMANAGER->play(L"ZU-zergegg-Death",	pt.x, pt.y);	break;
+				case UNITNUM_ZERG_DRONE:			EFFECTMANAGER->play(L"ZU-drone-Death",		pt.x, pt.y);	break;
+				case UNITNUM_ZERG_ZERGLING:			EFFECTMANAGER->play(L"ZU-zergling-Death",	pt.x, pt.y);	break;
+				case UNITNUM_ZERG_HYDRALISK:		EFFECTMANAGER->play(L"ZU-hydralisk-Death",	pt.x, pt.y);	break;
+				case UNITNUM_ZERG_LURKER:			EFFECTMANAGER->play(L"ZU-lurker-Death",		pt.x, pt.y);	break;
+				case UNITNUM_ZERG_LURKEREGG:		EFFECTMANAGER->play(L"ZU-lurkeregg-Death",	pt.x, pt.y);	break;
+				case UNITNUM_ZERG_ULTRALISK:		EFFECTMANAGER->play(L"ZU-ultralisk-Death",	pt.x, pt.y);	break;
+				case UNITNUM_ZERG_BROODLING:		break;
+				case UNITNUM_ZERG_DEFILER:			EFFECTMANAGER->play(L"ZU-defiler-Death",	pt.x, pt.y);	break;
+				case UNITNUM_ZERG_INFESTEDTERRAN:	break;
+				case UNITNUM_ZERG_OVERLORD:			break; //EFFECTMANAGER->play(L"ZU-overlord-Death"
+				case UNITNUM_ZERG_MUTALISK:			EFFECTMANAGER->play(L"ZU-mutalisk-Death",	pt.x, pt.y);	break;
+				case UNITNUM_ZERG_SCOURGE:			EFFECTMANAGER->play(L"ZU-scourge-Death",	pt.x, pt.y);	break;
+				case UNITNUM_ZERG_QUEEN:			EFFECTMANAGER->play(L"ZU-queen-Death",		pt.x, pt.y);	break;
+				case UNITNUM_ZERG_COCOON:			EFFECTMANAGER->play(L"ZU-cocoon-Death",		pt.x, pt.y);	break;
+				case UNITNUM_ZERG_GUADIAN:			EFFECTMANAGER->play(L"ZU-guadian-Death",	pt.x, pt.y);	break;
+				case UNITNUM_ZERG_DEVOURER:			EFFECTMANAGER->play(L"ZU-devourer-Death",	pt.x, pt.y);	break;
+				}
+			}
+
+			if (_vUnits[i]->getIsBusy() == 0)
 			{
 				_myControl		-= _vUnits[i]->getBaseStatus().unitControl;
 				_myControlMax	-= _vUnits[i]->getBaseStatus().publicControl;
@@ -505,14 +698,13 @@ void player::checkUnitValid(void)
 		}
 		else ++i;
 	}
-	_unitBusy = false;
 }
 
 void player::checkBuildingVaild(void)
 {
 	for (int i = 0; i < _vBuildings.size(); )
 	{
-		if (_vBuildings[i]->getValid() == false)
+		if (_vBuildings[i]->getValid() == false && _vBuildings[i]->getIsBusy() == 0)
 		{
 			//크립 제거 추가
 			BUILDINGNUM_ZERG buildingNum = _vBuildings[i]->getBuildingNumZerg();
@@ -521,32 +713,21 @@ void player::checkBuildingVaild(void)
 				|| buildingNum == BUILDINGNUM_ZERG_LAIR
 				|| buildingNum == BUILDINGNUM_ZERG_HIVE)
 			{
-				if (_vBuildings[i]->getNextObject() == NULL)
+				//다음 오브젝트가 없거나, 있어도 HP가 없어서 죽은경우 제거
+				if (_vBuildings[i]->getNextObject() == NULL
+					|| (_vBuildings[i]->getNextObject() != NULL && _vBuildings[i]->getBattleStatus().isDead == TRUE))
 				{
 					_creepManager->deleteCreep(_vBuildings[i]->getBattleStatus().ptTile, BUILDSIZE_HATCHERY);
-				}
-				else
-				{
-					if (_vBuildings[i]->getBattleStatus().curHP < 1.0f)
-					{
-						_creepManager->deleteCreep(_vBuildings[i]->getBattleStatus().ptTile, BUILDSIZE_HATCHERY);
-					}
 				}
 			}
 			else if (buildingNum == BUILDINGNUM_ZERG_CREEPCOLONY
 					|| buildingNum == BUILDINGNUM_ZERG_SUNKENCOLONY
 					|| buildingNum == BUILDINGNUM_ZERG_SPORECOLONY)
 			{
-				if (_vBuildings[i]->getNextObject() == NULL)
+				if (_vBuildings[i]->getNextObject() == NULL
+					|| (_vBuildings[i]->getNextObject() != NULL && _vBuildings[i]->getBattleStatus().isDead == TRUE))
 				{
 					_creepManager->deleteCreep(_vBuildings[i]->getBattleStatus().ptTile, BUILDSIZE_CREEPCOLONY);
-				}
-				else
-				{
-					if (_vBuildings[i]->getBattleStatus().curHP < 1.0f)
-					{
-						_creepManager->deleteCreep(_vBuildings[i]->getBattleStatus().ptTile, BUILDSIZE_CREEPCOLONY);
-					}
 				}
 			}
 			//~크립 제거 추가
@@ -557,7 +738,43 @@ void player::checkBuildingVaild(void)
 			//선택된 오브젝트면 다음 오브젝트로 바꾸고
 			_gameController->changeSelectInfoToNextObect(_vBuildings[i]);
 
+			//맵에서 제거
+			if (_vBuildings[i]->getNextObject() == NULL
+				|| (_vBuildings[i]->getNextObject() != NULL && _vBuildings[i]->getBattleStatus().isDead == TRUE))
+			{
+				POINT ptTile = _vBuildings[i]->getBattleStatus().ptTile;
+				RECT rcBody = _vBuildings[i]->getBattleStatus().rcBody;
+				int width = (rcBody.right - rcBody.left) / TILESIZE;
+				int height = (rcBody.bottom - rcBody.top) / TILESIZE;
+
+				for (int i = 0; i < width; i++)
+				{
+					for (int j = 0; j < height; j++)
+					{
+						int idx = ptTile.x + i;
+						int idy = ptTile.y + j;
+
+						if (_gameMap->getTiles()[idx][idy].obj == OBJECT_BUILDING_GAS_START_PLAYER1 + _playerNum)
+						{
+							_gameMap->getTiles()[idx][idy].obj = OBJECT_GAS_START;
+						}
+						else if (_gameMap->getTiles()[idx][idy].obj == OBJECT_BUILDING_GAS_PLAYER1 + _playerNum)
+						{
+							_gameMap->getTiles()[idx][idy].obj = OBJECT_GAS_BODY;
+						}
+						else
+						{
+							_gameMap->getTiles()[idx][idy].obj = OBJECT_NONE;
+						}
+					}
+				}
+			}
+			//~맵에서 제거
+
+
+
 			//삭제 
+			SAFE_RELEASEDELETE(_vBuildings[i]);
 			_vBuildings.erase(_vBuildings.begin() + i);
 		}
 		else ++i;
@@ -574,6 +791,7 @@ void player::addUnit(Unit* unit)
 
 void player::addBuilding(Building* building)
 {
+	//크립생성
 	BUILDINGNUM_ZERG buildingNum = building->getBuildingNumZerg();
 	if (buildingNum == BUILDINGNUM_ZERG_HATCHERY
 		|| buildingNum == BUILDINGNUM_ZERG_LAIR
@@ -588,8 +806,36 @@ void player::addBuilding(Building* building)
 		_creepManager->addCreep(building->getBattleStatus().ptTile, BUILDSIZE_CREEPCOLONY);
 	}
 
+	//인구수 계산
 	_myControlMax += building->getBaseStatus().publicControl;
 
+	//맵에 등록
+	POINT ptTile = building->getBattleStatus().ptTile;
+	RECT rcBody = building->getBattleStatus().rcBody;
+	int width =  (rcBody.right - rcBody.left) / TILESIZE;
+	int height = (rcBody.bottom - rcBody.top) / TILESIZE;
+	
+	for (int i = 0; i < width; i++)
+	{
+		for (int j = 0; j < height; j++)
+		{
+			int idx = ptTile.x + i;
+			int idy = ptTile.y + j;
+
+			if (_gameMap->getTiles()[idx][idy].obj == OBJECT_GAS_START)
+			{
+				_gameMap->getTiles()[idx][idy].obj = OBJECT_BUILDING_GAS_START_PLAYER1 + _playerNum;
+			}
+			else if(_gameMap->getTiles()[idx][idy].obj == OBJECT_GAS_BODY)
+			{
+				_gameMap->getTiles()[idx][idy].obj = OBJECT_BUILDING_GAS_PLAYER1 + _playerNum;
+			}
+			else
+			{
+				_gameMap->getTiles()[idx][idy].obj = OBJECT_BUILDING_PLAYER1 + _playerNum;
+			}
+		}
+	}
 
 	_vBuildings.push_back(building);
 }

@@ -194,6 +194,7 @@ namespace IOTA_UTIL
 
 	//ºÎµúÇûÀ½ ¾îÂîÇÒ²¨´Ï?
 	bool isCollisionReaction(const RECT& rcHold, RECT& rcMove);
+
 	int isCollisionOffset(const RECT& rcHold, RECT& rcMove);
 	bool isCollisionReaction(const MYRECT& mrcHold, MYRECT& mrcMove);
 	bool isCollisionReaction(const MYCIRCLE& cirHold, MYCIRCLE& cirMove);

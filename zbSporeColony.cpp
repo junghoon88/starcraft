@@ -107,6 +107,9 @@ void zbSporeColony::initBattleStatus(POINT ptTile)
 	_battleStatus.pt.set((_battleStatus.rcBody.left + _battleStatus.rcBody.right) * 0.5f, (_battleStatus.rcBody.top + _battleStatus.rcBody.bottom) * 0.5f);
 	_battleStatus.rcTile = RectMake(ptTile.x, ptTile.y, buildTileSize.x, buildTileSize.y);
 	_battleStatus.rcEllipse = _battleStatus.rcBody;
+
+
+	_battleStatus.curAWdamage = _baseStatus.AWdamage;
 }
 
 void zbSporeColony::release(void)

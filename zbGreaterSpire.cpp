@@ -182,10 +182,7 @@ void zbGreaterSpire::procCommands(void)
 
 				upgFlyatk.isProcessing = true;
 			}
-			else
-			{
-				//실패
-			}
+
 			_battleStatus.curCommand = COMMAND_NONE;
 		}
 		break;
@@ -206,10 +203,7 @@ void zbGreaterSpire::procCommands(void)
 
 				upgFlydep.isProcessing = true;
 			}
-			else
-			{
-				//실패
-			}
+
 			_battleStatus.curCommand = COMMAND_NONE;
 		}
 		break;

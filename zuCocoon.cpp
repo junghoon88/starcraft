@@ -1,10 +1,15 @@
 #include "stdafx.h"
 #include "zuCocoon.h"
 #include "zergDefine.h"
+
 #include "player.h"
 
+#include "zuGuadian.h"
+#include "zuDevourer.h"
 
-zuCocoon::zuCocoon(PLAYER playerNum)
+#include <assert.h>
+
+zuCocoon::zuCocoon(PLAYER playerNum, UNITNUM_ZERG nextUnitNum)
 {
 	_valid = true;
 
@@ -19,6 +24,11 @@ zuCocoon::zuCocoon(PLAYER playerNum)
 
 	//유닛 고유 번호
 	_unitNumZ = UNITNUM_ZERG_COCOON;
+
+	_nextUnitNum = nextUnitNum;
+
+	_nextUnit = NULL;
+
 }
 
 
@@ -28,8 +38,10 @@ zuCocoon::~zuCocoon()
 
 HRESULT zuCocoon::init(POINT pt)
 {
+	initNextUnit(pt);
 	initBaseStatus();
 	initBattleStatus(pt);
+	initProcessing();
 
 
 
@@ -40,6 +52,30 @@ HRESULT zuCocoon::init(POINT pt)
 	return S_OK;
 }
 
+void zuCocoon::initNextUnit(POINT pt)
+{
+	switch (_nextUnitNum)
+	{
+	case UNITNUM_ZERG_GUADIAN:
+		_nextUnit = new zuGuadian(_playerNum);
+		break;
+	case UNITNUM_ZERG_DEVOURER:
+		_nextUnit = new zuDevourer(_playerNum);
+		break;
+	}
+
+	if (_nextUnit == NULL)
+	{
+		assert(L"cocoon->nextUnit 에러");
+		return;
+	}
+
+	_nextUnit->setLinkAdressZergUpgrade(_zergUpgrade);
+	_nextUnit->setLinkAdressAstar(_aStar);
+	_nextUnit->setLinkAdressPlayer(_player);
+	_nextUnit->init(pt);
+
+}
 
 void zuCocoon::initBaseStatus(void)
 {
@@ -104,6 +140,22 @@ void zuCocoon::initBattleStatus(POINT pt)
 	_battleStatus.angleDeg = 315.0f;
 	_battleStatus.direction;
 }
+
+void zuCocoon::initProcessing(void)
+{
+	_processing.type = PROCESSING_MORPHING;
+
+	switch (_nextUnitNum)
+	{
+	case UNITNUM_ZERG_GUADIAN:				_processing.command = COMMAND_UNIT_GUADIAN;				_processing.img = IMAGEMANAGER->findImage(L"command-unit_guadian");			break;
+	case UNITNUM_ZERG_DEVOURER:				_processing.command = COMMAND_UNIT_DEVOURER;			_processing.img = IMAGEMANAGER->findImage(L"command-unit_devourer");		break;
+	}
+
+	_processing.curTime = 0.0f;
+	_processing.maxTime = _player->getZergProductionInfo()->getZUProductionInfo(_nextUnitNum).buildTime;
+	_processing.complete = false;
+}
+
 
 
 void zuCocoon::release(void)

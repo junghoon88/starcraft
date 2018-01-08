@@ -94,8 +94,8 @@ void sceneMaptool::update(void)
 		case SAMPLETERRAIN_HIGTDIRT:
 			dragIsoTile();
 			break;
-		case SAMPLETERRAIN_WATER:
-			dragIsoTile();
+		//case SAMPLETERRAIN_WATER:
+		//	dragIsoTile();
 			break;
 		}
 	}
@@ -184,11 +184,11 @@ void sceneMaptool::initSampleTerrainObject(void)
 
 	_rcSelectTerrain[SAMPLETERRAIN_DIRT]     = RectMake(SIDEWINDOW_STARTX + 10, _rcMiniMap.bottom + 30, TILESIZE, TILESIZE);
 	_rcSelectTerrain[SAMPLETERRAIN_HIGTDIRT] = RectMake(_rcSelectTerrain[SAMPLETERRAIN_DIRT].right + 5, _rcMiniMap.bottom + 30, TILESIZE, TILESIZE);
-	_rcSelectTerrain[SAMPLETERRAIN_WATER]    = RectMake(_rcSelectTerrain[SAMPLETERRAIN_HIGTDIRT].right + 5, _rcMiniMap.bottom + 30, TILESIZE, TILESIZE);
+	//_rcSelectTerrain[SAMPLETERRAIN_WATER]    = RectMake(_rcSelectTerrain[SAMPLETERRAIN_HIGTDIRT].right + 5, _rcMiniMap.bottom + 30, TILESIZE, TILESIZE);
 
 	_imgSelectTerrain[SAMPLETERRAIN_DIRT]     = IMAGEMANAGER->findImage(L"maptool-terrain-Dirt");
 	_imgSelectTerrain[SAMPLETERRAIN_HIGTDIRT] = IMAGEMANAGER->findImage(L"maptool-terrain-HighDirt");
-	_imgSelectTerrain[SAMPLETERRAIN_WATER]    = IMAGEMANAGER->findImage(L"maptool-terrain-Water-00");
+	//_imgSelectTerrain[SAMPLETERRAIN_WATER]    = IMAGEMANAGER->findImage(L"maptool-terrain-Water-00");
 
 	
 
@@ -692,8 +692,8 @@ void sceneMaptool::dragIsoTile(void)
 	case SAMPLETERRAIN_HIGTDIRT:
 		setHighDirt();
 		break;
-	case SAMPLETERRAIN_WATER:
-		setWater();
+	//case SAMPLETERRAIN_WATER:
+	//	setWater();
 		break;
 	}
 
@@ -1373,33 +1373,32 @@ void sceneMaptool::updateMiniMap(void)
 	{
 		for (int x = 0; x < TILEX; x++)
 		{
-			if (_tiles[x][y].obj != OBJECT_NONE)
-			{
-				switch (_tiles[x][y].obj)
-				{
-				case OBJECT_MINERAL1_START:	
-				case OBJECT_MINERAL1_BODY:
-				case OBJECT_MINERAL2_START:
-				case OBJECT_MINERAL2_BODY:
-				case OBJECT_MINERAL3_START:
-				case OBJECT_MINERAL3_BODY:
-				case OBJECT_GAS_START:
-				case OBJECT_GAS_BODY:
-					_colorMiniMap[x][y] = RGB(0, 228, 252);
-					break;
-
-											
-				case OBJECT_LOCATION_P1_START:
-				case OBJECT_LOCATION_P1_BODY:
-					_colorMiniMap[x][y] = RGB(255, 0, 0);
-					break;
-				case OBJECT_LOCATION_P2_START:
-				case OBJECT_LOCATION_P2_BODY:
-					_colorMiniMap[x][y] = RGB(0, 0, 255);
-					break;
-				}
-				continue;
-			}
+			//if (_tiles[x][y].obj != OBJECT_NONE)
+			//{
+			//	switch (_tiles[x][y].obj)
+			//	{
+			//	case OBJECT_MINERAL1_START:	
+			//	case OBJECT_MINERAL1_BODY:
+			//	case OBJECT_MINERAL2_START:
+			//	case OBJECT_MINERAL2_BODY:
+			//	case OBJECT_MINERAL3_START:
+			//	case OBJECT_MINERAL3_BODY:
+			//	case OBJECT_GAS_START:
+			//	case OBJECT_GAS_BODY:
+			//		_colorMiniMapObj[x][y] = RGB(0, 228, 252);
+			//		break;
+			//								
+			//	case OBJECT_LOCATION_P1_START:
+			//	case OBJECT_LOCATION_P1_BODY:
+			//		_colorMiniMapObj[x][y] = RGB(255, 0, 0);
+			//		break;
+			//	case OBJECT_LOCATION_P2_START:
+			//	case OBJECT_LOCATION_P2_BODY:
+			//		_colorMiniMapObj[x][y] = RGB(0, 0, 255);
+			//		break;
+			//	}
+			//	continue;
+			//}
 
 			switch (_tiles[x][y].terrain)
 			{
@@ -1432,6 +1431,17 @@ void sceneMaptool::saveData(const TCHAR* fileName)
 	WriteFile(file, _tiles, sizeof(tagTile) * TILEX * TILEY, &write, NULL);
 
 	CloseHandle(file);
+
+	//미니맵 bmp 저장
+	//1. path 에서 확장자만 bmp 로 변경
+	char szDrv[_MAX_DRIVE], szDir[_MAX_DIR], szFname[_MAX_FNAME], szExt[_MAX_EXT];
+	_splitpath(convert_mb(fileName), szDrv, szDir, szFname, szExt);
+	sprintf(szExt, ".bmp");
+	//2. bmp로 바꾼걸 다시 합체
+	char newpath[MAXCHAR]; 
+	_makepath_s(newpath, szDrv, szDir, szFname, szExt);
+	//3. 파일로 저장
+	_imgMiniMap->HDCToFile(newpath);
 }
 
 void sceneMaptool::loadData(const TCHAR* fileName)
@@ -1692,7 +1702,9 @@ void sceneMaptool::renderObject(void)
 
 void sceneMaptool::renderSideWindow(void)
 {
+	HBRUSH oldBrush = (HBRUSH)SelectObject(getMemDC(), _gBrush[BRUSHVERSION_BLACK]);
 	RectangleMake(getMemDC(), SIDEWINDOW_STARTX, 0, WINSIZEX - SIDEWINDOW_STARTX, WINSIZEY);
+	SelectObject(getMemDC(), oldBrush);
 
 	renderMiniMap();
 
@@ -1737,6 +1749,8 @@ void sceneMaptool::renderSideWindow(void)
 
 void sceneMaptool::renderMiniMap(void)
 {
+	POINT minimapOffset = { SIDEWINDOW_STARTX + 16 , 0 + 16 };
+
 	HDC hDCtemp = _imgMiniMap->getMemDC();
 	PatBlt(hDCtemp, 0, 0, TILEX, TILEY, BLACKNESS);
 
@@ -1747,20 +1761,12 @@ void sceneMaptool::renderMiniMap(void)
 			SetPixel(hDCtemp, x, y, _colorMiniMap[x][y]);
 		}
 	}
-	
-
-
-	HPEN oldPen = (HPEN)SelectObject(hDCtemp, _gPen[PENVERSION_MINIMAP]);
-	HBRUSH oldBrush = (HBRUSH)SelectObject(hDCtemp, _gBrush[BRUSHVERSION_BLACK]);
-	LineToRect(hDCtemp, _rcMiniMapCamera);
-	SelectObject(hDCtemp, oldPen);
-	SelectObject(hDCtemp, oldBrush);
 
 	//BitBlt(getMemDC(), SIDEWINDOW_STARTX + 16, 16, TILEX, TILEY, hDCtemp, 0, 0, SRCCOPY);
 
 	GdiTransparentBlt(getMemDC(),		//복사될 DC영역
-		SIDEWINDOW_STARTX + 16,
-		0 + 16,
+		minimapOffset.x,
+		minimapOffset.y,
 		TILEX, TILEY,												//복사될 가로 세로 크기
 
 		hDCtemp,			//복사할 DC
@@ -1768,6 +1774,39 @@ void sceneMaptool::renderMiniMap(void)
 		TILEX, TILEY,		//복사할 가로 세로 크기
 		RGB(0, 0, 0));			//제외할 칼라
 
+
+	for (int y = 0; y < TILEY; y++)
+	{
+		for (int x = 0; x < TILEX; x++)
+		{
+			switch (_tiles[x][y].obj)
+			{
+			case OBJECT_MINERAL1_START:
+			case OBJECT_MINERAL1_BODY:
+			case OBJECT_MINERAL2_START:
+			case OBJECT_MINERAL2_BODY:
+			case OBJECT_MINERAL3_START:
+			case OBJECT_MINERAL3_BODY:
+			case OBJECT_GAS_START:
+			case OBJECT_GAS_BODY:
+				SetPixel(getMemDC(), x + minimapOffset.x, y + minimapOffset.y, RGB(0, 228, 252));
+				break;
+			case OBJECT_LOCATION_P1_START:
+			case OBJECT_LOCATION_P1_BODY:
+				SetPixel(getMemDC(), x + minimapOffset.x, y + minimapOffset.y, RGB(255, 0, 0));
+				break;
+			case OBJECT_LOCATION_P2_START:
+			case OBJECT_LOCATION_P2_BODY:
+				SetPixel(getMemDC(), x + minimapOffset.x, y + minimapOffset.y, RGB(0, 0, 255));
+				break;
+			}
+		}
+	}
+
+	HPEN oldPen = (HPEN)SelectObject(getMemDC(), _gPen[PENVERSION_MINIMAP]);
+	OffsetRect(&_rcMiniMapCamera, minimapOffset.x, minimapOffset.y);
+	LineToRect(getMemDC(), _rcMiniMapCamera);
+	SelectObject(getMemDC(), oldPen);
 }
 
 

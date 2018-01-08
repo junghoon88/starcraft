@@ -32,6 +32,8 @@ void Building::release(void)
 
 void Building::update(void)
 {
+	checkDead();
+
 	procCommands();
 	
 	updatePosition();
@@ -182,6 +184,15 @@ void Building::updateProcessing(void)
 void Building::updateCommandSet(void)
 {
 }
+
+void Building::checkDead(void)
+{
+	if (_battleStatus.isDead)
+	{
+		_valid = true;
+	}
+}
+
 
 void Building::procCommands(void)
 {

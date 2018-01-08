@@ -6,7 +6,7 @@ effect::effect()
 	: _effectImage(NULL), 
 	_effectAnimation(NULL),
 	_isRunning(false), 
-	_x(0), _y(0)
+	_x(0), _y(0), _zorder(ZORDER_TILES)
 {
 }
 
@@ -82,6 +82,14 @@ void effect::render(ZORDER zorder)
 
 	RENDERMANAGER->insertImgAni(zorder, _effectImage, _x, _y, _effectAnimation);
 }
+
+void effect::Zrender(void)
+{
+	if (!_isRunning) return;
+
+	RENDERMANAGER->insertImgAni(_zorder, _effectImage, _x, _y, _effectAnimation);
+}
+
 
 void effect::startEffect(int x, int y)
 {

@@ -4,7 +4,7 @@
 #include "tile.h"
 #include "gameMap.h"
 
-class aStar : public gameNode
+class aStar
 {
 private:
 	vTile _vTotalList;	// 토탈 타일
@@ -31,6 +31,8 @@ public:
 	//타일 셋팅할 함수
 	void initTiles(void);
 	void setTiles(POINT startPt, POINT endPt);
+	void updateMapInfo(void);
+
 
 
 	//현재 타일에서 갈수 있는 길 찾는 함수
@@ -41,10 +43,6 @@ public:
 	void clearTiles(void);
 	tile* getTile(POINT tilePt);
 
-
-	void release(void);
-	void update(void);
-	void render(void);
 
 
 public:

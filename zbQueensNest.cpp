@@ -195,10 +195,7 @@ void zbQueensNest::procCommands(void)
 
 				evolution.isProcessing = true;
 			}
-			else
-			{
-				//실패
-			}
+
 			_battleStatus.curCommand = COMMAND_NONE;
 		}
 		break;
@@ -219,10 +216,7 @@ void zbQueensNest::procCommands(void)
 
 				evolution.isProcessing = true;
 			}
-			else
-			{
-				//실패
-			}
+
 			_battleStatus.curCommand = COMMAND_NONE;
 		}
 		break;
@@ -243,10 +237,7 @@ void zbQueensNest::procCommands(void)
 
 				evolution.isProcessing = true;
 			}
-			else
-			{
-				//실패
-			}
+
 			_battleStatus.curCommand = COMMAND_NONE;
 		}
 		break;

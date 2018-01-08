@@ -2,11 +2,14 @@
 #include "Unit.h"
 #include "Building.h"
 
+#include "tileNode.h"
+
 void Unit::procCommands(void)
 {
 	switch (_battleStatus.curCommand)
 	{
 	case COMMAND_NONE:
+		_battleStatus.curCommand = _battleStatus.oldCommand;
 		break;
 	case COMMAND_MOVE:
 		if (_baseStatus.isAir)
@@ -21,103 +24,74 @@ void Unit::procCommands(void)
 	case COMMAND_STOP:
 		break;
 	case COMMAND_ATTACK:
+		attackProc();
 		break;
 	case COMMAND_PATROL:
 		break;
 	case COMMAND_HOLD:
 		break;
+
+
 	case COMMAND_GATHER:
+		if (_unitNumZ != UNITNUM_ZERG_DRONE)
+		{
+			_battleStatus.oldCommand = _battleStatus.curCommand;
+			_battleStatus.curCommand = COMMAND_MOVE;
+		}
 		break;
 	case COMMAND_RETURNCARGO:
+		if (_unitNumZ != UNITNUM_ZERG_DRONE)
+		{
+			_battleStatus.curCommand = _battleStatus.oldCommand;
+		}
 		break;
+
+
 	case COMMAND_BURROW:
+		if (_baseStatus.commands[8] != COMMAND_BURROW || _battleStatus.isBurrow == TRUE)
+		{
+			_battleStatus.curCommand = _battleStatus.oldCommand;
+		}
 		break;
 	case COMMAND_UNBURROW:
+		if (_baseStatus.commands[8] != COMMAND_UNBURROW || _battleStatus.isBurrow == FALSE)
+		{
+			_battleStatus.curCommand = _battleStatus.oldCommand;
+		}
 		break;
+
 	case COMMAND_INFEST:
-		break;
 	case COMMAND_PARASITE:
-		break;
 	case COMMAND_BROODRING:
-		break;
 	case COMMAND_ENSNARE:
+		if (_unitNumZ != UNITNUM_ZERG_QUEEN)
+		{
+			_battleStatus.curCommand = _battleStatus.oldCommand;
+		}
+		break;
 		break;
 	case COMMAND_CONSUME:
-		break;
 	case COMMAND_DARKSWARM:
-		break;
 	case COMMAND_PLAGUE:
+		if (_unitNumZ != UNITNUM_ZERG_DEFILER)
+		{
+			_battleStatus.curCommand = _battleStatus.oldCommand;
+		}
 		break;
-
-		//드론에서 처리함--------
-		//BUILD1
-	//case COMMAND_BUILD_HATCHERY:
-	//case COMMAND_BUILD_LAIR:
-	//case COMMAND_BUILD_HIVE:
-	//case COMMAND_BUILD_CREEPCOLONY:
-	//case COMMAND_BUILD_SUNKENCOLONY:
-	//case COMMAND_BUILD_SPORECOLONY:
-	//case COMMAND_BUILD_EXTRACTOR:
-	//case COMMAND_BUILD_SPAWNINGPOOL:
-	//case COMMAND_BUILD_EVOLUTIONCHAMBER:
-	//case COMMAND_BUILD_HYDRALISKDEN:
-		//BUILD2
-	//case COMMAND_BUILD_SPIRE:
-	//case COMMAND_BUILD_GREATERSPIRE:
-	//case COMMAND_BUILD_QUEENSNEST:
-	//case COMMAND_BUILD_NYDUSCANAL:
-	//case COMMAND_BUILD_ULTRALISKCAVERN:
-	//case COMMAND_BUILD_DEFILERMOUND:
-	//	break;
-		//--------드론에서 처리함
-
-		//UNIT
-		//라바에서 처리함--------
-	//case COMMAND_UNIT_DRONE:
-	//case COMMAND_UNIT_ZERGLING:
-	//case COMMAND_UNIT_OVERLORD:
-	//case COMMAND_UNIT_HYDRALISK:
-	//case COMMAND_UNIT_MUTALISK:
-	//case COMMAND_UNIT_SCOURGE:
-	//case COMMAND_UNIT_QUEEN:
-	//case COMMAND_UNIT_ULTRALISK:
-	//case COMMAND_UNIT_DEFILER:
-	//--------라바에서 처리함
 
 		//UNIT2
-	case COMMAND_UNIT_LURKER:
-	case COMMAND_UNIT_GUADIAN:
-	case COMMAND_UNIT_DEVOURER:
-	case COMMAND_UNIT_INFESTEDTERRAN:
-
-		//UPGRADE
-	case COMMAND_UPGRADE_ZERG_MELEEATTACKS:		//저그 지상유닛 근접 공격
-	case COMMAND_UPGRADE_ZERG_MISSILEATTACKS:	//저그 지상유닛 원거리 공격
-	case COMMAND_UPGRADE_ZERG_CARAPACE:			//저그 지상유닛 방어력
-	case COMMAND_UPGRADE_ZERG_FLYERATTACKS:		//저그 공중유닛 공격
-	case COMMAND_UPGRADE_ZERG_FLYERCARAPACE:		//저그 공중유닛 방어력
-
-												//EVOLUTION
-	case COMMAND_EVOLUTION_ZERG_BURROW:			//저그 버러우 업글
-	case COMMAND_EVOLUTION_ZERG_METABOLICK_BOOST:		//저글링 이속업
-	case COMMAND_EVOLUTION_ZERG_ADRENAL_GLANDS:			//저글링 아드레날린
-	case COMMAND_EVOLUTION_ZERG_VECTRAL_SACS:			//오버로드 수송업
-	case COMMAND_EVOLUTION_ZERG_ANTENNAE:				//오버로드 시야업
-	case COMMAND_EVOLUTION_ZERG_PNEUMATIZED_CARAPACE:	//오버로드 이속업
-	case COMMAND_EVOLUTION_ZERG_MUSCULAR_AUGMENTS:		//히드라 이속업
-	case COMMAND_EVOLUTION_ZERG_GROOVED_SPINES:			//히드라 사정거리업
-	case COMMAND_EVOLUTION_ZERG_LURKER_ASPECT:	//럴커 업글
-	case COMMAND_EVOLUTION_ZERG_SPAWN_BROODLING:	//퀸 브루드링 업글
-	case COMMAND_EVOLUTION_ZERG_ENSNARE:			//퀸 인스테어 업글
-	case COMMAND_EVOLUTION_ZERG_GAMETE_MEIOSIS:			//퀸 마나업
-	case COMMAND_EVOLUTION_ZERG_ANABOLIC_SYNTHESIS:		//울트라 이속업
-	case COMMAND_EVOLUTION_ZERG_CHITINOUS_PLATING:		//울트라 방업(+2)
-	case COMMAND_EVOLUTION_ZERG_PLAGUE:			//디파일러 플레이그
-	case COMMAND_EVOLUTION_ZERG_CONSUME:			//디파일러 컨슘
-	case COMMAND_EVOLUTION_ZERG_METASYNAPTIC_NODE:		//디파일러 마나업
+	//case COMMAND_UNIT_LURKER:
+	//case COMMAND_UNIT_GUADIAN:
+	//case COMMAND_UNIT_DEVOURER:
+	//case COMMAND_UNIT_INFESTEDTERRAN:
 
 	default:
 		break;
+	}
+
+	if (_battleStatus.unitState == UNITSTATE_ATTACK && _battleStatus.curCommand != COMMAND_ATTACK)
+	{
+		_battleStatus.unitState = UNITSTATE_MOVE;
 	}
 }
 
@@ -125,9 +99,88 @@ void Unit::procCommands(void)
 
 void Unit::moveGround(void)
 {
+	//충돌했으면 AStar 를 다시 계산한다.
+	if (_battleStatus.isCollision)
+	{
+		_battleStatus.useAstar = true;
+		_battleStatus.calcAstar = true;
+
+		_battleStatus.isCollision = false;
+		return;
+	}
+
+
 	if (_battleStatus.targetObject!= NULL)
 	{
+		if (_battleStatus.useAstar)
+		{
+			//AstarProc 에서 처리해줄때까지 기다린다.
+			if (_battleStatus.calcAstar == false)
+			{
+				//moveToPoint(_battleStatus.ptTarget);
+				return;
+			}
 
+			_battleStatus.useAstar = false;
+		}
+
+		if (_vCloseList.size() <= 1)
+		{
+			//다시 계산을 요청한다.
+//			_battleStatus.calcAstar = false;
+
+			MYPOINT startPt = _battleStatus.pt;
+			MYPOINT endPt = _battleStatus.targetObject->getBattleStatus().pt;
+			POINT ptTarget = endPt.toPoint();
+
+			float width1 = _battleStatus.rcBody.right - _battleStatus.rcBody.left;
+			float height1 = _battleStatus.rcBody.bottom - _battleStatus.rcBody.top;
+			float width2 = _battleStatus.targetObject->getBattleStatus().rcBody.right - _battleStatus.targetObject->getBattleStatus().rcBody.left;
+			float height2 = _battleStatus.targetObject->getBattleStatus().rcBody.bottom - _battleStatus.targetObject->getBattleStatus().rcBody.top;
+
+			int gapX = (width1 + width2) / 2;
+			int gapY = (height1 + height2) / 2;
+
+			float angleDeg = getAngleDeg(startPt.x, startPt.y, endPt.x, endPt.y);
+			if ((angleDeg >= 0 && angleDeg <= 45) || (angleDeg >= 315 && angleDeg < 360))
+			{
+				//오른쪽방향
+				ptTarget.x = endPt.x - gapX;
+				ptTarget.y = startPt.y;
+			}
+			else if (angleDeg > 45 && angleDeg < 135)
+			{
+				//위쪽방향
+				ptTarget.x = startPt.x;
+				ptTarget.y = endPt.y + gapY;
+			}
+			else if (angleDeg >= 135 && angleDeg <= 225)
+			{
+				//왼쪽방향
+				ptTarget.x = endPt.x + gapX;
+				ptTarget.y = startPt.y;
+			}
+			else if (angleDeg > 225 && angleDeg < 315)
+			{
+				//아래방향
+				ptTarget.x = startPt.x;
+				ptTarget.y = endPt.y - gapY;
+			}
+
+			_battleStatus.ptTarget = ptTarget;
+
+			moveToPoint(_battleStatus.ptTarget);
+		}
+		else
+		{
+			tile* nextTile = _vCloseList[_vCloseList.size() - 1];
+			POINT ptNext;
+			ptNext.x = (nextTile->getIdX() + 0.5f) * TILESIZE;
+			ptNext.y = (nextTile->getIdY() + 0.5f) * TILESIZE;
+
+			//실제 이동
+			moveToPoint(ptNext);
+		}
 	}
 	else
 	{
@@ -150,24 +203,29 @@ void Unit::moveGround(void)
 				//AstarProc 에서 처리해줄때까지 기다린다.
 				if (_battleStatus.calcAstar == false)
 				{
-					moveToPoint(_battleStatus.ptTarget);
+					//moveToPoint(_battleStatus.ptTarget);
 					return;
 				}
 
-				//_aStar->setTiles(ptStartTile, ptEndTile);
-				//_aStar->pathFinder(_aStar->getStartTile());
-				//_vCloseList = _aStar->getCloseList();
-				//_battleStatus.useAstar = false;
 				_battleStatus.useAstar = false;
 			}
 
 			if (_vCloseList.size() == 0)
 			{
 				moveToPoint(_battleStatus.ptTarget);
+
+				//if (_battleStatus.ptTile.x == ptEndTile.x && _battleStatus.ptTile.y == ptEndTile.y)
+				//{
+				//	moveToPoint(_battleStatus.ptTarget);
+				//}
+				//else
+				//{
+				//	moveComplete();
+				//}
 			}
 			else
 			{
-				tile* nextTile = _vCloseList[0];
+				tile* nextTile = _vCloseList[_vCloseList.size() - 1];
 				POINT ptNext;
 				ptNext.x = (nextTile->getIdX() + 0.5f) * TILESIZE;
 				ptNext.y = (nextTile->getIdY() + 0.5f) * TILESIZE;
@@ -234,11 +292,14 @@ void Unit::moveComplete(void)
 	case COMMAND_NONE:
 		break;
 	case COMMAND_MOVE:
+		_battleStatus.oldCommand = _battleStatus.curCommand;
 		_battleStatus.curCommand = COMMAND_STOP;
 		break;
 	case COMMAND_STOP:
 		break;
 	case COMMAND_ATTACK:
+		_battleStatus.oldCommand = _battleStatus.curCommand;
+		_battleStatus.curCommand = COMMAND_STOP;
 		break;
 	case COMMAND_PATROL:
 		break;
@@ -277,6 +338,7 @@ void Unit::checkCloseList(void)
 {
 	if (_vCloseList.size() == 0)
 		return;
+
 	vTileIter iter = _vCloseList.begin();
 	while (iter != _vCloseList.end())
 	{
@@ -317,3 +379,116 @@ void Unit::setImageFrameForAngle(void)
 	_battleStatus.bodyFrame.x = iAngleDeg;
 }
 
+
+void Unit::attackProc(void)
+{
+	if (_battleStatus.targetObject != NULL && _battleStatus.targetObject->getValid() == FALSE)
+	{
+		_battleStatus.targetObject = findEnemy();
+	}
+
+	if (_baseStatus.AWable == FALSE && _baseStatus.GWable == FALSE)
+	{
+		//공격 못하는 유닛은 move로 변경
+		_battleStatus.curCommand = COMMAND_MOVE;
+		return;
+	}
+
+
+
+
+
+
+
+	if (_battleStatus.targetObject == NULL)
+	{
+		_battleStatus.unitState = UNITSTATE_MOVE;
+
+		//어택땅
+		_battleStatus.targetObject = findEnemy();
+
+		if (_baseStatus.isAir)
+		{
+			moveAir();
+		}
+		else
+		{
+			moveGround();
+		}
+	}
+	else
+	{
+		if (_battleStatus.targetObject->getBaseStatus().isAir == TRUE
+			&& _baseStatus.AWable == FALSE)
+		{
+			//타겟이 공중유닛인데 공중공격 못하는 유닛은 move로 변경
+			_battleStatus.curCommand = COMMAND_MOVE;
+			return;
+		}
+
+		if (_battleStatus.targetObject->getBaseStatus().isAir == FALSE
+			&& _baseStatus.GWable == FALSE)
+		{
+			//타겟이 지상유닛인데 지상공격 못하는 유닛은 move로 변경
+			_battleStatus.curCommand = COMMAND_MOVE;
+			return;
+		}
+
+		//
+		if (isInAttackRange(_battleStatus.targetObject))
+		{
+			_battleStatus.unitState = UNITSTATE_ATTACK;
+		}
+		else
+		{
+			_battleStatus.unitState = UNITSTATE_MOVE;
+
+			if (_baseStatus.isAir)
+			{
+				moveAir();
+			}
+			else
+			{
+				moveGround();
+			}
+		}
+	}
+}
+
+BOOL Unit::isInAttackRange(gameObject* target)
+{
+	float dist = getDistance(_battleStatus.pt.x, _battleStatus.pt.y,
+		target->getBattleStatus().pt.x, target->getBattleStatus().pt.y);
+
+	if (_baseStatus.isAir)
+	{
+		if (dist < _baseStatus.AWattackRange)
+		{
+			return TRUE;
+		}
+		else
+		{
+			return FALSE;
+		}
+	}
+	else
+	{
+		if (dist < _baseStatus.GWattackRange * TILESIZE)
+		{
+			return TRUE;
+		}
+		else
+		{
+			return FALSE;
+		}
+	}
+}
+
+gameObject* Unit::findEnemy(void)
+{
+	RECT rcView = RectMakeCenter(_battleStatus.pt.x, _battleStatus.pt.y, _baseStatus.sight, _baseStatus.sight);
+
+	//....적을 받아야함..
+
+	return NULL;
+}

@@ -20,7 +20,6 @@
 #include "imageManager.h"
 #include "timeManager.h"
 #include "soundManager.h"
-#include "effectManager.h"
 #include "iniDataManager.h"
 #include "sceneManager.h"
 #include "keyAniManager.h"
@@ -33,6 +32,7 @@
 #include "globalMacroVariables.h"
 #include "database.h"
 
+#include "effectManager.h"
 #include "RenderManager.h"
 
 

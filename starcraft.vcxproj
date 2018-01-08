@@ -134,6 +134,7 @@
     <ClInclude Include="timer.h" />
     <ClInclude Include="txtData.h" />
     <ClInclude Include="Unit.h" />
+    <ClInclude Include="UnitCollision.h" />
     <ClInclude Include="utils.h" />
     <ClInclude Include="zbCreepColony.h" />
     <ClInclude Include="zbDefilerMound.h" />
@@ -226,6 +227,7 @@
     <ClCompile Include="txtData.cpp" />
     <ClCompile Include="Unit+commands.cpp" />
     <ClCompile Include="Unit.cpp" />
+    <ClCompile Include="UnitCollision.cpp" />
     <ClCompile Include="utils.cpp" />
     <ClCompile Include="winMain.cpp" />
     <ClCompile Include="zbCreepColony.cpp" />

@@ -4,7 +4,10 @@
 #include "zergDefine.h"
 #include "player.h"
 
+#include "nrGas.h"
+
 zbExtractor::zbExtractor(PLAYER playerNum)
+	: _nrGas(NULL)
 {
 	_valid = true;
 
@@ -19,7 +22,6 @@ zbExtractor::zbExtractor(PLAYER playerNum)
 
 	//유닛 고유 번호
 	_buildingNumZ = BUILDINGNUM_ZERG_EXTRACTOR;
-
 }
 
 
@@ -90,7 +92,10 @@ void zbExtractor::initBattleStatus(POINT ptTile)
 
 void zbExtractor::release(void)
 {
-
+	if (_nrGas)
+	{
+		_nrGas->setAmountGas(_amountGas);
+	}
 }
 
 void zbExtractor::update(void)
@@ -135,4 +140,13 @@ void zbExtractor::updateCommandSet(void)
 void zbExtractor::procCommands(void)
 {
 
+}
+
+
+void zbExtractor::findNrGas(void)
+{
+	_nrGas = _player->getGamemap()->findGas(_battleStatus.ptTile);
+
+	_isNrGas = true;
+	_amountGas = _nrGas->getAmountGas();
 }

@@ -109,6 +109,9 @@
     <Filter Include="MainGame\sceneBattle\creepManager">
       <UniqueIdentifier>{c0ea1920-b370-47c6-8936-ec92a5894b02}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MainGame\sceneBattle\collision">
+      <UniqueIdentifier>{212efe6d-1f53-4b45-892d-af21b0ccad3a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -348,12 +351,6 @@
     <ClInclude Include="hotkeys.h">
       <Filter>MainGame\Common</Filter>
     </ClInclude>
-    <ClInclude Include="nrMineral.h">
-      <Filter>MainGame\sceneBattle\gameMap</Filter>
-    </ClInclude>
-    <ClInclude Include="nrGas.h">
-      <Filter>MainGame\sceneBattle\gameMap</Filter>
-    </ClInclude>
     <ClInclude Include="gameObject.h">
       <Filter>MainGame\Common</Filter>
     </ClInclude>
@@ -392,6 +389,15 @@
     </ClInclude>
     <ClInclude Include="creepAstar.h">
       <Filter>MainGame\sceneBattle\creepManager</Filter>
+    </ClInclude>
+    <ClInclude Include="nrGas.h">
+      <Filter>MainGame\sceneBattle\gameMap</Filter>
+    </ClInclude>
+    <ClInclude Include="nrMineral.h">
+      <Filter>MainGame\sceneBattle\gameMap</Filter>
+    </ClInclude>
+    <ClInclude Include="UnitCollision.h">
+      <Filter>MainGame\Common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -611,12 +617,6 @@
     <ClCompile Include="gameNode.cpp">
       <Filter>2DFramework</Filter>
     </ClCompile>
-    <ClCompile Include="nrGas.cpp">
-      <Filter>MainGame\sceneBattle\gameMap</Filter>
-    </ClCompile>
-    <ClCompile Include="nrMineral.cpp">
-      <Filter>MainGame\sceneBattle\gameMap</Filter>
-    </ClCompile>
     <ClCompile Include="gameObject.cpp">
       <Filter>MainGame\Common</Filter>
     </ClCompile>
@@ -652,6 +652,15 @@
     </ClCompile>
     <ClCompile Include="creepAstar.cpp">
       <Filter>MainGame\sceneBattle\creepManager</Filter>
+    </ClCompile>
+    <ClCompile Include="nrGas.cpp">
+      <Filter>MainGame\sceneBattle\gameMap</Filter>
+    </ClCompile>
+    <ClCompile Include="nrMineral.cpp">
+      <Filter>MainGame\sceneBattle\gameMap</Filter>
+    </ClCompile>
+    <ClCompile Include="UnitCollision.cpp">
+      <Filter>MainGame\Common</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

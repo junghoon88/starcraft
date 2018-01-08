@@ -16,6 +16,8 @@
 
 #include "creepManager.h"
 
+#include "UnitCollision.h"
+
 class player : public gameNode
 {
 private:
@@ -35,10 +37,6 @@ private:
 	vUnits							_vUnitsInCamera;		//카메라에 보여주는 유닛들
 	vBuildings						_vBuildings;			//플레이어가 가지고 있는 건물들
 	vBuildings						_vBuildingsInCamera;	//카메라에 보여주는 건물들
-
-	BOOL							_unitBusy;
-	BOOL							_buildingBusy;
-
 
 	//플레이어 정보
 	PLAYER							_playerNum;	
@@ -69,6 +67,7 @@ private:
 	//interface
 	gameController*					_gameController;
 
+	UnitCollision*					_UnitCollision;
 
 
 public:
@@ -83,6 +82,7 @@ public:
 	bool isHaveBuilding(BUILDINGNUM_ZERG num);
 
 
+	bool canResource(UINT mineral, UINT gas);
 	bool useResource(UINT mineral, UINT gas);
 	bool useResource(UINT mineral, UINT gas, float control);
 	inline void addResource(UINT mineral, UINT gas)		{ _myMineral += mineral; _myGas += gas; }
@@ -97,6 +97,8 @@ public:
 
 
 private:
+	void initStartUnit(void);
+
 	void checkInCamera(void);
 	void calcResource(void);
 	void updateZergUpgrade(void);
@@ -107,6 +109,8 @@ public:
 	inline zergProductionInfo* getZergProductionInfo(void) { return _zergProductionInfo; }
 
 
+	inline UINT	getMyMineral(void)		{ return _myMineral; }
+	inline UINT	getMyGas(void)			{ return _myGas; }
 	inline FLOAT getMyControl(void)		{ return _myControl; }
 	inline FLOAT getMyControlMax(void)	{ return _myControlMax; }
 	inline UINT	getShowMineral(void)	{ return _showMineral; }
@@ -118,9 +122,6 @@ public:
 	inline vUnits		getUnitsInCamera(void)		{ return _vUnitsInCamera; }
 	inline vBuildings	getBuildings(void)			{ return _vBuildings; }
 	inline vBuildings	getBuildingsInCamera(void)	{ return _vBuildingsInCamera; }
-
-	inline BOOL getUnitBusy(void) { return _unitBusy; }
-	inline BOOL getBuildingBusy(void) { return _buildingBusy; }
 
 
 
@@ -134,7 +135,7 @@ public:
 	inline void addZergEvolutionComplete(EVOLUTION_ZERG evolution)	{ _vZergEvolutionComplete.push_back(evolution); }
 
 
-
+	inline gameMap* getGamemap(void) { return _gameMap; }
 	inline fog* getFog(void) { return _fog; }
 	inline creepManager* getCreepManager(void) { return _creepManager; }
 
@@ -145,6 +146,8 @@ public:
 
 
 	inline gameController* getGameController(void) { return _gameController; }
+
+	inline UnitCollision* getUnitCollision(void) { return _UnitCollision; }
 
 public:
 	friend unsigned CALLBACK AstarThread(void* pArguments);
