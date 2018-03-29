@@ -44,9 +44,10 @@
 
 #define CANCLE_RESOURCE				0.75f
 
-#define BUILDSPEEDMULTIPLY		25.0f
+#define BUILDSPEEDMULTIPLY		15.0f
 
-#define UNIT_BODY_FPS_TIME		(1/15.0f)
+#define UNIT_BODY_FPS_TIME		(1.0f/15.0)
+#define UNIT_ATTACK_FPS_TIME	(1.0f/60.0)
 
 #define SELECTUNIT_MAX			12
 

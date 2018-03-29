@@ -191,6 +191,7 @@ void zuLarva::procCommands(void)
 			_player->addUnit(egg);
 		}
 
+
 		_battleStatus.curCommand = COMMAND_NONE;
 	}
 }

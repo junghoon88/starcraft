@@ -117,7 +117,19 @@ void zbCreepColony::updatePosition(void)
 }
 void zbCreepColony::updateImageFrame(void)
 {
+	float tick = TIMEMANAGER->getElapsedTime();
 
+	_battleStatus.bodyFrameTime += tick;
+	if (_battleStatus.bodyFrameTime >= UNIT_BODY_FPS_TIME)
+	{
+		_battleStatus.bodyFrameTime -= UNIT_BODY_FPS_TIME;
+
+		_battleStatus.bodyFrame.x++;
+		if (_battleStatus.bodyFrame.x > _baseStatus.imgBody->getMaxFrameX())
+		{
+			_battleStatus.bodyFrame.x = 0;
+		}
+	}
 }
 
 void zbCreepColony::updateProcessing(void)

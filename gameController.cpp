@@ -78,7 +78,6 @@ HRESULT gameController::init(PLAYER playerNum, RACES races)
 	_editboxChat->setImage(IMAGEMANAGER->findImage(L"interface-editchat"));
 
 
-	//debug
 	_isInInterface = false;
 	_isClicked = false;
 	_isDraging = false;
@@ -317,13 +316,14 @@ void gameController::actionMouseMap(void)
 
 						if (_selectInfo.object[i]->getIsBuilding())
 						{
-							_selectInfo.object[i]->receiveCommand(COMMAND_SETRALLYPOINT, ptMouseReal);
-							EFFECTMANAGER->play(L"마우스우클릭", _ptMouse.x, _ptMouse.y);
+							//_selectInfo.object[i]->receiveCommand(COMMAND_SETRALLYPOINT, ptMouseReal);
+							//EFFECTMANAGER->play(L"마우스우클릭", _ptMouse.x, _ptMouse.y);
 						}
 						else
 						{
 							_selectInfo.object[i]->receiveCommand(COMMAND_MOVE, ptMouseReal);
-							EFFECTMANAGER->play(L"마우스우클릭", _ptMouse.x, _ptMouse.y);
+							//EFFECTMANAGER->play(L"마우스우클릭", _ptMouse.x, _ptMouse.y);
+							EFFECTMANAGER->play(L"마우스우클릭", ptMouseReal.x, ptMouseReal.y);
 						}
 					}
 				}
@@ -335,8 +335,8 @@ void gameController::actionMouseMap(void)
 
 						if (_selectInfo.object[i]->getIsBuilding())
 						{
-							_selectInfo.object[i]->receiveCommand(COMMAND_SETRALLYPOINT, ptMouseReal);
-							EFFECTMANAGER->play(L"마우스우클릭", _ptMouse.x, _ptMouse.y);
+							//_selectInfo.object[i]->receiveCommand(COMMAND_SETRALLYPOINT, ptMouseReal);
+							//EFFECTMANAGER->play(L"마우스우클릭", _ptMouse.x, _ptMouse.y);
 						}
 						else
 						{
@@ -416,7 +416,8 @@ void gameController::actionMouseMap(void)
 					if (_selectInfo.object[i] == NULL) continue;
 
 					_selectInfo.object[i]->receiveCommand(_curCommand, ptMouseReal);
-					EFFECTMANAGER->play(L"마우스우클릭", _ptMouse.x, _ptMouse.y);
+					//EFFECTMANAGER->play(L"마우스우클릭", _ptMouse.x, _ptMouse.y);
+					EFFECTMANAGER->play(L"마우스우클릭", ptMouseReal.x, ptMouseReal.y);
 				}
 			}
 			else
@@ -496,13 +497,14 @@ void gameController::actionMouseMap(void)
 
 						if (_selectInfo.object[i]->getIsBuilding())
 						{
-							_selectInfo.object[i]->receiveCommand(COMMAND_SETRALLYPOINT, ptMouseReal);
-							EFFECTMANAGER->play(L"마우스우클릭", _ptMouse.x, _ptMouse.y);
+							//_selectInfo.object[i]->receiveCommand(COMMAND_SETRALLYPOINT, ptMouseReal);
+							//EFFECTMANAGER->play(L"마우스우클릭", _ptMouse.x, _ptMouse.y);
 						}
 						else
 						{
 							_selectInfo.object[i]->receiveCommand(COMMAND_MOVE, ptMouseReal);
-							EFFECTMANAGER->play(L"마우스우클릭", _ptMouse.x, _ptMouse.y);
+							//EFFECTMANAGER->play(L"마우스우클릭", _ptMouse.x, _ptMouse.y);
+							EFFECTMANAGER->play(L"마우스우클릭", ptMouseReal.x, ptMouseReal.y);
 						}
 					}
 				}
@@ -514,17 +516,27 @@ void gameController::actionMouseMap(void)
 
 						if (_selectInfo.object[i]->getIsBuilding())
 						{
-							_selectInfo.object[i]->receiveCommand(COMMAND_SETRALLYPOINT, ptMouseReal);
+							//_selectInfo.object[i]->receiveCommand(COMMAND_SETRALLYPOINT, ptMouseReal);
 						}
 						else
 						{
-							if (target->getPlayerNum() == _playerNum)
+							if (target->getIsNrMineral() || target->getIsNrGas())
+							{
+								_selectInfo.object[i]->receiveCommand(COMMAND_GATHER, target);
+								//EFFECTMANAGER->play(L"마우스우클릭", _ptMouse.x, _ptMouse.y);
+								EFFECTMANAGER->play(L"마우스우클릭", ptMouseReal.x, ptMouseReal.y);
+							}
+							else if (target->getPlayerNum() == _playerNum)
 							{
 								_selectInfo.object[i]->receiveCommand(COMMAND_MOVE, target);
+								//EFFECTMANAGER->play(L"마우스우클릭", _ptMouse.x, _ptMouse.y);
+								EFFECTMANAGER->play(L"마우스우클릭", ptMouseReal.x, ptMouseReal.y);
 							}
 							else
 							{
 								_selectInfo.object[i]->receiveCommand(COMMAND_ATTACK, target);
+								//EFFECTMANAGER->play(L"마우스우클릭", _ptMouse.x, _ptMouse.y);
+								EFFECTMANAGER->play(L"마우스우클릭", ptMouseReal.x, ptMouseReal.y);
 							}
 						}
 					}
@@ -1440,6 +1452,13 @@ TEAM gameController::clickObject(void)
 	POINT ptMouseReal;
 	ptMouseReal.x = _ptMouse.x + MAINCAMERA->getCameraX();
 	ptMouseReal.y = _ptMouse.y + MAINCAMERA->getCameraY();
+	
+	bool findSameUnits = false;
+
+	if (KEYMANAGER->isStayKeyDown(VK_CONTROL))
+	{
+		findSameUnits = true;
+	}
 
 	//내 오브젝트 먼저 체크
 	{
@@ -1460,6 +1479,25 @@ TEAM gameController::clickObject(void)
 				_selectInfo.isSelected = true;
 				_selectInfo.num = 1;
 				_selectInfo.object[0] = vUnitsInCamera[j];
+
+
+				if (findSameUnits)
+				{
+					for (int k = 0; k < vUnitsInCamera.size(); k++)
+					{
+						if (j == k) continue;
+
+						if (vUnitsInCamera[j]->getUnitnumZerg() == vUnitsInCamera[k]->getUnitnumZerg())
+						{
+							vUnitsInCamera[k]->setClicked(true);
+							_selectInfo.object[_selectInfo.num] = vUnitsInCamera[k];
+							_selectInfo.num++;
+
+							if (_selectInfo.num == SELECTUNIT_MAX)
+								break;
+						}
+					}
+				}
 
 				return TEAM_MYTEAM;
 			}
@@ -2727,7 +2765,38 @@ void gameController::matchingCommandImage(void)
 			{
 				_commandSet[i].button->setImage(L"command-upgrade_zerg_meleeattacks");
 
-				_commandSet[i].button->setDisable(false);
+				switch (_myPlayer->getZergUpgrade()->getUpgrade()[UPGRADE_ZERG_MELEEATTACKS].level)
+				{
+				case 0:		
+					_commandSet[i].button->setDisable(false);
+					break;
+				case 1:
+					if (_myPlayer->isHaveBuilding(BUILDINGNUM_ZERG_LAIR) || _myPlayer->isHaveBuilding(BUILDINGNUM_ZERG_HIVE))
+					{
+						_commandSet[i].button->setDisable(false);
+					}
+					else
+					{
+						_commandSet[i].button->setDisable(true);
+					}
+					break;
+				case 2:
+					if (_myPlayer->isHaveBuilding(BUILDINGNUM_ZERG_HIVE))
+					{
+						_commandSet[i].button->setDisable(false);
+					}
+					else
+					{
+						_commandSet[i].button->setDisable(true);
+					}
+					break;
+				case 3:
+				default:
+					_commandSet[i].button->setImage(L"");
+					_commandSet[i].button->setDisable(false);
+					_commandSet[i].command = COMMAND_NONE;
+					break;
+				}
 
 				_commandSet[i].button->setOnlyDown(false);
 				break;
@@ -2736,7 +2805,38 @@ void gameController::matchingCommandImage(void)
 			{
 				_commandSet[i].button->setImage(L"command-upgrade_zerg_missileattacks");
 
-				_commandSet[i].button->setDisable(false);
+				switch (_myPlayer->getZergUpgrade()->getUpgrade()[UPGRADE_ZERG_MISSILEATTACKS].level)
+				{
+				case 0:
+					_commandSet[i].button->setDisable(false);
+					break;
+				case 1:
+					if (_myPlayer->isHaveBuilding(BUILDINGNUM_ZERG_LAIR) || _myPlayer->isHaveBuilding(BUILDINGNUM_ZERG_HIVE))
+					{
+						_commandSet[i].button->setDisable(false);
+					}
+					else
+					{
+						_commandSet[i].button->setDisable(true);
+					}
+					break;
+				case 2:
+					if (_myPlayer->isHaveBuilding(BUILDINGNUM_ZERG_HIVE))
+					{
+						_commandSet[i].button->setDisable(false);
+					}
+					else
+					{
+						_commandSet[i].button->setDisable(true);
+					}
+					break;
+				case 3:
+				default:
+					_commandSet[i].button->setImage(L"");
+					_commandSet[i].button->setDisable(false);
+					_commandSet[i].command = COMMAND_NONE;
+					break;
+				}
 
 				_commandSet[i].button->setOnlyDown(false);
 				break;
@@ -2745,7 +2845,38 @@ void gameController::matchingCommandImage(void)
 			{
 				_commandSet[i].button->setImage(L"command-upgrade_zerg_carapace");
 
-				_commandSet[i].button->setDisable(false);
+				switch (_myPlayer->getZergUpgrade()->getUpgrade()[UPGRADE_ZERG_CARAPACE].level)
+				{
+				case 0:
+					_commandSet[i].button->setDisable(false);
+					break;
+				case 1:
+					if (_myPlayer->isHaveBuilding(BUILDINGNUM_ZERG_LAIR) || _myPlayer->isHaveBuilding(BUILDINGNUM_ZERG_HIVE))
+					{
+						_commandSet[i].button->setDisable(false);
+					}
+					else
+					{
+						_commandSet[i].button->setDisable(true);
+					}
+					break;
+				case 2:
+					if (_myPlayer->isHaveBuilding(BUILDINGNUM_ZERG_HIVE))
+					{
+						_commandSet[i].button->setDisable(false);
+					}
+					else
+					{
+						_commandSet[i].button->setDisable(true);
+					}
+					break;
+				case 3:
+				default:
+					_commandSet[i].button->setImage(L"");
+					_commandSet[i].button->setDisable(false);
+					_commandSet[i].command = COMMAND_NONE;
+					break;
+				}
 
 				_commandSet[i].button->setOnlyDown(false);
 				break;
@@ -2754,7 +2885,29 @@ void gameController::matchingCommandImage(void)
 			{
 				_commandSet[i].button->setImage(L"command-upgrade_zerg_flyerattacks");
 
-				_commandSet[i].button->setDisable(false);
+				switch (_myPlayer->getZergUpgrade()->getUpgrade()[UPGRADE_ZERG_FLYERATTACKS].level)
+				{
+				case 0:
+				case 1:
+					_commandSet[i].button->setDisable(false);
+					break;
+				case 2:
+					if (_myPlayer->isHaveBuilding(BUILDINGNUM_ZERG_HIVE))
+					{
+						_commandSet[i].button->setDisable(false);
+					}
+					else
+					{
+						_commandSet[i].button->setDisable(true);
+					}
+					break;
+				case 3:
+				default:
+					_commandSet[i].button->setImage(L"");
+					_commandSet[i].button->setDisable(false);
+					_commandSet[i].command = COMMAND_NONE;
+					break;
+				}
 
 				_commandSet[i].button->setOnlyDown(false);
 				break;
@@ -2763,7 +2916,29 @@ void gameController::matchingCommandImage(void)
 			{
 				_commandSet[i].button->setImage(L"command-upgrade_zerg_flyercarapace");
 
-				_commandSet[i].button->setDisable(false);
+				switch (_myPlayer->getZergUpgrade()->getUpgrade()[UPGRADE_ZERG_FLYERCARAPACE].level)
+				{
+				case 0:
+				case 1:
+					_commandSet[i].button->setDisable(false);
+					break;
+				case 2:
+					if (_myPlayer->isHaveBuilding(BUILDINGNUM_ZERG_HIVE))
+					{
+						_commandSet[i].button->setDisable(false);
+					}
+					else
+					{
+						_commandSet[i].button->setDisable(true);
+					}
+					break;
+				case 3:
+				default:
+					_commandSet[i].button->setImage(L"");
+					_commandSet[i].button->setDisable(false);
+					_commandSet[i].command = COMMAND_NONE;
+					break;
+				}
 
 				_commandSet[i].button->setOnlyDown(false);
 				break;
@@ -2987,37 +3162,83 @@ void gameController::actionCommand(void)
 	case COMMAND_SELECT_LARVA:
 		if (_selectInfo.object[0]->getBuildingNumZerg() == BUILDINGNUM_ZERG_HATCHERY)
 		{
-			zbHatchery* hatchery = (zbHatchery*)_selectInfo.object[0];
-			vector<zuLarva*> larvas = hatchery->getLarvas();
-			if (larvas.size() > 0)
+			if (_selectInfo.object[0]->getNextObject() == NULL)
 			{
-				_selectInfo.object[0]->setClicked(false);
-				_selectInfo.object[0] = NULL;
-				_selectInfo.num = 0;
-
-				for (int i = 0; i < larvas.size(); i++)
+				//다음오브젝트가 NULL이면 순수 해처리
+				zbHatchery* hatchery = (zbHatchery*)_selectInfo.object[0];
+				vector<zuLarva*> larvas = hatchery->getLarvas();
+				if (larvas.size() > 0)
 				{
-					larvas[i]->setClicked(true);
-					_selectInfo.object[i] = larvas[i];
-					_selectInfo.num++;
+					_selectInfo.object[0]->setClicked(false);
+					_selectInfo.object[0] = NULL;
+					_selectInfo.num = 0;
+
+					for (int i = 0; i < larvas.size(); i++)
+					{
+						larvas[i]->setClicked(true);
+						_selectInfo.object[i] = larvas[i];
+						_selectInfo.num++;
+					}
+				}
+			}
+			else
+			{
+				//다음오브젝트가 NULL이 아니면 해처리에서 레어로 변태중
+				zbMutating* hatchery = (zbMutating*)_selectInfo.object[0];
+				vector<zuLarva*> larvas = hatchery->getLarvas();
+				if (larvas.size() > 0)
+				{
+					_selectInfo.object[0]->setClicked(false);
+					_selectInfo.object[0] = NULL;
+					_selectInfo.num = 0;
+
+					for (int i = 0; i < larvas.size(); i++)
+					{
+						larvas[i]->setClicked(true);
+						_selectInfo.object[i] = larvas[i];
+						_selectInfo.num++;
+					}
 				}
 			}
 		}
 		else if (_selectInfo.object[0]->getBuildingNumZerg() == BUILDINGNUM_ZERG_LAIR)
 		{
-			zbLair* lair = (zbLair*)_selectInfo.object[0];
-			vector<zuLarva*> larvas = lair->getLarvas();
-			if (larvas.size() > 0)
+			if (_selectInfo.object[0]->getNextObject() == NULL)
 			{
-				_selectInfo.object[0]->setClicked(false);
-				_selectInfo.object[0] = NULL;
-				_selectInfo.num = 0;
-
-				for (int i = 0; i < larvas.size(); i++)
+				//다음오브젝트가 NULL이면 순수 레어
+				zbLair* lair = (zbLair*)_selectInfo.object[0];
+				vector<zuLarva*> larvas = lair->getLarvas();
+				if (larvas.size() > 0)
 				{
-					larvas[i]->setClicked(true);
-					_selectInfo.object[i] = larvas[i];
-					_selectInfo.num++;
+					_selectInfo.object[0]->setClicked(false);
+					_selectInfo.object[0] = NULL;
+					_selectInfo.num = 0;
+
+					for (int i = 0; i < larvas.size(); i++)
+					{
+						larvas[i]->setClicked(true);
+						_selectInfo.object[i] = larvas[i];
+						_selectInfo.num++;
+					}
+				}
+			}
+			else
+			{
+				//다음오브젝트가 NULL이 아니면 레어에서 하이브로 변태중
+				zbMutating* lair = (zbMutating*)_selectInfo.object[0];
+				vector<zuLarva*> larvas = lair->getLarvas();
+				if (larvas.size() > 0)
+				{
+					_selectInfo.object[0]->setClicked(false);
+					_selectInfo.object[0] = NULL;
+					_selectInfo.num = 0;
+
+					for (int i = 0; i < larvas.size(); i++)
+					{
+						larvas[i]->setClicked(true);
+						_selectInfo.object[i] = larvas[i];
+						_selectInfo.num++;
+					}
 				}
 			}
 		}
@@ -3359,7 +3580,7 @@ void gameController::setCommandSet(void)
 		bool isSameUnits = true;
 		UNITNUM_ZERG unitnum0 = _selectInfo.object[0]->getUnitnumZerg();
 
-		for (int i = 1; i < COMMAND_MAX; i++)
+		for (int i = 0; i < COMMAND_MAX; i++)
 		{
 			if (_selectInfo.object[i] == NULL) continue;
 
@@ -3389,22 +3610,29 @@ void gameController::setCommandSet(void)
 		{
 			//2. 다른 유닛일 경우 모두 지상유닛인지 체크 (->TRUE : 버러우 가능한 유닛이 있으면 버러우 커맨드 추가)
 			//3. 공격 불가능한 유닛들만 있는지 체크 (-> 공격 커맨드 빼야됨)
+			//4. 모두 지상유닛이면서 버러우 상태일 경우
 			bool isBurrowable = true;
 			bool isAttackagble = false;
+			bool isAllBurrowing = true;
 
-			for (int i = 1; i < COMMAND_MAX; i++)
+			for (int i = 0; i < COMMAND_MAX; i++)
 			{
 				if (_selectInfo.object[i] == NULL) continue;
 
 				if (_selectInfo.object[i]->getBaseStatus().isAir)
 				{
 					isBurrowable = false;
+					isAllBurrowing = false;
 				}
 				else
 				{
 					if (_selectInfo.object[i]->getBaseStatus().commands[8] != COMMAND_BURROW)
 					{
 						isBurrowable = false;
+					}
+					if (_selectInfo.object[i]->getBaseStatus().commands[8] != COMMAND_UNBURROW)
+					{
+						isAllBurrowing = false;
 					}
 				}
 
@@ -3414,16 +3642,32 @@ void gameController::setCommandSet(void)
 				}
 			}
 
+
 			_unitCommandInfo = _curCommand;
-			_commandSetUnit[0] = COMMAND_MOVE;
-			_commandSetUnit[1] = COMMAND_STOP;
-			_commandSetUnit[2] = isAttackagble ? COMMAND_ATTACK : COMMAND_NONE;
-			_commandSetUnit[3] = COMMAND_PATROL;
-			_commandSetUnit[4] = COMMAND_HOLD;
-			_commandSetUnit[5] = COMMAND_NONE;
-			_commandSetUnit[6] = COMMAND_NONE;
-			_commandSetUnit[7] = COMMAND_NONE;
-			_commandSetUnit[8] = isBurrowable ? COMMAND_BURROW : COMMAND_NONE;
+			if (isAllBurrowing)
+			{
+				_commandSetUnit[0] = COMMAND_NONE;
+				_commandSetUnit[1] = COMMAND_NONE;
+				_commandSetUnit[2] = COMMAND_NONE;
+				_commandSetUnit[3] = COMMAND_NONE;
+				_commandSetUnit[4] = COMMAND_NONE;
+				_commandSetUnit[5] = COMMAND_NONE;
+				_commandSetUnit[6] = COMMAND_NONE;
+				_commandSetUnit[7] = COMMAND_NONE;
+				_commandSetUnit[8] = COMMAND_UNBURROW;
+			}
+			else
+			{
+				_commandSetUnit[0] = COMMAND_MOVE;
+				_commandSetUnit[1] = COMMAND_STOP;
+				_commandSetUnit[2] = isAttackagble ? COMMAND_ATTACK : COMMAND_NONE;
+				_commandSetUnit[3] = COMMAND_PATROL;
+				_commandSetUnit[4] = COMMAND_HOLD;
+				_commandSetUnit[5] = COMMAND_NONE;
+				_commandSetUnit[6] = COMMAND_NONE;
+				_commandSetUnit[7] = COMMAND_NONE;
+				_commandSetUnit[8] = isBurrowable ? COMMAND_BURROW : COMMAND_NONE;
+			}
 		}
 	}
 

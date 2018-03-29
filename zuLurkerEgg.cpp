@@ -3,6 +3,10 @@
 #include "zergDefine.h"
 #include "player.h"
 
+#include <assert.h>
+
+#include "zuLurker.h"
+
 
 zuLurkerEgg::zuLurkerEgg(PLAYER playerNum)
 {
@@ -20,6 +24,10 @@ zuLurkerEgg::zuLurkerEgg(PLAYER playerNum)
 	//유닛 고유 번호
 	_unitNumZ = UNITNUM_ZERG_LURKEREGG;
 
+	_nextUnitNum = UNITNUM_ZERG_LURKER;
+
+	_nextUnit = NULL;
+
 }
 
 
@@ -29,10 +37,10 @@ zuLurkerEgg::~zuLurkerEgg()
 
 HRESULT zuLurkerEgg::init(POINT pt)
 {
+	initNextUnit(pt);
 	initBaseStatus();
 	initBattleStatus(pt);
-
-
+	initProcessing();
 
 	updatePosition();
 
@@ -42,13 +50,29 @@ HRESULT zuLurkerEgg::init(POINT pt)
 	return S_OK;
 }
 
+void zuLurkerEgg::initNextUnit(POINT pt)
+{
+	_nextUnit = new zuLurker(_playerNum);
+
+	if (_nextUnit == NULL)
+	{
+		assert(L"lurkeregg->nextUnit 에러");
+		return;
+	}
+
+	_nextUnit->setLinkAdressZergUpgrade(_zergUpgrade);
+	_nextUnit->setLinkAdressAstar(_aStar);
+	_nextUnit->setLinkAdressPlayer(_player);
+	_nextUnit->init(pt);
+}
+
 
 void zuLurkerEgg::initBaseStatus(void)
 {
 	_stprintf(_baseStatus.name, L"Zerg LerkerEgg");
 
 	TCHAR strKey[100];
-	_stprintf(strKey, L"ZU-lerkeregg-Body%d", _playerNum);
+	_stprintf(strKey, L"ZU-lurkeregg-Body%d", _playerNum);
 	_baseStatus.imgBody = IMAGEMANAGER->findImage(strKey);
 	_baseStatus.imgFace = IMAGEMANAGER->findImage(L"ZU-lerkeregg-Face");
 	_baseStatus.imgStat1 = IMAGEMANAGER->findImage(L"ZU-lerkeregg-Stat1");
@@ -80,7 +104,7 @@ void zuLurkerEgg::initBaseStatus(void)
 	_baseStatus.GWable = FALSE;
 	_baseStatus.AWable = FALSE;
 
-	_baseStatus.commands[0] = COMMAND_MOVE;
+	_baseStatus.commands[0] = COMMAND_NONE;
 	_baseStatus.commands[1] = COMMAND_NONE;
 	_baseStatus.commands[2] = COMMAND_NONE;
 	_baseStatus.commands[3] = COMMAND_NONE;
@@ -105,6 +129,18 @@ void zuLurkerEgg::initBattleStatus(POINT pt)
 	_battleStatus.direction;
 }
 
+void zuLurkerEgg::initProcessing(void)
+{
+	_processing.type = PROCESSING_MORPHING;
+
+	_processing.command = COMMAND_UNIT_LURKER;
+	_processing.img = IMAGEMANAGER->findImage(L"command-unit_lurker");
+
+	_processing.curTime = 0.0f;
+	_processing.maxTime = _player->getZergProductionInfo()->getZUProductionInfo(UNITNUM_ZERG_LURKER).buildTime;
+	_processing.complete = false;
+
+}
 
 void zuLurkerEgg::release(void)
 {
@@ -113,6 +149,9 @@ void zuLurkerEgg::release(void)
 void zuLurkerEgg::update(void)
 {
 	Unit::update();
+
+	updateProgressBar();
+
 }
 
 void zuLurkerEgg::render(void)
@@ -141,11 +180,70 @@ void zuLurkerEgg::updateBattleStatus(void)
 
 void zuLurkerEgg::updateImageFrame(void)
 {
-	Unit::setImageFrameForAngle();
+	//중간 반복
+	_battleStatus.bodyFrameTime += TIMEMANAGER->getElapsedTime();
+	if (_battleStatus.bodyFrameTime >= UNIT_BODY_FPS_TIME)
+	{
+		_battleStatus.bodyFrameTime -= UNIT_BODY_FPS_TIME;
+
+		if (!_processing.complete)
+		{
+			//처음
+			if (_battleStatus.bodyFrame.x < 4)
+			{
+				_battleStatus.bodyFrame.x++;
+			}
+			else
+			{
+				_battleStatus.bodyFrame.x = (_battleStatus.bodyFrame.x == 6) ? 4 : _battleStatus.bodyFrame.x + 1;
+			}
+		}
+		else
+		{
+			//마지막
+			if (_battleStatus.bodyFrame.x < 9)
+			{
+				_battleStatus.bodyFrame.x++;
+			}
+			else
+			{
+				_nextUnit->init(_battleStatus.pt.toPoint());
+				_player->addUnit(_nextUnit);
+				_nextObject = _nextUnit;
+				
+				_valid = false;
+			}
+		}
+	}
+}
+
+void zuLurkerEgg::updateProgressBar(void)
+{
+	float tick = TIMEMANAGER->getElapsedTime() * BUILDSPEEDMULTIPLY;
+
+	if (_processing.complete == false)
+	{
+		_processing.curTime += tick;
+
+		if (_processing.curTime >= _processing.maxTime)
+		{
+			_processing.curTime = _processing.maxTime;
+
+			_processing.complete = true;
+			_battleStatus.bodyFrame.x = 7;
+		}
+	}
 }
 
 void zuLurkerEgg::procCommands(void)
 {
-	Unit::procCommands();
+	if (_battleStatus.curCommand == COMMAND_ESC)
+	{
+		//SAFE_RELEASEDELETE(_nextUnit);
 
+	}
+	else
+	{
+		_battleStatus.curCommand = COMMAND_NONE;
+	}
 }

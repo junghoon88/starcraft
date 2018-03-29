@@ -56,7 +56,6 @@ zuDrone::zuDrone(PLAYER playerNum)
 	_mineralGatheringTimeMax = 3.0f;
 	_gasGatheringTime = 0.0f;
 	_gasGatheringTimeMax = 1.0f;
-
 }
 
 
@@ -188,25 +187,134 @@ void zuDrone::updateBattleStatus(void)
 {
 	Unit::updateBattleStatus();
 
-
 }
 
 void zuDrone::updateImageFrame(void)
 {
-	Unit::setImageFrameForAngle();
+
+	float tick = TIMEMANAGER->getElapsedTime();
+	
+	if (_isBurrowing)
+	{
+		_battleStatus.unitState = UNITSTATE_STOP;
+		_workState = WORKSTATE_IDLE;
+
+		if (_battleStatus.bodyFrame.y != 12)
+		{
+			_battleStatus.bodyFrame.x = 0;
+			_battleStatus.bodyFrame.y = 12;
+			_battleStatus.bodyFrameTime = 0.0f;
+		}
+
+		_battleStatus.bodyFrameTime += tick;
+		if (_battleStatus.bodyFrameTime >= UNIT_BODY_FPS_TIME)
+		{
+			_battleStatus.bodyFrameTime -= UNIT_BODY_FPS_TIME;
+			_battleStatus.bodyFrame.x++;
+			if (_battleStatus.bodyFrame.x > 7)
+			{
+				_battleStatus.bodyFrame.x = 7;
+				_isBurrowing = false;
+				_battleStatus.isBurrow = true;
+				_battleStatus.angleDeg = 315.0f;
+			}
+		}
+	}
+	else if (_isUnburrowing)
+	{
+		_battleStatus.bodyFrameTime += tick;
+		if (_battleStatus.bodyFrameTime >= UNIT_BODY_FPS_TIME / 4)
+		{
+			_battleStatus.bodyFrameTime -= UNIT_BODY_FPS_TIME / 4;
+			_battleStatus.bodyFrame.x--;
+			if (_battleStatus.bodyFrame.x < 0)
+			{
+				_battleStatus.bodyFrame.x = 3;
+				_isUnburrowing = false;
+				_battleStatus.isBurrow = false;
+				_battleStatus.curCommand = COMMAND_STOP;
+				_battleStatus.oldCommand = COMMAND_STOP;
+
+				if (_hangingMineral > 0)
+				{
+					_battleStatus.bodyFrame.y = 10;
+				}
+				else if (_hangingGas > 0)
+				{
+					_battleStatus.bodyFrame.y = 11;
+				}
+				else
+				{
+					_battleStatus.bodyFrame.y = 0;
+				}
+			}
+		}
+	}
+	else
+	{
+		if (_battleStatus.isBurrow)
+			return;
+
+		Unit::setImageFrameForAngle();
+
+		if (_battleStatus.unitState == UNITSTATE_ATTACK)
+		{
+			_workState = WORKSTATE_IDLE;
+
+			if (_battleStatus.targetObject == NULL)
+			{
+				_battleStatus.bodyFrameTime = 0.0f;
+				return;
+			}
+
+			float attackTime = (_battleStatus.targetObject->getBaseStatus().isAir) ? _baseStatus.AWcooldown : _baseStatus.GWcooldown;
+			attackTime = attackTime * UNIT_ATTACK_FPS_TIME; //공격이 1프레임이니까
+
+			_battleStatus.bodyFrameTime += tick;
+			if (_battleStatus.bodyFrameTime >= attackTime)
+			{
+				_battleStatus.bodyFrameTime -= attackTime;
+				_battleStatus.targetObject->hitDamage(this);
+			}
+		}
+	}
 }
 
 void zuDrone::updateCommandSet(void)
 {
-	if (_hangingMineral == 0 && _hangingGas == 0)
+	if (_battleStatus.isBurrow)
 	{
-		_baseStatus.commands[4] = COMMAND_GATHER;
+		_baseStatus.commands[0] = COMMAND_NONE;
+		_baseStatus.commands[1] = COMMAND_NONE;
+		_baseStatus.commands[2] = COMMAND_NONE;
+		_baseStatus.commands[3] = COMMAND_NONE;
+		_baseStatus.commands[4] = COMMAND_NONE;
 		_baseStatus.commands[5] = COMMAND_NONE;
+		_baseStatus.commands[6] = COMMAND_NONE;
+		_baseStatus.commands[7] = COMMAND_NONE;
+		_baseStatus.commands[8] = COMMAND_UNBURROW;
 	}
 	else
 	{
-		_baseStatus.commands[4] = COMMAND_NONE;
-		_baseStatus.commands[5] = COMMAND_RETURNCARGO;
+		_baseStatus.commands[0] = COMMAND_MOVE;
+		_baseStatus.commands[1] = COMMAND_STOP;
+		_baseStatus.commands[2] = COMMAND_ATTACK;
+		_baseStatus.commands[3] = COMMAND_NONE;
+
+		if (_hangingMineral == 0 && _hangingGas == 0)
+		{
+			_baseStatus.commands[4] = COMMAND_GATHER;
+			_baseStatus.commands[5] = COMMAND_NONE;
+		}
+		else
+		{
+			_baseStatus.commands[4] = COMMAND_NONE;
+			_baseStatus.commands[5] = COMMAND_RETURNCARGO;
+		}
+
+		_baseStatus.commands[6] = COMMAND_BUILD1;
+		_baseStatus.commands[7] = COMMAND_BUILD2;
+		_baseStatus.commands[8] = COMMAND_BURROW;
 	}
 }
 

@@ -145,11 +145,96 @@ void zuDevourer::updateBattleStatus(void)
 	Unit::updateBattleStatus();
 
 
+
+
 }
 
 void zuDevourer::updateImageFrame(void)
 {
 	Unit::setImageFrameForAngle();
+
+	float tick = TIMEMANAGER->getElapsedTime();
+
+	bool fireableAir = false;
+
+	float attackTimeAir = _baseStatus.AWcooldown * UNIT_ATTACK_FPS_TIME;
+
+	_battleStatus.bulletDelayAir += tick;
+	if (_battleStatus.bulletDelayAir >= attackTimeAir)
+	{
+		fireableAir = true;
+		_battleStatus.bulletDelayAir = attackTimeAir;
+	}
+
+
+	if (_battleStatus.unitState != UNITSTATE_ATTACK)
+	{
+		if (_battleStatus.bodyFrame.y > 5)
+		{
+			_battleStatus.bodyFrame.y = 0;
+		}
+
+		_battleStatus.bodyFrameTime += tick;
+		if (_battleStatus.bodyFrameTime >= UNIT_BODY_FPS_TIME)
+		{
+			_battleStatus.bodyFrameTime -= UNIT_BODY_FPS_TIME;
+
+			_battleStatus.bodyFrame.y++;
+			if (_battleStatus.bodyFrame.y > 5)
+			{
+				_battleStatus.bodyFrame.y = 0;
+			}
+		}
+	}
+	else
+	{
+
+
+		if (_battleStatus.unitState == UNITSTATE_ATTACK && _battleStatus.targetObject != NULL)
+		{
+			if (_battleStatus.targetObject->getBaseStatus().isAir)
+			{
+				if (fireableAir)
+				{
+					_battleStatus.bodyFrameTime += tick;
+					if (_battleStatus.bodyFrameTime >= UNIT_BODY_FPS_TIME)
+					{
+						_battleStatus.bodyFrameTime -= UNIT_BODY_FPS_TIME;
+
+						_battleStatus.bodyFrame.y++;
+						if (_battleStatus.bodyFrame.y > 9)
+						{
+							_battleStatus.bodyFrame.y = 0;
+
+							bullets* bullet = new bullets(BULLETNUM_DEVOURER);
+							bullet->init(this, _battleStatus.targetObject);
+							_player->addBullet(bullet);
+							_battleStatus.bulletDelayAir = 0.0f;
+						}
+					}
+				}
+				else
+				{
+					if (_battleStatus.bodyFrame.y > 6)
+					{
+						_battleStatus.bodyFrame.y = 0;
+					}
+					_battleStatus.bodyFrameTime = 0.0f;
+					_battleStatus.bodyFrameTime += tick;
+					if (_battleStatus.bodyFrameTime >= UNIT_BODY_FPS_TIME)
+					{
+						_battleStatus.bodyFrameTime -= UNIT_BODY_FPS_TIME;
+
+						_battleStatus.bodyFrame.y++;
+						if (_battleStatus.bodyFrame.y > 6)
+						{
+							_battleStatus.bodyFrame.y = 0;
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
 void zuDevourer::procCommands(void)

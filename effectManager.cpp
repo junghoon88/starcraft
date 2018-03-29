@@ -75,7 +75,7 @@ void effectManager::render()
 			iterEffects vArrIter;
 			for (vArrIter = mIter->second.begin(); vArrIter != mIter->second.end(); ++vArrIter)
 			{
-				(*vArrIter)->render();
+				(*vArrIter)->Zrender();
 			}
 		}
 	}

@@ -54,7 +54,7 @@ void zuGuadian::initBaseStatus(void)
 
 	_baseStatus.unitControl = 2.0f;
 
-	_baseStatus.maxHP = 25.0f;
+	_baseStatus.maxHP = 150.0f;
 
 	_baseStatus.useSH = FALSE;
 	_baseStatus.maxSH = 0.0f;
@@ -77,14 +77,14 @@ void zuGuadian::initBaseStatus(void)
 	_baseStatus.sameGWAW = FALSE;
 
 	_baseStatus.GWable = TRUE;
-	_baseStatus.AWAttackType = ATTACKTYPE_ZERG_FLYING;
-	_stprintf(_baseStatus.AWname, L"Acid Spore");
-	_baseStatus.AWdamage = 20;
-	_baseStatus.AWdamagePlus = 2;
-	_baseStatus.AWmaxHit = 1;
-	_baseStatus.AWdamageType = DAMAGETYPE_NORMAL;
-	_baseStatus.AWcooldown = 30.0;
-	_baseStatus.AWattackRange = 8.0f;
+	_baseStatus.GWAttackType = ATTACKTYPE_ZERG_FLYING;
+	_stprintf(_baseStatus.GWname, L"Acid Spore");
+	_baseStatus.GWdamage = 20;
+	_baseStatus.GWdamagePlus = 2;
+	_baseStatus.GWmaxHit = 1;
+	_baseStatus.GWdamageType = DAMAGETYPE_NORMAL;
+	_baseStatus.GWcooldown = 30.0;
+	_baseStatus.GWattackRange = 8.0f;
 
 	_baseStatus.AWable = FALSE;
 
@@ -150,6 +150,45 @@ void zuGuadian::updateBattleStatus(void)
 void zuGuadian::updateImageFrame(void)
 {
 	Unit::setImageFrameForAngle();
+
+	float tick = TIMEMANAGER->getElapsedTime();
+
+	_battleStatus.bodyFrameTime += tick;
+	if (_battleStatus.bodyFrameTime >= UNIT_BODY_FPS_TIME)
+	{
+		_battleStatus.bodyFrameTime -= UNIT_BODY_FPS_TIME;
+
+		_battleStatus.bodyFrame.y++;
+		if (_battleStatus.bodyFrame.y > _baseStatus.imgBody->getMaxFrameY())
+		{
+			_battleStatus.bodyFrame.y = 0;
+		}
+	}
+
+	bool fireableGround = false;
+
+	float attackTimeGround = _baseStatus.GWcooldown * UNIT_ATTACK_FPS_TIME;
+
+	_battleStatus.bulletDelayGround += tick;
+	if (_battleStatus.bulletDelayGround >= attackTimeGround)
+	{
+		fireableGround = true;
+		_battleStatus.bulletDelayGround = attackTimeGround;
+	}
+
+	if (_battleStatus.unitState == UNITSTATE_ATTACK && _battleStatus.targetObject != NULL)
+	{
+		if (_battleStatus.targetObject->getBaseStatus().isAir == FALSE)
+		{
+			if (fireableGround)
+			{
+				bullets* bullet = new bullets(BULLETNUM_GUADIAN);
+				bullet->init(this, _battleStatus.targetObject);
+				_player->addBullet(bullet);
+				_battleStatus.bulletDelayGround = 0.0f;
+			}
+		}
+	}
 }
 
 void zuGuadian::procCommands(void)

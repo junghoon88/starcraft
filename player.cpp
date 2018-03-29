@@ -29,6 +29,9 @@ unsigned CALLBACK AstarThread(void* pArguments)
 			num = 0;
 
 
+		//
+		if (p->getGameObject()->isValidObject(units[num]) == NULL)
+			continue;
 
 		tagBattleStatus battleStatus = units[num]->getBattleStatus();
 
@@ -38,6 +41,9 @@ unsigned CALLBACK AstarThread(void* pArguments)
 
 		//AStar 를 사용하는데 계산을 끝냈으면 다음
 		if (battleStatus.calcAstar == TRUE)
+			continue;
+
+		if (units[num]->getValid() == FALSE)
 			continue;
 
 		if (units[num]->getIsBusy() != 0)
@@ -117,10 +123,13 @@ unsigned CALLBACK CollisionThread(void* pArguments)
 		if (++num >= p->getUnits().size())
 			num = 0;
 
-		Unit* unitMove = p->getUnits()[num];
-
-		if (unitMove->getIsBusy() != 0)
+		if (p->getUnits()[num]->getValid() == FALSE)
 			continue;
+
+		if (p->getUnits()[num]->getIsBusy() != 0)
+			continue;
+
+		Unit* unitMove = p->getUnits()[num];
 
 		unitMove->addIsBusy(0x02);
 
@@ -167,6 +176,7 @@ player::player()
 	: _zergUpgrade(NULL), _gameMap(NULL), _fog(NULL), _creepManager(NULL), _aStar(NULL), _gameController(NULL)
 	, _UnitCollision(NULL)
 {
+	_gameObject = NULL;
 }
 
 
@@ -177,6 +187,8 @@ player::~player()
 
 HRESULT player::init(PLAYER playerNum, RACES races)
 {
+	_gameObject = new gameObject;
+
 	_myMineral = _showMineral = 50;
 	_myGas = _showGas = 0;
 
@@ -216,17 +228,13 @@ HRESULT player::init(PLAYER playerNum, RACES races)
 	initStartUnit();
 
 
+
 	unsigned int threadId = 0;
 	_hAstarThread		= (HANDLE)_beginthreadex(NULL, 0, &AstarThread, this, 0, &threadId);
 	_hCreepThread		= (HANDLE)_beginthreadex(NULL, 0, &CreepThread, this, 0, &threadId);
-	_hCollisionThread	= (HANDLE)_beginthreadex(NULL, 0, &CollisionThread, this, 0, &threadId);
+	//_hCollisionThread	= (HANDLE)_beginthreadex(NULL, 0, &CollisionThread, this, 0, &threadId);
 
 	_endThread = FALSE;
-
-
-
-
-
 
 	return S_OK;
 }
@@ -241,8 +249,8 @@ void player::release(void)
 	WaitForSingleObject(_hCreepThread, INFINITE);
 	CloseHandle(_hCreepThread);
 
-	WaitForSingleObject(_hCollisionThread, INFINITE);
-	CloseHandle(_hCollisionThread);
+	//WaitForSingleObject(_hCollisionThread, INFINITE);
+	//CloseHandle(_hCollisionThread);
 
 	for (UINT i = 0; i < _vUnits.size(); i++)
 	{
@@ -255,6 +263,14 @@ void player::release(void)
 		SAFE_RELEASEDELETE(_vBuildings[i]);
 	}
 	_vBuildings.clear();
+
+	for (UINT i = 0; i < _vBullets.size(); i++)
+	{
+		SAFE_RELEASEDELETE(_vBullets[i]);
+	}
+	_vBullets.clear();
+
+	SAFE_RELEASEDELETE(_gameObject);
 
 
 
@@ -276,7 +292,8 @@ void player::update(void)
 
 	//죽거나 없어져서 무효화된 유닛, 건물 체크
 	checkUnitValid();
-	checkBuildingVaild();
+	checkBuildingValid();
+	checkBulletsValid();
 
 	//완료된 업그레이드가 있는지 체크
 	updateZergUpgrade();
@@ -297,6 +314,13 @@ void player::update(void)
 		_vBuildings[i]->update();
 	}
 
+	for (UINT i = 0; i < _vBullets.size(); i++)
+	{
+		if (_vBullets[i]->getValid() == FALSE) continue;
+
+		_vBullets[i]->update();
+	}
+
 	//현재 자원계산
 	calcResource();
 
@@ -312,9 +336,13 @@ void player::render(fog* fog)
 	{
 		_vUnitsInCamera[i]->render();
 	}
-	for (UINT i = 0; i < _vBuildings.size(); i++)
+	for (UINT i = 0; i < _vBuildingsInCamera.size(); i++)
 	{
-		_vBuildings[i]->render();
+		_vBuildingsInCamera[i]->render();
+	}
+	for (UINT i = 0; i < _vBulletsInCamera.size(); i++)
+	{
+		_vBulletsInCamera[i]->render();
 	}
 
 	_fog->render();
@@ -372,6 +400,7 @@ void player::checkInCamera(void)
 {
 	_vUnitsInCamera.clear();		//카메라에 보여주는 유닛들
 	_vBuildingsInCamera.clear();	//카메라에 보여주는 건물들
+	_vBulletsInCamera.clear();
 
 	RECT temp;
 	RECT rcCamera = MAINCAMERA->getRectCamera();
@@ -391,6 +420,15 @@ void player::checkInCamera(void)
 		if (IntersectRect(&temp, &rcCamera, &rcBody))
 		{
 			_vBuildingsInCamera.push_back(_vBuildings[i]);
+		}
+	}
+
+	for (UINT i = 0; i < _vBullets.size(); i++)
+	{
+		RECT rcBody = _vBullets[i]->getRect();
+		if (IntersectRect(&temp, &rcCamera, &rcBody))
+		{
+			_vBulletsInCamera.push_back(_vBullets[i]);
 		}
 	}
 }
@@ -490,7 +528,7 @@ void player::updateZergUpgrade(void)
 			//case EVOLUTION_ZERG_LURKER_ASPECT:			//럴커 업글
 				for (int j = 0; j < _vUnits.size(); j++)
 				{
-					if (_vUnits[j]->getUnitnumZerg() != UNITNUM_ZERG_OVERLORD) continue;
+					if (_vUnits[j]->getUnitnumZerg() != UNITNUM_ZERG_HYDRALISK) continue;
 
 					_vUnits[j]->updateBattleStatus();
 				}
@@ -608,13 +646,33 @@ bool player::useResource(UINT mineral, UINT gas)
 
 bool player::useResource(UINT mineral, UINT gas, float control)
 {
-	if (_myMineral >= mineral && _myGas >= gas && (_myControl + control) <= _myControlMax)
+	//오버로드, 가디언, 디바워러처럼 인구수가 변화없는애들은 인구수 체크하지 않는다.
+	if (control < 0.01f)
 	{
-		_myMineral -= mineral;
-		_myGas -= gas;
-		return true;
+		if (_myMineral >= mineral && _myGas >= gas)
+		{
+			_myMineral -= mineral;
+			_myGas -= gas;
+			return true;
+		}
 	}
 	else
+	{
+		if (_myMineral >= mineral && _myGas >= gas && (_myControl + control) <= _myControlMax)
+		{
+			_myMineral -= mineral;
+			_myGas -= gas;
+			return true;
+		}
+	}
+
+	//if (_myMineral >= mineral && _myGas >= gas && (_myControl + control) <= _myControlMax)
+	//{
+	//	_myMineral -= mineral;
+	//	_myGas -= gas;
+	//	return true;
+	//}
+	//else
 	{
 		if (_myMineral < mineral)
 		{
@@ -661,6 +719,9 @@ void player::checkUnitValid(void)
 
 				POINT pt = _vUnits[i]->getBattleStatus().pt.toPoint();
 
+				//pt.x -= MAINCAMERA->getCameraX();
+				//pt.y -= MAINCAMERA->getCameraY();
+
 				switch (unitNumZ)
 				{
 				case UNITNUM_ZERG_LARVA:			EFFECTMANAGER->play(L"ZU-larva-Death",		pt.x, pt.y);	break;
@@ -674,7 +735,7 @@ void player::checkUnitValid(void)
 				case UNITNUM_ZERG_BROODLING:		break;
 				case UNITNUM_ZERG_DEFILER:			EFFECTMANAGER->play(L"ZU-defiler-Death",	pt.x, pt.y);	break;
 				case UNITNUM_ZERG_INFESTEDTERRAN:	break;
-				case UNITNUM_ZERG_OVERLORD:			break; //EFFECTMANAGER->play(L"ZU-overlord-Death"
+				case UNITNUM_ZERG_OVERLORD:			EFFECTMANAGER->play(L"ZU-overlord-Death",	pt.x, pt.y);	break;
 				case UNITNUM_ZERG_MUTALISK:			EFFECTMANAGER->play(L"ZU-mutalisk-Death",	pt.x, pt.y);	break;
 				case UNITNUM_ZERG_SCOURGE:			EFFECTMANAGER->play(L"ZU-scourge-Death",	pt.x, pt.y);	break;
 				case UNITNUM_ZERG_QUEEN:			EFFECTMANAGER->play(L"ZU-queen-Death",		pt.x, pt.y);	break;
@@ -690,6 +751,7 @@ void player::checkUnitValid(void)
 				_myControlMax	-= _vUnits[i]->getBaseStatus().publicControl;
 
 				_gameController->changeSelectInfoToNextObect(_vUnits[i]);
+
 				SAFE_RELEASEDELETE(_vUnits[i]);
 				_vUnits.erase(_vUnits.begin() + i);
 			}
@@ -700,7 +762,7 @@ void player::checkUnitValid(void)
 	}
 }
 
-void player::checkBuildingVaild(void)
+void player::checkBuildingValid(void)
 {
 	for (int i = 0; i < _vBuildings.size(); )
 	{
@@ -781,6 +843,19 @@ void player::checkBuildingVaild(void)
 	}
 }
 
+void player::checkBulletsValid(void)
+{
+	for (int i = 0; i < _vBullets.size();)
+	{
+		if (_vBullets[i]->getValid() == FALSE)
+		{
+			SAFE_RELEASEDELETE(_vBullets[i]);
+			_vBullets.erase(_vBullets.begin() + i);
+		}
+		else ++i;
+	}
+}
+
 void player::addUnit(Unit* unit)
 {
 	_myControl += unit->getBaseStatus().unitControl;
@@ -839,3 +914,4 @@ void player::addBuilding(Building* building)
 
 	_vBuildings.push_back(building);
 }
+

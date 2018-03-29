@@ -97,6 +97,7 @@ void Building::render(int imgOffsetX, int imgOffsetY)
 		_battleStatus.bodyFrame.x, _battleStatus.bodyFrame.y, rcBody);
 
 	//debug
+#if 0
 	{
 		RECT temp = _battleStatus.rcBody;
 		temp.left -= MAINCAMERA->getCameraX();
@@ -105,6 +106,7 @@ void Building::render(int imgOffsetX, int imgOffsetY)
 		temp.bottom -= MAINCAMERA->getCameraY();
 		RENDERMANAGER->insertLineRectangle(ZORDER_GAMEDEBUG1, temp, PENVERSION_BLUE1);
 	}
+#endif
 }
 
 void Building::updateBattleStatus(void)
@@ -189,6 +191,7 @@ void Building::checkDead(void)
 {
 	if (_battleStatus.isDead)
 	{
+		_nextObject = NULL;
 		_valid = true;
 	}
 }

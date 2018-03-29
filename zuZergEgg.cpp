@@ -51,18 +51,9 @@ HRESULT zuZergEgg::init(POINT pt)
 	initBattleStatus(pt);
 	initProcessing();
 
-
-
 	updatePosition();
 
 	updateBattleStatus();
-
-
-
-
-
-
-
 
 	return S_OK;
 }
@@ -107,11 +98,6 @@ void zuZergEgg::initNextUnit(POINT pt)
 		assert(L"egg->nextUnit ¿¡·¯");
 		return;
 	}
-
-	_nextUnit->setLinkAdressZergUpgrade(_zergUpgrade);
-	_nextUnit->setLinkAdressAstar(_aStar);
-	_nextUnit->setLinkAdressPlayer(_player);
-	_nextUnit->init(pt);
 
 	if (_nextUnit2 == NULL)
 	{

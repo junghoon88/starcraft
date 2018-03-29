@@ -75,7 +75,8 @@ void gameMap::loadData(void)
 
 	//실제 맵 데이터를 불러온다.
 	TCHAR strMapName[100];
-	_stprintf(strMapName, L"MapData/test3.map");
+	_tcscpy(strMapName, DATABASE->getMapFile());
+	//_stprintf(strMapName, L"MapData/test3.map");
 
 	file = CreateFile(strMapName, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 

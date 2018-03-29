@@ -157,8 +157,12 @@ void zbHatchery::larvaValidCheck(void)
 
 void zbHatchery::responeLarva(void)
 {
-	if (_vLarva.size() == LARVA_MAX)
+	if (_vLarva.size() >= LARVA_MAX)
 	{
+		if (_vLarva.size() > LARVA_MAX)
+		{
+			printf("");
+		}
 		_larvaResponeTime = 0.0f;
 		return;
 	}
@@ -238,6 +242,19 @@ void zbHatchery::updatePosition(void)
 
 void zbHatchery::updateImageFrame(void)
 {
+	float tick = TIMEMANAGER->getElapsedTime();
+
+	_battleStatus.bodyFrameTime += tick;
+	if (_battleStatus.bodyFrameTime >= UNIT_BODY_FPS_TIME)
+	{
+		_battleStatus.bodyFrameTime -= UNIT_BODY_FPS_TIME;
+
+		_battleStatus.bodyFrame.y++;
+		if (_battleStatus.bodyFrame.y > _baseStatus.imgBody->getMaxFrameY())
+		{
+			_battleStatus.bodyFrame.y = 0;
+		}
+	}
 
 }
 

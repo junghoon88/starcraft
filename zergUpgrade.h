@@ -46,7 +46,10 @@ public:
 
 public:
 	inline tagUpgrade* getUpgrade(void) { return _upgrade; }
+	inline void setUpgradeIsProcessing(UPGRADE_ZERG num, bool processing) { _upgrade[num].isProcessing = processing; }
+
 	inline tagEvolution* getEvolution(void) { return _evolution; }
+	inline void setUpgradeIsProcessing(EVOLUTION_ZERG num, bool processing) { _evolution[num].isProcessing = processing; }
 
 };
 

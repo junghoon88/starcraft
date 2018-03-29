@@ -127,8 +127,12 @@ void zbHive::larvaValidCheck(void)
 
 void zbHive::responeLarva(void)
 {
-	if (_vLarva.size() == LARVA_MAX)
+	if (_vLarva.size() >= LARVA_MAX)
 	{
+		if (_vLarva.size() > LARVA_MAX)
+		{
+			printf("");
+		}
 		_larvaResponeTime = 0.0f;
 		return;
 	}
@@ -206,6 +210,19 @@ void zbHive::updatePosition(void)
 
 void zbHive::updateImageFrame(void)
 {
+	float tick = TIMEMANAGER->getElapsedTime();
+
+	_battleStatus.bodyFrameTime += tick;
+	if (_battleStatus.bodyFrameTime >= UNIT_BODY_FPS_TIME)
+	{
+		_battleStatus.bodyFrameTime -= UNIT_BODY_FPS_TIME;
+
+		_battleStatus.bodyFrame.x++;
+		if (_battleStatus.bodyFrame.x > _baseStatus.imgBody->getMaxFrameX())
+		{
+			_battleStatus.bodyFrame.x = 0;
+		}
+	}
 
 }
 

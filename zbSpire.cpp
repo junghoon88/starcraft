@@ -118,6 +118,19 @@ void zbSpire::updatePosition(void)
 
 void zbSpire::updateImageFrame(void)
 {
+	float tick = TIMEMANAGER->getElapsedTime();
+
+	_battleStatus.bodyFrameTime += tick;
+	if (_battleStatus.bodyFrameTime >= UNIT_BODY_FPS_TIME)
+	{
+		_battleStatus.bodyFrameTime -= UNIT_BODY_FPS_TIME;
+
+		_battleStatus.bodyFrame.x++;
+		if (_battleStatus.bodyFrame.x > _baseStatus.imgBody->getMaxFrameX())
+		{
+			_battleStatus.bodyFrame.x = 0;
+		}
+	}
 
 }
 
@@ -133,6 +146,7 @@ void zbSpire::updateCommandSet(void)
 	{
 		_baseStatus.commands[0] = COMMAND_NONE;
 		_baseStatus.commands[1] = COMMAND_NONE;
+		_baseStatus.commands[6] = COMMAND_NONE;
 		_baseStatus.commands[8] = COMMAND_ESC;
 	}
 	else
@@ -182,7 +196,7 @@ void zbSpire::procCommands(void)
 			_processing.maxTime = upgFlyatk.vCost[upgFlyatk.level].duration;
 			_processing.complete = false;
 
-			upgFlyatk.isProcessing = true;
+			_player->getZergUpgrade()->setUpgradeIsProcessing(UPGRADE_ZERG_FLYERATTACKS, true);
 		}
 
 		_battleStatus.curCommand = COMMAND_NONE;
@@ -191,7 +205,7 @@ void zbSpire::procCommands(void)
 
 	case COMMAND_UPGRADE_ZERG_FLYERCARAPACE:
 	{
-		tagUpgrade upgFlydep = _player->getZergUpgrade()->getUpgrade()[UPGRADE_ZERG_FLYERATTACKS];
+		tagUpgrade upgFlydep = _player->getZergUpgrade()->getUpgrade()[UPGRADE_ZERG_CARAPACE];
 
 		if (_player->useResource(upgFlydep.vCost[upgFlydep.level].mineral, upgFlydep.vCost[upgFlydep.level].gas))
 		{
@@ -203,7 +217,7 @@ void zbSpire::procCommands(void)
 			_processing.maxTime = upgFlydep.vCost[upgFlydep.level].duration;
 			_processing.complete = false;
 
-			upgFlydep.isProcessing = true;
+			_player->getZergUpgrade()->setUpgradeIsProcessing(UPGRADE_ZERG_CARAPACE, true);
 		}
 
 		_battleStatus.curCommand = COMMAND_NONE;

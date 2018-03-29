@@ -56,7 +56,11 @@ void sceneInit::render(void)
 
 void sceneInit::initImage(void)
 {
-	_loading->loadFrameImage(L"버튼1", L"image/button1.bmp", 100, 60, 1, 2);
+	_loading->loadImage(L"background1", L"image/background1.bmp",	WINSIZEX, WINSIZEY);
+	_loading->loadImage(L"background2", L"image/background2.bmp",	WINSIZEX, WINSIZEY);
+	_loading->loadImage(L"window1",		L"image/window1.bmp",		240, 240);
+	_loading->loadImage(L"fade",		L"image/fade.bmp",			WINSIZEX, WINSIZEY, false, RGB(0, 0, 0), true);
+
 	_loading->loadFrameImage(L"버튼2", L"image/button2.bmp", 123, 29, 1, 1);
 
 	initImageNeutralResource();
@@ -69,6 +73,7 @@ void sceneInit::initImage(void)
 	initImageZergUnits();
 	initImageZergBuildings();
 	initImageZergDeath();
+	initImageZergBullet();
 
 }
 
@@ -327,31 +332,29 @@ void sceneInit::initImageZergUnits(void)
 		//drone
 		_stprintf(strKey, L"ZU-drone-Body%d", i);
 		_stprintf(strFile, L"image/zerg/unit/drone/Body%d.bmp", i);
-		//_loading->loadFrameImage(strKey, strFile, 576, 1008, 8, 14, true, RGB(255, 0, 255));
-		_loading->loadFrameImage(strKey, strFile, 1024, 1536, 8, 12, true, RGB(0, 255, 255));
+		_loading->loadFrameImage(strKey, strFile, 1024, 1664, 8, 13, true, RGB(0, 255, 255));
 
-		//zergling 프레임수정해야함
+		//zergling
 		_stprintf(strKey, L"ZU-zergling-Body%d", i);
 		_stprintf(strFile, L"image/zerg/unit/zergling/Body%d.bmp", i);
-		_loading->loadFrameImage(strKey, strFile, 1024, 1408, 8, 11, true, RGB(0, 255, 255));
-
-		//hydralisk 프레임수정해야함
-		_stprintf(strKey, L"ZU-hydralisk-Body%d", i);
-		_stprintf(strFile, L"image/zerg/unit/hydralisk/Body%d.bmp", i);
 		_loading->loadFrameImage(strKey, strFile, 1024, 1536, 8, 12, true, RGB(0, 255, 255));
 
+		//hydralisk
+		_stprintf(strKey, L"ZU-hydralisk-Body%d", i);
+		_stprintf(strFile, L"image/zerg/unit/hydralisk/Body%d.bmp", i);
+		_loading->loadFrameImage(strKey, strFile, 1024, 1664, 8, 13, true, RGB(0, 255, 255));
 
-		//lurker 프레임수정해야함
+		//lurker
 		_stprintf(strKey, L"ZU-lurker-Body%d", i);
 		_stprintf(strFile, L"image/zerg/unit/lurker/Body%d.bmp", i);
-		_loading->loadFrameImage(strKey, strFile, 1024, 896, 8, 7, true, RGB(0, 255, 255));
+		_loading->loadFrameImage(strKey, strFile, 1024, 1152, 8, 9, true, RGB(0, 255, 255));
 
 		//lurkeregg
 		_stprintf(strKey, L"ZU-lurkeregg-Body%d", i);
 		_stprintf(strFile, L"image/zerg/unit/lurkeregg/Body%d.bmp", i);
 		_loading->loadFrameImage(strKey, strFile, 960, 96, 10, 1, true, RGB(0, 255, 255));
 
-		//ultralisk 프레임수정해야함
+		//ultralisk
 		_stprintf(strKey, L"ZU-ultralisk-Body%d", i);
 		_stprintf(strFile, L"image/zerg/unit/ultralisk/Body%d.bmp", i);
 		_loading->loadFrameImage(strKey, strFile, 1024, 1920, 8, 15, true, RGB(0, 255, 255));
@@ -361,10 +364,10 @@ void sceneInit::initImageZergUnits(void)
 		_stprintf(strFile, L"image/zerg/unit/broodling/Body%d.bmp", i);
 		_loading->loadFrameImage(strKey, strFile, 384, 576, 8, 12, true, RGB(0, 255, 255));
 
-		//defiler 프레임수정해야함
+		//defiler
 		_stprintf(strKey, L"ZU-defiler-Body%d", i);
 		_stprintf(strFile, L"image/zerg/unit/defiler/Body%d.bmp", i);
-		_loading->loadFrameImage(strKey, strFile, 640, 640, 8, 8, true, RGB(0, 255, 255));
+		_loading->loadFrameImage(strKey, strFile, 640, 720, 8, 9, true, RGB(0, 255, 255));
 
 		//infestedterran
 		_stprintf(strKey, L"ZU-infestedterran-Body%d", i);
@@ -393,6 +396,9 @@ void sceneInit::initImageZergUnits(void)
 		_loading->loadFrameImage(strKey, strFile, 1024, 1408, 8, 11, true, RGB(0, 255, 255));
 
 		//cocoon
+		_stprintf(strKey, L"ZU-cocoon-Body%d", i);
+		_stprintf(strFile, L"image/zerg/unit/cocoon/Body%d.bmp", i);
+		_loading->loadFrameImage(strKey, strFile, 38, 33, 1, 1, true, RGB(0, 255, 255));
 
 		//guadian 프레임수정해야함
 		_stprintf(strKey, L"ZU-guadian-Body%d", i);
@@ -400,6 +406,9 @@ void sceneInit::initImageZergUnits(void)
 		_loading->loadFrameImage(strKey, strFile, 768, 672, 8, 7, true, RGB(0, 255, 255));
 
 		//devourer
+		_stprintf(strKey, L"ZU-devourer-Body%d", i);
+		_stprintf(strFile, L"image/zerg/unit/devourer/Body%d.bmp", i);
+		_loading->loadFrameImage(strKey, strFile, 768, 960, 8, 10, true, RGB(0, 255, 255));
 
 	}
 
@@ -687,7 +696,7 @@ void sceneInit::initImageZergDeath(void)
 	//infestedterran
 
 	//overlord
-	//_loading->loadFrameImage(L"ZU-overlord-Death",	L"image/zerg/unit/overlord/Death.bmp",	89, 96, true, RGB(255, 0, 255));
+	_loading->loadFrameImage(L"ZU-overlord-Death",	L"image/zerg/unit/overlord/Death.bmp",	612, 60, 9, 1, true, RGB(255, 0, 255));
 
 	//mutalisk
 	_loading->loadFrameImage(L"ZU-mutalisk-Death",	L"image/zerg/unit/mutalisk/Death.bmp",	612, 60, 9, 1, true, RGB(255, 0, 255));
@@ -699,11 +708,33 @@ void sceneInit::initImageZergDeath(void)
 	_loading->loadFrameImage(L"ZU-queen-Death",		L"image/zerg/unit/queen/Death.bmp",		1026, 103, 9, 1, true, RGB(255, 0, 255));
 
 	//cocoon
-	_loading->loadFrameImage(L"ZU-cocoon-Death",	L"image/zerg/unit/cocoon/Death.bmp",	89, 96, true, RGB(255, 0, 255));
+	_loading->loadFrameImage(L"ZU-cocoon-Death",	L"image/zerg/unit/cocoon/Death.bmp",	612, 60, 9, 1, true, RGB(255, 0, 255));
 
 	//guadian
 	_loading->loadFrameImage(L"ZU-guadian-Death",	L"image/zerg/unit/guadian/Death.bmp",	1026, 110, 9, 1, true, RGB(255, 0, 255));
 
 	//devourer
 	_loading->loadFrameImage(L"ZU-devourer-Death",	L"image/zerg/unit/devourer/Death.bmp",	990, 100, 9, 1, true, RGB(255, 0, 255));
+}
+
+
+void sceneInit::initImageZergBullet(void)
+{
+	_loading->loadFrameImage(L"ZU-hydralisk-Bullet000", L"image/zerg/unit/hydralisk/attack000.bmp", 86, 854, 1, 7, true, RGB(255, 0, 255));
+	_loading->loadFrameImage(L"ZU-hydralisk-Bullet045", L"image/zerg/unit/hydralisk/attack045.bmp", 86, 854, 1, 7, true, RGB(255, 0, 255));
+	_loading->loadFrameImage(L"ZU-hydralisk-Bullet090", L"image/zerg/unit/hydralisk/attack090.bmp", 86, 854, 1, 7, true, RGB(255, 0, 255));
+	_loading->loadFrameImage(L"ZU-hydralisk-Bullet135", L"image/zerg/unit/hydralisk/attack135.bmp", 86, 854, 1, 7, true, RGB(255, 0, 255));
+	_loading->loadFrameImage(L"ZU-hydralisk-Bullet180", L"image/zerg/unit/hydralisk/attack180.bmp", 86, 854, 1, 7, true, RGB(255, 0, 255));
+	_loading->loadFrameImage(L"ZU-hydralisk-Bullet225", L"image/zerg/unit/hydralisk/attack225.bmp", 86, 854, 1, 7, true, RGB(255, 0, 255));
+	_loading->loadFrameImage(L"ZU-hydralisk-Bullet270", L"image/zerg/unit/hydralisk/attack270.bmp", 86, 854, 1, 7, true, RGB(255, 0, 255));
+	_loading->loadFrameImage(L"ZU-hydralisk-Bullet315", L"image/zerg/unit/hydralisk/attack315.bmp", 86, 854, 1, 7, true, RGB(255, 0, 255));
+
+
+	_loading->loadFrameImage(L"ZU-mutalisk-Bullet",		L"image/zerg/unit/mutalisk/Bullet.bmp",		190, 25, 10, 1, true, RGB(255, 0, 255));
+	_loading->loadFrameImage(L"ZU-mutalisk-BulletEffect", L"image/zerg/unit/mutalisk/BulletEffect.bmp", 620, 63, 10, 1, true, RGB(255, 0, 255));
+	_loading->loadFrameImage(L"ZU-guadian-Bullet",		L"image/zerg/unit/guadian/Bullet.bmp",		13, 14, 1, 1, true, RGB(255, 0, 255));
+	_loading->loadFrameImage(L"ZU-guadian-BulletEffect",L"image/zerg/unit/guadian/BulletEffect.bmp",708, 61, 12, 1, true, RGB(255, 0, 255));
+	_loading->loadFrameImage(L"ZU-devourer-Bullet",		L"image/zerg/unit/devourer/Bullet.bmp",		640, 80, 8, 1, true, RGB(255, 0, 255));
+
+
 }

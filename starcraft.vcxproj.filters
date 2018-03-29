@@ -399,6 +399,9 @@
     <ClInclude Include="UnitCollision.h">
       <Filter>MainGame\Common</Filter>
     </ClInclude>
+    <ClInclude Include="bullets.h">
+      <Filter>MainGame\Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -660,6 +663,9 @@
       <Filter>MainGame\sceneBattle\gameMap</Filter>
     </ClCompile>
     <ClCompile Include="UnitCollision.cpp">
+      <Filter>MainGame\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="bullets.cpp">
       <Filter>MainGame\Common</Filter>
     </ClCompile>
   </ItemGroup>

@@ -26,6 +26,8 @@ public:
 	void updatePosition(void);
 	void updateImageFrame(void);
 
+	void updateProgressBar(void);
+
 	void procCommands(void);
 
 };

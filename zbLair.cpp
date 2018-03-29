@@ -128,8 +128,12 @@ void zbLair::larvaValidCheck(void)
 
 void zbLair::responeLarva(void)
 {
-	if (_vLarva.size() == LARVA_MAX)
+	if (_vLarva.size() >= LARVA_MAX)
 	{
+		if (_vLarva.size() > LARVA_MAX)
+		{
+			printf("");
+		}
 		_larvaResponeTime = 0.0f;
 		return;
 	}
@@ -207,6 +211,19 @@ void zbLair::updatePosition(void)
 }
 void zbLair::updateImageFrame(void)
 {
+	float tick = TIMEMANAGER->getElapsedTime();
+
+	_battleStatus.bodyFrameTime += tick;
+	if (_battleStatus.bodyFrameTime >= UNIT_BODY_FPS_TIME)
+	{
+		_battleStatus.bodyFrameTime -= UNIT_BODY_FPS_TIME;
+
+		_battleStatus.bodyFrame.x++;
+		if (_battleStatus.bodyFrame.x > _baseStatus.imgBody->getMaxFrameX())
+		{
+			_battleStatus.bodyFrame.x = 0;
+		}
+	}
 
 }
 
@@ -381,6 +398,9 @@ void zbLair::procCommands(void)
 				nextBuilding->setLinkAdressAstar(_aStar);
 				nextBuilding->setLinkAdressPlayer(_player);
 				nextBuilding->init(_battleStatus.ptTile);
+
+				nextBuilding->setLarvas(_vLarva);
+				nextBuilding->setLarvaResponeTime(_larvaResponeTime);
 
 				//HP 업데이트
 

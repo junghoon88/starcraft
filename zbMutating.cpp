@@ -116,6 +116,8 @@ void zbMutating::initNextBuilding(POINT ptTile)
 	_nextBuilding->setLinkAdressAstar(_aStar);
 	_nextBuilding->setLinkAdressPlayer(_player);
 	_nextBuilding->init(ptTile);
+
+	_nextObject = _nextBuilding;
 }
 
 
@@ -324,12 +326,12 @@ void zbMutating::render(int imgOffsetX, int imgOffsetY)
 	case BUILDINGNUM_ZERG_CREEPCOLONY:				Building::render(48, 64);		break;
 	case BUILDINGNUM_ZERG_SUNKENCOLONY:				Building::render(48, 64);		break;
 	case BUILDINGNUM_ZERG_SPORECOLONY:				Building::render(48, 64);		break;
-	case BUILDINGNUM_ZERG_EXTRACTOR:				Building::render(48, 64);		break;
+	case BUILDINGNUM_ZERG_EXTRACTOR:				Building::render(24, 64);		break;
 	case BUILDINGNUM_ZERG_SPAWNINGPOOL:				Building::render(32, 64);		break;
 	case BUILDINGNUM_ZERG_EVOLUTIONCHAMBER:			Building::render(32, 64);		break;
 	case BUILDINGNUM_ZERG_HYDRALISKDEN:				Building::render(32, 64);		break;
-	case BUILDINGNUM_ZERG_SPIRE:					Building::render(32, 64);		break;
-	case BUILDINGNUM_ZERG_GREATERSPIRE:				Building::render(32, 64);		break;
+	case BUILDINGNUM_ZERG_SPIRE:					Building::render(48, 64);		break;
+	case BUILDINGNUM_ZERG_GREATERSPIRE:				Building::render(48, 64);		break;
 	case BUILDINGNUM_ZERG_QUEENSNEST:				Building::render(32, 64);		break;
 	case BUILDINGNUM_ZERG_NYDUSCANAL:				Building::render(32, 64);		break;
 	case BUILDINGNUM_ZERG_ULTRALISKCAVERN:			Building::render(32, 64);		break;
@@ -354,8 +356,12 @@ void zbMutating::larvaValidCheck(void)
 
 void zbMutating::responeLarva(void)
 {
-	if (_vLarva.size() == LARVA_MAX)
+	if (_vLarva.size() >= LARVA_MAX)
 	{
+		if (_vLarva.size() > LARVA_MAX)
+		{
+			printf("");
+		}
 		_larvaResponeTime = 0.0f;
 		return;
 	}
@@ -463,7 +469,6 @@ void zbMutating::updateImageFrame(void)
 			temp.bodyFrame.x = 0;
 			temp.bodyFrame.y = 0;
 
-
 			if (_nextBuilding->getBuildingNumZerg() == BUILDINGNUM_ZERG_HATCHERY)
 			{
 				_nextBuilding->init(_battleStatus.ptTile, 1);
@@ -494,13 +499,18 @@ void zbMutating::updateImageFrame(void)
 					float ratio = _nextBuilding->getBattleStatus().maxHP / _battleStatus.maxHP;
 					temp.curHP = temp.curHP * ratio;
 				}
+				else if (_nextBuilding->getBattleStatus().maxHP > _battleStatus.maxHP)
+				{
+					FLOAT gapHP = _nextBuilding->getBattleStatus().maxHP - _battleStatus.maxHP;
+					temp.curHP += gapHP;
+				}
 			}
-
+			temp.maxHP = _nextBuilding->getBaseStatus().maxHP;
 
 			_nextBuilding->setBattleStatus(temp);
 			_player->addBuilding(_nextBuilding);
 
-			_nextObject = _nextBuilding;
+			//_nextObject = _nextBuilding;
 			_valid = false;
 		}
 	}

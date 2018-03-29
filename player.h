@@ -18,10 +18,14 @@
 
 #include "UnitCollision.h"
 
+#include "bullets.h"
+
 class player : public gameNode
 {
 private:
 	//static 변수
+	//Astar 에서 다른 gameObject 를 체크하기 위해 만듬;
+	gameObject*						_gameObject;
 
 private:
 	UINT							_myMineral;
@@ -37,6 +41,10 @@ private:
 	vUnits							_vUnitsInCamera;		//카메라에 보여주는 유닛들
 	vBuildings						_vBuildings;			//플레이어가 가지고 있는 건물들
 	vBuildings						_vBuildingsInCamera;	//카메라에 보여주는 건물들
+	vBullets						_vBullets;
+	vBullets						_vBulletsInCamera;
+
+
 
 	//플레이어 정보
 	PLAYER							_playerNum;	
@@ -89,10 +97,12 @@ public:
 
 
 	void checkUnitValid(void);
-	void checkBuildingVaild(void);
+	void checkBuildingValid(void);
+	void checkBulletsValid(void);
 
 	void addUnit(Unit* unit);
 	void addBuilding(Building* building);
+	inline void addBullet(bullets* bullet) { _vBullets.push_back(bullet); }
 
 
 
@@ -108,6 +118,7 @@ public:
 	inline void setLinkAdressZergProduction(zergProductionInfo* info) { _zergProductionInfo = info; }
 	inline zergProductionInfo* getZergProductionInfo(void) { return _zergProductionInfo; }
 
+	inline gameObject* getGameObject(void) { return _gameObject; }
 
 	inline UINT	getMyMineral(void)		{ return _myMineral; }
 	inline UINT	getMyGas(void)			{ return _myGas; }
@@ -118,7 +129,7 @@ public:
 
 
 
-	inline vUnits		getUnits(void) { return _vUnits; }
+	inline vUnits		getUnits(void)				{ return _vUnits; }
 	inline vUnits		getUnitsInCamera(void)		{ return _vUnitsInCamera; }
 	inline vBuildings	getBuildings(void)			{ return _vBuildings; }
 	inline vBuildings	getBuildingsInCamera(void)	{ return _vBuildingsInCamera; }

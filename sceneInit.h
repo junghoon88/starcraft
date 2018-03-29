@@ -19,6 +19,7 @@ private:
 	void initImageZergUnits(void);
 	void initImageZergBuildings(void);
 	void initImageZergDeath(void);
+	void initImageZergBullet(void);
 
 public:
 	HRESULT init(void);

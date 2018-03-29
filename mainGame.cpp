@@ -70,7 +70,6 @@ void mainGame::update(void)
 
 
 
-
 	MAINCAMERA->update();
 
 	SCENEMANAGER->update();
@@ -88,7 +87,7 @@ void mainGame::render(void)
 
 
 	TIMEMANAGER->render(getMemDC());
-	MAINCAMERA->render(getMemDC());
+	//MAINCAMERA->render(getMemDC());
 	
 	//========================================================================
 	//백버퍼에 있는걸 HDC로 그려주는 역할

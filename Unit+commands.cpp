@@ -3,9 +3,34 @@
 #include "Building.h"
 
 #include "tileNode.h"
+#include <assert.h>
 
 void Unit::procCommands(void)
 {
+	if (_isBurrowing || _isUnburrowing)
+		return;
+
+	if (_battleStatus.isBurrow)
+	{
+		if (_unitNumZ == UNITNUM_ZERG_LURKER)
+		{
+			if (_battleStatus.curCommand != COMMAND_STOP
+				&& _battleStatus.curCommand != COMMAND_ATTACK
+				&& _battleStatus.curCommand != COMMAND_UNBURROW)
+			{
+				return;
+			}
+		}
+		else
+		{
+			if (_battleStatus.curCommand != COMMAND_UNBURROW)
+			{
+				return;
+			}
+		}
+	}
+
+
 	switch (_battleStatus.curCommand)
 	{
 	case COMMAND_NONE:
@@ -22,6 +47,7 @@ void Unit::procCommands(void)
 		}
 		break;
 	case COMMAND_STOP:
+		_battleStatus.unitState = UNITSTATE_STOP;
 		break;
 	case COMMAND_ATTACK:
 		attackProc();
@@ -52,11 +78,19 @@ void Unit::procCommands(void)
 		{
 			_battleStatus.curCommand = _battleStatus.oldCommand;
 		}
+		else
+		{
+			_isBurrowing = true;
+		}
 		break;
 	case COMMAND_UNBURROW:
 		if (_baseStatus.commands[8] != COMMAND_UNBURROW || _battleStatus.isBurrow == FALSE)
 		{
 			_battleStatus.curCommand = _battleStatus.oldCommand;
+		}
+		else
+		{
+			_isUnburrowing = true;
 		}
 		break;
 
@@ -129,45 +163,48 @@ void Unit::moveGround(void)
 			//다시 계산을 요청한다.
 //			_battleStatus.calcAstar = false;
 
-			MYPOINT startPt = _battleStatus.pt;
-			MYPOINT endPt = _battleStatus.targetObject->getBattleStatus().pt;
-			POINT ptTarget = endPt.toPoint();
-
-			float width1 = _battleStatus.rcBody.right - _battleStatus.rcBody.left;
-			float height1 = _battleStatus.rcBody.bottom - _battleStatus.rcBody.top;
-			float width2 = _battleStatus.targetObject->getBattleStatus().rcBody.right - _battleStatus.targetObject->getBattleStatus().rcBody.left;
-			float height2 = _battleStatus.targetObject->getBattleStatus().rcBody.bottom - _battleStatus.targetObject->getBattleStatus().rcBody.top;
-
-			int gapX = (width1 + width2) / 2;
-			int gapY = (height1 + height2) / 2;
-
-			float angleDeg = getAngleDeg(startPt.x, startPt.y, endPt.x, endPt.y);
-			if ((angleDeg >= 0 && angleDeg <= 45) || (angleDeg >= 315 && angleDeg < 360))
+			if (_battleStatus.targetObject->getBaseStatus().isAir == FALSE)
 			{
-				//오른쪽방향
-				ptTarget.x = endPt.x - gapX;
-				ptTarget.y = startPt.y;
-			}
-			else if (angleDeg > 45 && angleDeg < 135)
-			{
-				//위쪽방향
-				ptTarget.x = startPt.x;
-				ptTarget.y = endPt.y + gapY;
-			}
-			else if (angleDeg >= 135 && angleDeg <= 225)
-			{
-				//왼쪽방향
-				ptTarget.x = endPt.x + gapX;
-				ptTarget.y = startPt.y;
-			}
-			else if (angleDeg > 225 && angleDeg < 315)
-			{
-				//아래방향
-				ptTarget.x = startPt.x;
-				ptTarget.y = endPt.y - gapY;
-			}
+				MYPOINT startPt = _battleStatus.pt;
+				MYPOINT endPt = _battleStatus.targetObject->getBattleStatus().pt;
+				POINT ptTarget = endPt.toPoint();
 
-			_battleStatus.ptTarget = ptTarget;
+				float width1 = _battleStatus.rcBody.right - _battleStatus.rcBody.left;
+				float height1 = _battleStatus.rcBody.bottom - _battleStatus.rcBody.top;
+				float width2 = _battleStatus.targetObject->getBattleStatus().rcBody.right - _battleStatus.targetObject->getBattleStatus().rcBody.left;
+				float height2 = _battleStatus.targetObject->getBattleStatus().rcBody.bottom - _battleStatus.targetObject->getBattleStatus().rcBody.top;
+
+				int gapX = (width1 + width2) / 2;
+				int gapY = (height1 + height2) / 2;
+
+				float angleDeg = getAngleDeg(startPt.x, startPt.y, endPt.x, endPt.y);
+				if ((angleDeg >= 0 && angleDeg <= 45) || (angleDeg >= 315 && angleDeg < 360))
+				{
+					//오른쪽방향
+					ptTarget.x = endPt.x - gapX;
+					ptTarget.y = startPt.y;
+				}
+				else if (angleDeg > 45 && angleDeg < 135)
+				{
+					//위쪽방향
+					ptTarget.x = startPt.x;
+					ptTarget.y = endPt.y + gapY;
+				}
+				else if (angleDeg >= 135 && angleDeg <= 225)
+				{
+					//왼쪽방향
+					ptTarget.x = endPt.x + gapX;
+					ptTarget.y = startPt.y;
+				}
+				else if (angleDeg > 225 && angleDeg < 315)
+				{
+					//아래방향
+					ptTarget.x = startPt.x;
+					ptTarget.y = endPt.y - gapY;
+				}
+
+				_battleStatus.ptTarget = ptTarget;
+			}
 
 			moveToPoint(_battleStatus.ptTarget);
 		}
@@ -394,12 +431,6 @@ void Unit::attackProc(void)
 		return;
 	}
 
-
-
-
-
-
-
 	if (_battleStatus.targetObject == NULL)
 	{
 		_battleStatus.unitState = UNITSTATE_MOVE;
@@ -418,6 +449,13 @@ void Unit::attackProc(void)
 	}
 	else
 	{
+		if (isValidObject(_battleStatus.targetObject) == NULL)
+		{
+			_battleStatus.targetObject = NULL;
+			_battleStatus.curCommand = COMMAND_MOVE;
+			return;
+		}
+
 		if (_battleStatus.targetObject->getBaseStatus().isAir == TRUE
 			&& _baseStatus.AWable == FALSE)
 		{
@@ -458,12 +496,26 @@ void Unit::attackProc(void)
 BOOL Unit::isInAttackRange(gameObject* target)
 {
 	float dist = getDistance(_battleStatus.pt.x, _battleStatus.pt.y,
-		target->getBattleStatus().pt.x, target->getBattleStatus().pt.y);
+							target->getBattleStatus().pt.x, target->getBattleStatus().pt.y);
 
-	if (_baseStatus.isAir)
+	int halfWidth1 = _battleStatus.rcBody.right - _battleStatus.rcBody.right;
+	int halfHeight1 = _battleStatus.rcBody.bottom - _battleStatus.rcBody.top;
+
+	int halfWidth2 = target->getBattleStatus().rcBody.right - target->getBattleStatus().rcBody.right;
+	int halfHeight2 = target->getBattleStatus().rcBody.bottom - target->getBattleStatus().rcBody.top;
+
+	float r1 = sqrt(pow(halfWidth1, 2) + pow(halfHeight1, 2));
+	float r2 = sqrt(pow(halfWidth2, 2) + pow(halfHeight2, 2));
+
+	dist -= (r1 + r2)/2;
+
+	if (target->getBaseStatus().isAir)
 	{
-		if (dist < _baseStatus.AWattackRange)
+		if (dist < _baseStatus.AWattackRange * TILESIZE)
 		{
+			_battleStatus.angleDeg = getAngleDeg(_battleStatus.pt.x, _battleStatus.pt.y,
+												target->getBattleStatus().pt.x, target->getBattleStatus().pt.y);
+
 			return TRUE;
 		}
 		else
@@ -475,6 +527,9 @@ BOOL Unit::isInAttackRange(gameObject* target)
 	{
 		if (dist < _baseStatus.GWattackRange * TILESIZE)
 		{
+			_battleStatus.angleDeg = getAngleDeg(_battleStatus.pt.x, _battleStatus.pt.y,
+				target->getBattleStatus().pt.x, target->getBattleStatus().pt.y);
+
 			return TRUE;
 		}
 		else

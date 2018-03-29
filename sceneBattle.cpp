@@ -195,13 +195,27 @@ void sceneBattle::initEffects(void)
 	//EFFECTMANAGER->addEffect(L"ZU-broodling-Death"
 	EFFECTMANAGER->addEffect(L"ZU-defiler-Death",		L"ZU-defiler-Death"		, ZORDER_GAMEOBJECT, 15, 0.016f, 200);
 	//infestedterran
-	//EFFECTMANAGER->addEffect(L"ZU-overlord-Death"
+	EFFECTMANAGER->addEffect(L"ZU-overlord-Death",		L"ZU-overlord-Death"	, ZORDER_GAMEOBJECTAIR, 15, 0.016f, 200);
 	EFFECTMANAGER->addEffect(L"ZU-mutalisk-Death",		L"ZU-mutalisk-Death"	, ZORDER_GAMEOBJECTAIR, 15, 0.016f, 200);
 	EFFECTMANAGER->addEffect(L"ZU-scourge-Death",		L"ZU-scourge-Death"		, ZORDER_GAMEOBJECTAIR, 15, 0.016f, 200);
 	EFFECTMANAGER->addEffect(L"ZU-queen-Death",			L"ZU-queen-Death"		, ZORDER_GAMEOBJECTAIR, 15, 0.016f, 200);
 	EFFECTMANAGER->addEffect(L"ZU-cocoon-Death",		L"ZU-cocoon-Death"		, ZORDER_GAMEOBJECTAIR, 15, 0.016f, 200);
 	EFFECTMANAGER->addEffect(L"ZU-guadian-Death",		L"ZU-guadian-Death"		, ZORDER_GAMEOBJECTAIR, 15, 0.016f, 200);
 	EFFECTMANAGER->addEffect(L"ZU-devourer-Death",		L"ZU-devourer-Death"	, ZORDER_GAMEOBJECTAIR, 15, 0.016f, 200);
+
+	//Bullet
+	EFFECTMANAGER->addEffect(L"ZU-hydralisk-Bullet000", L"ZU-hydralisk-Bullet000", ZORDER_GAMEOBJECT, 30, 0.016f, 200);
+	EFFECTMANAGER->addEffect(L"ZU-hydralisk-Bullet045", L"ZU-hydralisk-Bullet045", ZORDER_GAMEOBJECT, 30, 0.016f, 200);
+	EFFECTMANAGER->addEffect(L"ZU-hydralisk-Bullet090", L"ZU-hydralisk-Bullet090", ZORDER_GAMEOBJECT, 30, 0.016f, 200);
+	EFFECTMANAGER->addEffect(L"ZU-hydralisk-Bullet135", L"ZU-hydralisk-Bullet135", ZORDER_GAMEOBJECT, 30, 0.016f, 200);
+	EFFECTMANAGER->addEffect(L"ZU-hydralisk-Bullet180", L"ZU-hydralisk-Bullet180", ZORDER_GAMEOBJECT, 30, 0.016f, 200);
+	EFFECTMANAGER->addEffect(L"ZU-hydralisk-Bullet225", L"ZU-hydralisk-Bullet225", ZORDER_GAMEOBJECT, 30, 0.016f, 200);
+	EFFECTMANAGER->addEffect(L"ZU-hydralisk-Bullet270", L"ZU-hydralisk-Bullet270", ZORDER_GAMEOBJECT, 30, 0.016f, 200);
+	EFFECTMANAGER->addEffect(L"ZU-hydralisk-Bullet315", L"ZU-hydralisk-Bullet315", ZORDER_GAMEOBJECT, 30, 0.016f, 200);
+
+
+	EFFECTMANAGER->addEffect(L"ZU-mutalisk-BulletEffect",	L"ZU-mutalisk-BulletEffect", ZORDER_GAMEOBJECTAIR, 30, 0.016f, 200);
+	EFFECTMANAGER->addEffect(L"ZU-guadian-BulletEffect",	L"ZU-guadian-BulletEffect",  ZORDER_GAMEOBJECTAIR, 30, 0.016f, 200);
 
 	//Building
 

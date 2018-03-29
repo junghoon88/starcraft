@@ -165,6 +165,8 @@ void zuCocoon::release(void)
 void zuCocoon::update(void)
 {
 	Unit::update();
+
+	updateProgressBar();
 }
 
 void zuCocoon::render(void)
@@ -194,10 +196,44 @@ void zuCocoon::updateBattleStatus(void)
 void zuCocoon::updateImageFrame(void)
 {
 	Unit::setImageFrameForAngle();
+
+	if (_processing.complete)
+	{
+		_nextUnit->init(_battleStatus.pt.toPoint());
+		_player->addUnit(_nextUnit);
+		_nextObject = _nextUnit;
+
+		_valid = false;
+	}
+}
+
+void zuCocoon::updateProgressBar(void)
+{
+	float tick = TIMEMANAGER->getElapsedTime() * BUILDSPEEDMULTIPLY;
+
+	if (_processing.complete == false)
+	{
+		_processing.curTime += tick;
+
+		if (_processing.curTime >= _processing.maxTime)
+		{
+			_processing.curTime = _processing.maxTime;
+
+			_processing.complete = true;
+		}
+	}
 }
 
 void zuCocoon::procCommands(void)
 {
-	Unit::procCommands();
+	if (_battleStatus.curCommand == COMMAND_ESC)
+	{
+		//SAFE_RELEASEDELETE(_nextUnit);
+
+	}
+	else
+	{
+		_battleStatus.curCommand = COMMAND_NONE;
+	}
 
 }

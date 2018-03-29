@@ -114,7 +114,7 @@ void soundManager::play(wstring keyName, float volume)
 		if (keyName == iter->first)
 		{
 			Sound** ss = iter->second;
-			_system->playSound(FMOD_CHANNEL_FREE, *iter->second, false, &_channel[_mTotalChannels.size()]);
+			_system->playSound(FMOD_CHANNEL_REUSE, *iter->second, false, &_channel[_mTotalChannels.size()]);
 			//_system->playSound(_sound[count], 0, false, &_channel[count]); //1.10버전테스트
 			//채널별로 볼륨 설정
 			_channel[_mTotalChannels.size()]->setVolume(volume);

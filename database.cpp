@@ -15,7 +15,7 @@ HRESULT database::init()
 {
 	//loadDatabase(L"database.txt");
 
-	_mapNum = 0;
+	_stprintf(_strMapFile, L"");
 
 	_gameStart = false;
 

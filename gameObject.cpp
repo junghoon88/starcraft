@@ -49,6 +49,10 @@ gameObject::gameObject()
 
 	_amountMineral = 0;
 	_amountGas = 0;
+
+	_isBurrowing = FALSE;
+	_isUnburrowing = FALSE;
+
 }
 
 
@@ -148,7 +152,7 @@ UINT gameObject::gatherGas(void)
 }
 
 
-void gameObject::hitDamage(gameObject* object)
+void gameObject::hitDamage(gameObject* attackker)
 {
 	float damage = 0.0f;
 	DAMAGETYPE dmgType = DAMAGETYPE_NORMAL;
@@ -156,16 +160,24 @@ void gameObject::hitDamage(gameObject* object)
 	if (_baseStatus.isAir)
 	{
 		//내가 공중유닛일 때
-		damage = object->getBattleStatus().curAWdamage;
-		dmgType = object->getBaseStatus().AWdamageType;
+		damage = attackker->getBattleStatus().curAWdamage;
+		dmgType = attackker->getBaseStatus().AWdamageType;
 	}
 	else
 	{
 		//내가 지상유닛일 때
-		damage = object->getBattleStatus().curGWdamage;
-		dmgType = object->getBaseStatus().GWdamageType;
+		damage = attackker->getBattleStatus().curGWdamage;
+		dmgType = attackker->getBaseStatus().GWdamageType;
 	}
 
+	//방어력 계산
+	damage = damage - _battleStatus.curArmor;
+
+	//데미지가 0 이하가 되면 0~1 사이 랜덤 실수로 변경
+	if (damage <= 0.0f)
+	{
+		damage = RND->getFloat(1.0f);
+	}
 
 
 	//데미지 유형, 내 유닛 사이즈에 따라 데미지를 변경해준다. 
@@ -213,5 +225,96 @@ void gameObject::hitDamage(gameObject* object)
 	if (_battleStatus.curHP < 1.0f)
 	{
 		_battleStatus.isDead = true;
+		attackker->addKill();
 	}
+}
+
+//bullet 공격일 경우, 공격유닛이 그 사이에 죽을수도 있기 때문에
+void gameObject::hitDamage(gameObject* attackker, float dmg, DAMAGETYPE type)
+{
+	float damage = dmg;
+	DAMAGETYPE dmgType = type;
+
+	//방어력 계산
+	damage = damage - _battleStatus.curArmor;
+
+	//데미지가 0 이하가 되면 0~1 사이 랜덤 실수로 변경
+	if (damage <= 0.0f)
+	{
+		damage = RND->getFloat(1.0f);
+	}
+
+
+	//데미지 유형, 내 유닛 사이즈에 따라 데미지를 변경해준다. 
+	switch (dmgType)
+	{
+	case DAMAGETYPE_NORMAL:
+		damage = damage;
+		break;
+	case DAMAGETYPE_CONCUSSIVE:
+	{
+		switch (_baseStatus.unitSize)
+		{
+		case UNITSIZE_SMALL:
+			damage = damage;
+			break;
+		case UNITSIZE_MEDIUM:
+			damage = damage * 0.5f;
+			break;
+		case UNITSIZE_LARGE:
+			damage = damage * 0.25f;
+			break;
+		}
+	}
+	break;
+	case DAMAGETYPE_EXPLOSIVE:
+	{
+		switch (_baseStatus.unitSize)
+		{
+		case UNITSIZE_SMALL:
+			damage = damage * 0.5f;
+			break;
+		case UNITSIZE_MEDIUM:
+			damage = damage * 0.75f;
+			break;
+		case UNITSIZE_LARGE:
+			damage = damage;
+			break;
+		}
+	}
+	break;
+	}
+
+	//HP 계산
+	_battleStatus.curHP -= damage;
+	if (_battleStatus.curHP < 1.0f)
+	{
+		_battleStatus.isDead = true;
+
+		if (attackker != NULL && attackker->getValid() == TRUE)
+		{
+			attackker->addKill();
+		}
+	}
+}
+
+//외부에서 접근할때 gameObject가 delete 되었는지 확인용
+gameObject* gameObject::isValidObject(gameObject* obj)
+{
+	if (obj->getIsBuilding())
+	{
+		if (obj->getBuildingNumZerg() <= BUILDINGNUM_ZERG_NONE || obj->getBuildingNumZerg() >= BUILDINGNUM_ZERG_MAX)
+		{
+			obj = NULL;
+		}
+	}
+	else
+	{
+		if (obj->getUnitnumZerg() <= UNITNUM_ZERG_NONE || obj->getUnitnumZerg() >= UNITNUM_ZERG_MAX)
+		{
+			obj = NULL;
+		}
+	}
+
+	return obj;
 }

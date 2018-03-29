@@ -87,7 +87,7 @@ void effect::Zrender(void)
 {
 	if (!_isRunning) return;
 
-	RENDERMANAGER->insertImgAni(_zorder, _effectImage, _x, _y, _effectAnimation);
+	RENDERMANAGER->insertImgAni(_zorder, _effectImage, _x - MAINCAMERA->getCameraX(), _y - MAINCAMERA->getCameraY(), _effectAnimation);
 }
 
 

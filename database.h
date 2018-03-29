@@ -24,7 +24,7 @@ private:
 private:
 	arrElement _mTotalElement;
 
-	int _mapNum;
+	TCHAR	_strMapFile[100];
 
 	BOOL	_gameStart;
 	//플레이어가 선택한 종족 정보
@@ -50,8 +50,8 @@ public:
 	~database();
 
 public:
-	inline int getMapNum(void) { return _mapNum; }
-	inline void setMapNum(int num) { _mapNum = num; }
+	inline TCHAR* getMapFile(void) { return _strMapFile; }
+	inline void setMapFile(TCHAR* file) { _tcscpy(_strMapFile, file); }
 
 	inline BOOL	getGameStart(void) { return _gameStart; }
 	inline void setGameStart(BOOL start) { _gameStart = start; }

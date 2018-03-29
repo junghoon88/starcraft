@@ -84,11 +84,11 @@ void zuZergling::initBaseStatus(void)
 	_baseStatus.GWdamagePlus = 1;						
 	_baseStatus.GWmaxHit = 1;							
 	_baseStatus.GWdamageType = DAMAGETYPE_NORMAL;		
-	_baseStatus.GWcooldown = (_player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_ADRENAL_GLANDS].complete == false) ? 8.0f : 6.0f; //업글시 6					
+	_baseStatus.GWcooldown = (_player->getZergUpgrade()->getEvolution()[EVOLUTION_ZERG_ADRENAL_GLANDS].complete == false) ? 8.0f : 6.0f;
 	_baseStatus.GWattackRange = 1.0f;					
 
 	_baseStatus.AWable = FALSE;							
-
+	
 	_baseStatus.commands[0] = COMMAND_MOVE;
 	_baseStatus.commands[1] = COMMAND_STOP;
 	_baseStatus.commands[2] = COMMAND_ATTACK;
@@ -153,75 +153,154 @@ void zuZergling::updateBattleStatus(void)
 
 void zuZergling::updateImageFrame(void)
 {
-	Unit::setImageFrameForAngle();
-
 	float tick = TIMEMANAGER->getElapsedTime();
 
-	if (_battleStatus.unitState == UNITSTATE_STOP)
+	if (_isBurrowing)
 	{
-		//0
-		_battleStatus.bodyFrame.y = 0;
-		_battleStatus.bodyFrameTime = 0.0f;
-	}
-	else if (_battleStatus.unitState == UNITSTATE_MOVE)
-	{
-		//5, 6, 7, 8, 9
-		if (_battleStatus.bodyFrame.y >= 5 && _battleStatus.bodyFrame.y <= 9)
-		{
-			_battleStatus.bodyFrameTime += tick;
-			if (_battleStatus.bodyFrameTime >= UNIT_BODY_FPS_TIME)
-			{
-				_battleStatus.bodyFrameTime -= UNIT_BODY_FPS_TIME;
+		_battleStatus.unitState = UNITSTATE_STOP;
 
-				_battleStatus.bodyFrame.y++;
-				if (_battleStatus.bodyFrame.y > 9)
-				{
-					_battleStatus.bodyFrame.y = 5;
-				}
-			}
-		}
-		else
+		if (_battleStatus.bodyFrame.y != 11)
 		{
-			_battleStatus.bodyFrame.y = 5;
+			_battleStatus.bodyFrame.x = 0;
+			_battleStatus.bodyFrame.y = 11;
 			_battleStatus.bodyFrameTime = 0.0f;
 		}
-	}
-	else if (_battleStatus.unitState == UNITSTATE_ATTACK)
-	{
-		if (_battleStatus.targetObject == NULL)
+
+		_battleStatus.bodyFrameTime += tick;
+		if (_battleStatus.bodyFrameTime >= UNIT_BODY_FPS_TIME)
 		{
+			_battleStatus.bodyFrameTime -= UNIT_BODY_FPS_TIME;
+			_battleStatus.bodyFrame.x++;
+			if (_battleStatus.bodyFrame.x > 7)
+			{
+				_battleStatus.bodyFrame.x = 7;
+				_isBurrowing = false;
+				_battleStatus.isBurrow = true;
+				_battleStatus.angleDeg = 315.0f;
+			}
+		}
+	}
+	else if (_isUnburrowing)
+	{
+		_battleStatus.bodyFrameTime += tick;
+		if (_battleStatus.bodyFrameTime >= UNIT_BODY_FPS_TIME / 4)
+		{
+			_battleStatus.bodyFrameTime -= UNIT_BODY_FPS_TIME / 4;
+			_battleStatus.bodyFrame.x--;
+			if (_battleStatus.bodyFrame.x < 0)
+			{
+				_battleStatus.bodyFrame.x = 3;
+				_isUnburrowing = false;
+				_battleStatus.isBurrow = false;
+				_battleStatus.curCommand = COMMAND_STOP;
+				_battleStatus.oldCommand = COMMAND_STOP;
+
+				_battleStatus.bodyFrame.y = 0;
+			}
+		}
+	}
+	else
+	{
+		if (_battleStatus.isBurrow)
+			return;
+
+		Unit::setImageFrameForAngle();
+
+
+		if (_battleStatus.unitState == UNITSTATE_STOP)
+		{
+			//0
 			_battleStatus.bodyFrame.y = 0;
 			_battleStatus.bodyFrameTime = 0.0f;
-			return;
 		}
-
-		float attackTime = (_battleStatus.targetObject->getBaseStatus().isAir) ? _baseStatus.AWcooldown : _baseStatus.GWcooldown;
-		attackTime = attackTime / 4; //공격이 4프레임이니까 공격시간을 4로 나눠서 적용한다.
-
-		//1, 2, 3, 4
-		if (_battleStatus.bodyFrame.y >= 1 && _battleStatus.bodyFrame.y <= 4)
+		else if (_battleStatus.unitState == UNITSTATE_MOVE)
 		{
-			_battleStatus.bodyFrameTime += tick;
-			if (_battleStatus.bodyFrameTime >= UNIT_BODY_FPS_TIME)
+			//5, 6, 7, 8, 9
+			if (_battleStatus.bodyFrame.y >= 5 && _battleStatus.bodyFrame.y <= 9)
 			{
-				_battleStatus.bodyFrameTime -= UNIT_BODY_FPS_TIME;
-
-				_battleStatus.bodyFrame.y++;
-				if (_battleStatus.bodyFrame.y > 4)
+				_battleStatus.bodyFrameTime += tick;
+				if (_battleStatus.bodyFrameTime >= UNIT_BODY_FPS_TIME)
 				{
-					_battleStatus.bodyFrame.y = 1;
-					_battleStatus.targetObject->hitDamage(this);
+					_battleStatus.bodyFrameTime -= UNIT_BODY_FPS_TIME;
+
+					_battleStatus.bodyFrame.y++;
+					if (_battleStatus.bodyFrame.y > 9)
+					{
+						_battleStatus.bodyFrame.y = 5;
+					}
 				}
 			}
+			else
+			{
+				_battleStatus.bodyFrame.y = 5;
+				_battleStatus.bodyFrameTime = 0.0f;
+			}
 		}
-		else
+		else if (_battleStatus.unitState == UNITSTATE_ATTACK)
 		{
-			_battleStatus.bodyFrame.y = 1;
-			_battleStatus.bodyFrameTime = 0.0f;
-		}
+			if (_battleStatus.targetObject == NULL)
+			{
+				_battleStatus.bodyFrame.y = 0;
+				_battleStatus.bodyFrameTime = 0.0f;
+				return;
+			}
 
+			float attackTime = (_battleStatus.targetObject->getBaseStatus().isAir) ? _baseStatus.AWcooldown : _baseStatus.GWcooldown;
+			attackTime = attackTime * UNIT_ATTACK_FPS_TIME / 4; //공격이 4프레임이니까 공격시간을 4로 나눠서 적용한다.
+
+			//1, 2, 3, 4
+			if (_battleStatus.bodyFrame.y >= 1 && _battleStatus.bodyFrame.y <= 4)
+			{
+				_battleStatus.bodyFrameTime += tick;
+				if (_battleStatus.bodyFrameTime >= attackTime)
+				{
+					_battleStatus.bodyFrameTime -= attackTime;
+
+					_battleStatus.bodyFrame.y++;
+					if (_battleStatus.bodyFrame.y > 4)
+					{
+						_battleStatus.bodyFrame.y = 1;
+						_battleStatus.targetObject->hitDamage(this);
+					}
+				}
+			}
+			else
+			{
+				_battleStatus.bodyFrame.y = 1;
+				_battleStatus.bodyFrameTime = 0.0f;
+			}
+		}
 	}
 }
+
+void zuZergling::updateCommandSet(void)
+{
+	if (_battleStatus.isBurrow)
+	{
+		_baseStatus.commands[0] = COMMAND_NONE;
+		_baseStatus.commands[1] = COMMAND_NONE;
+		_baseStatus.commands[2] = COMMAND_NONE;
+		_baseStatus.commands[3] = COMMAND_NONE;
+		_baseStatus.commands[4] = COMMAND_NONE;
+		_baseStatus.commands[5] = COMMAND_NONE;
+		_baseStatus.commands[6] = COMMAND_NONE;
+		_baseStatus.commands[7] = COMMAND_NONE;
+		_baseStatus.commands[8] = COMMAND_UNBURROW;
+	}
+	else
+	{
+		_baseStatus.commands[0] = COMMAND_MOVE;
+		_baseStatus.commands[1] = COMMAND_STOP;
+		_baseStatus.commands[2] = COMMAND_ATTACK;
+		_baseStatus.commands[3] = COMMAND_PATROL;
+		_baseStatus.commands[4] = COMMAND_HOLD;
+		_baseStatus.commands[5] = COMMAND_NONE;
+		_baseStatus.commands[6] = COMMAND_NONE;
+		_baseStatus.commands[7] = COMMAND_NONE;
+		_baseStatus.commands[8] = COMMAND_BURROW;
+	}
+}
+
 
 void zuZergling::procCommands(void)
 {

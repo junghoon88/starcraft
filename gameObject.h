@@ -136,6 +136,9 @@ struct tagBattleStatus
 	MYPOINT				ptold;			//이전위치
 	POINT				ptTileOccupy;	//정지상태일때 자리를 차지하고 있는 타일(맵에 등록함)
 
+	FLOAT				bulletDelayGround;
+	FLOAT				bulletDelayAir;
+	UINT				kills;
 
 	BOOL				isBurrow;
 
@@ -206,6 +209,11 @@ protected:
 	UINT					_amountMineral;
 	UINT					_amountGas;
 
+
+	//
+	BOOL					_isBurrowing;
+	BOOL					_isUnburrowing;
+
 public:
 	gameObject();
 	~gameObject();
@@ -229,7 +237,11 @@ public:
 	UINT gatherMineral(void);
 	UINT gatherGas(void);
 
-	void hitDamage(gameObject* object);
+	void hitDamage(gameObject* attackker);
+	void hitDamage(gameObject* attackker, float dmg, DAMAGETYPE type);
+	inline void addKill(void) { _battleStatus.kills++; }
+
+	gameObject* isValidObject(gameObject* obj);
 
 public:
 	inline BOOL getValid(void) { return _valid; }

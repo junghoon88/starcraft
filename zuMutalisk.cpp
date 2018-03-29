@@ -3,6 +3,9 @@
 #include "zergDefine.h"
 #include "player.h"
 
+#include "zuCocoon.h"
+#include "bullets.h"
+
 
 zuMutalisk::zuMutalisk(PLAYER playerNum)
 {
@@ -173,10 +176,106 @@ void zuMutalisk::updateImageFrame(void)
 			_battleStatus.bodyFrame.y = 0;
 		}
 	}
+
+	bool fireableGround = false;
+	bool fireableAir = false;
+
+	float attackTimeGround = _baseStatus.GWcooldown * UNIT_ATTACK_FPS_TIME;
+	float attackTimeAir    = _baseStatus.AWcooldown * UNIT_ATTACK_FPS_TIME;
+
+	_battleStatus.bulletDelayGround += tick;
+	if (_battleStatus.bulletDelayGround >= attackTimeGround)
+	{
+		fireableGround = true;
+		_battleStatus.bulletDelayGround = attackTimeGround;
+	}
+
+	_battleStatus.bulletDelayAir += tick;
+	if (_battleStatus.bulletDelayAir >= attackTimeAir)
+	{
+		fireableAir = true;
+		_battleStatus.bulletDelayAir = attackTimeAir;
+	}
+
+
+	if (_battleStatus.unitState == UNITSTATE_ATTACK && _battleStatus.targetObject != NULL)
+	{
+		if (_battleStatus.targetObject->getBaseStatus().isAir)
+		{
+			if (fireableAir)
+			{
+				bullets* bullet = new bullets(BULLETNUM_MUTALISK);
+				bullet->init(this, _battleStatus.targetObject);
+				_player->addBullet(bullet);
+				_battleStatus.bulletDelayAir = 0.0f;
+			}
+		}
+		else
+		{
+			if (fireableGround)
+			{
+				bullets* bullet = new bullets(BULLETNUM_MUTALISK);
+				bullet->init(this, _battleStatus.targetObject);
+				_player->addBullet(bullet);
+				_battleStatus.bulletDelayGround = 0.0f;
+			}
+		}
+	}
 }
 
 void zuMutalisk::procCommands(void)
 {
 	Unit::procCommands();
+
+	if (_battleStatus.curCommand == COMMAND_UNIT_GUADIAN)
+	{
+		tagProduction buildCost = _player->getZergProductionInfo()->getZUProductionInfo(UNITNUM_ZERG_GUADIAN);
+
+		//내가 차지하고 있는 인구수를 빼준다.
+		buildCost.control = buildCost.control - _baseStatus.unitControl;
+
+		if (_player->useResource(buildCost.costMinerals, buildCost.costGas, buildCost.control))
+		{
+			//성공
+			zuCocoon* cocoon = new zuCocoon(_playerNum, UNITNUM_ZERG_GUADIAN);
+			cocoon->setLinkAdressZergUpgrade(_zergUpgrade);
+			cocoon->setLinkAdressAstar(_aStar);
+			cocoon->setLinkAdressPlayer(_player);
+			cocoon->init(_battleStatus.pt.toPoint());
+
+			_nextObject = cocoon;
+			_valid = false;
+
+			_player->addUnit(cocoon);
+		}
+
+		_battleStatus.curCommand = COMMAND_NONE;
+
+
+	}
+	else if (_battleStatus.curCommand == COMMAND_UNIT_DEVOURER)
+	{
+		tagProduction buildCost = _player->getZergProductionInfo()->getZUProductionInfo(UNITNUM_ZERG_DEVOURER);
+
+		//내가 차지하고 있는 인구수를 빼준다.
+		buildCost.control = buildCost.control - _baseStatus.unitControl;
+
+		if (_player->useResource(buildCost.costMinerals, buildCost.costGas, buildCost.control))
+		{
+			//성공
+			zuCocoon* cocoon = new zuCocoon(_playerNum, UNITNUM_ZERG_DEVOURER);
+			cocoon->setLinkAdressZergUpgrade(_zergUpgrade);
+			cocoon->setLinkAdressAstar(_aStar);
+			cocoon->setLinkAdressPlayer(_player);
+			cocoon->init(_battleStatus.pt.toPoint());
+
+			_nextObject = cocoon;
+			_valid = false;
+
+			_player->addUnit(cocoon);
+		}
+
+		_battleStatus.curCommand = COMMAND_NONE;
+	}
 
 }

@@ -103,7 +103,7 @@ void zuHydralisk::initBaseStatus(void)
 	_baseStatus.commands[3] = COMMAND_PATROL;
 	_baseStatus.commands[4] = COMMAND_HOLD;
 	_baseStatus.commands[5] = COMMAND_NONE;
-	_baseStatus.commands[6] = COMMAND_NONE;
+	_baseStatus.commands[6] = COMMAND_UNIT_LURKER;
 	_baseStatus.commands[7] = COMMAND_NONE;
 	_baseStatus.commands[8] = COMMAND_BURROW;
 }
@@ -162,11 +162,200 @@ void zuHydralisk::updateBattleStatus(void)
 
 void zuHydralisk::updateImageFrame(void)
 {
-	Unit::setImageFrameForAngle();
+	float tick = TIMEMANAGER->getElapsedTime();
+
+	if (_isBurrowing)
+	{
+		_battleStatus.unitState = UNITSTATE_STOP;
+
+		if (_battleStatus.bodyFrame.y != 12)
+		{
+			_battleStatus.bodyFrame.x = 0;
+			_battleStatus.bodyFrame.y = 12;
+			_battleStatus.bodyFrameTime = 0.0f;
+		}
+
+		_battleStatus.bodyFrameTime += tick;
+		if (_battleStatus.bodyFrameTime >= UNIT_BODY_FPS_TIME)
+		{
+			_battleStatus.bodyFrameTime -= UNIT_BODY_FPS_TIME;
+			_battleStatus.bodyFrame.x++;
+			if (_battleStatus.bodyFrame.x > 7)
+			{
+				_battleStatus.bodyFrame.x = 7;
+				_isBurrowing = false;
+				_battleStatus.isBurrow = true;
+				_battleStatus.angleDeg = 315.0f;
+			}
+		}
+	}
+	else if (_isUnburrowing)
+	{
+		_battleStatus.bodyFrameTime += tick;
+		if (_battleStatus.bodyFrameTime >= UNIT_BODY_FPS_TIME / 4)
+		{
+			_battleStatus.bodyFrameTime -= UNIT_BODY_FPS_TIME / 4;
+			_battleStatus.bodyFrame.x--;
+			if (_battleStatus.bodyFrame.x < 0)
+			{
+				_battleStatus.bodyFrame.x = 3;
+				_isUnburrowing = false;
+				_battleStatus.isBurrow = false;
+				_battleStatus.curCommand = COMMAND_STOP;
+				_battleStatus.oldCommand = COMMAND_STOP;
+
+				_battleStatus.bodyFrame.y = 0;
+			}
+		}
+	}
+	else
+	{
+		if (_battleStatus.isBurrow)
+			return;
+
+		Unit::setImageFrameForAngle();
+
+		if (_battleStatus.unitState == UNITSTATE_STOP)
+		{
+			//0
+			_battleStatus.bodyFrame.y = 0;
+			_battleStatus.bodyFrameTime = 0.0f;
+		}
+		else if (_battleStatus.unitState == UNITSTATE_MOVE)
+		{
+			//5, 6, 7, 8, 9, 10, 11
+			if (_battleStatus.bodyFrame.y >= 5 && _battleStatus.bodyFrame.y <= 11)
+			{
+				_battleStatus.bodyFrameTime += tick;
+				if (_battleStatus.bodyFrameTime >= UNIT_BODY_FPS_TIME)
+				{
+					_battleStatus.bodyFrameTime -= UNIT_BODY_FPS_TIME;
+
+					_battleStatus.bodyFrame.y++;
+					if (_battleStatus.bodyFrame.y > 11)
+					{
+						_battleStatus.bodyFrame.y = 5;
+					}
+				}
+			}
+			else
+			{
+				_battleStatus.bodyFrame.y = 5;
+				_battleStatus.bodyFrameTime = 0.0f;
+			}
+		}
+		else if (_battleStatus.unitState == UNITSTATE_ATTACK)
+		{
+			if (_battleStatus.targetObject == NULL)
+			{
+				_battleStatus.bodyFrame.y = 0;
+				_battleStatus.bodyFrameTime = 0.0f;
+				return;
+			}
+
+			float attackTime = (_battleStatus.targetObject->getBaseStatus().isAir) ? _baseStatus.AWcooldown : _baseStatus.GWcooldown;
+			attackTime = attackTime * UNIT_ATTACK_FPS_TIME / 4; //공격이 4프레임이니까 공격시간을 4로 나눠서 적용한다.
+
+			//1, 2, 3, 4
+			if (_battleStatus.bodyFrame.y >= 1 && _battleStatus.bodyFrame.y <= 4)
+			{
+				_battleStatus.bodyFrameTime += tick;
+				if (_battleStatus.bodyFrameTime >= attackTime)
+				{
+					_battleStatus.bodyFrameTime -= attackTime;
+
+					_battleStatus.bodyFrame.y++;
+					if (_battleStatus.bodyFrame.y > 4)
+					{
+						_battleStatus.bodyFrame.y = 1;
+						_battleStatus.targetObject->hitDamage(this);
+
+						switch (_battleStatus.bodyFrame.x)
+						{
+						case 0:	EFFECTMANAGER->play(L"ZU-hydralisk-Bullet000", _battleStatus.pt.x - 24 + 86/2 /*- MAINCAMERA->getCameraX()*/, _battleStatus.pt.y - 80 + 122/2 /*- MAINCAMERA->getCameraY()*/);	break;
+						case 1:	EFFECTMANAGER->play(L"ZU-hydralisk-Bullet045", _battleStatus.pt.x - 19 + 86/2 /*- MAINCAMERA->getCameraX()*/, _battleStatus.pt.y - 68 + 122/2 /*- MAINCAMERA->getCameraY()*/);	break;
+						case 2:	EFFECTMANAGER->play(L"ZU-hydralisk-Bullet090", _battleStatus.pt.x -  6 + 86/2 /*- MAINCAMERA->getCameraX()*/, _battleStatus.pt.y - 61 + 122/2 /*- MAINCAMERA->getCameraY()*/);	break;
+						case 3:	EFFECTMANAGER->play(L"ZU-hydralisk-Bullet135", _battleStatus.pt.x - 15 + 86/2 /*- MAINCAMERA->getCameraX()*/, _battleStatus.pt.y - 54 + 122/2 /*- MAINCAMERA->getCameraY()*/);	break;
+						case 4:	EFFECTMANAGER->play(L"ZU-hydralisk-Bullet180", _battleStatus.pt.x - 23 + 86/2 /*- MAINCAMERA->getCameraX()*/, _battleStatus.pt.y - 46 + 122/2 /*- MAINCAMERA->getCameraY()*/);	break;
+						case 5:	EFFECTMANAGER->play(L"ZU-hydralisk-Bullet225", _battleStatus.pt.x - 65 + 86/2 /*- MAINCAMERA->getCameraX()*/, _battleStatus.pt.y - 50 + 122/2 /*- MAINCAMERA->getCameraY()*/);	break;
+						case 6:	EFFECTMANAGER->play(L"ZU-hydralisk-Bullet270", _battleStatus.pt.x - 76 + 86/2 /*- MAINCAMERA->getCameraX()*/, _battleStatus.pt.y - 59 + 122/2 /*- MAINCAMERA->getCameraY()*/);	break;
+						case 7:	EFFECTMANAGER->play(L"ZU-hydralisk-Bullet315", _battleStatus.pt.x - 64 + 86/2 /*- MAINCAMERA->getCameraX()*/, _battleStatus.pt.y - 68 + 122/2 /*- MAINCAMERA->getCameraY()*/);	break;
+						}
+
+						if (_battleStatus.targetObject->getBattleStatus().isDead)
+						{
+							_battleStatus.targetObject = NULL;
+							_battleStatus.unitState == UNITSTATE_STOP;
+						}
+					}
+				}
+			}
+			else
+			{
+				_battleStatus.bodyFrame.y = 1;
+				_battleStatus.bodyFrameTime = 0.0f;
+			}
+		}
+	}
 }
+
+
+void zuHydralisk::updateCommandSet(void)
+{
+	if (_battleStatus.isBurrow)
+	{
+		_baseStatus.commands[0] = COMMAND_NONE;
+		_baseStatus.commands[1] = COMMAND_NONE;
+		_baseStatus.commands[2] = COMMAND_NONE;
+		_baseStatus.commands[3] = COMMAND_NONE;
+		_baseStatus.commands[4] = COMMAND_NONE;
+		_baseStatus.commands[5] = COMMAND_NONE;
+		_baseStatus.commands[6] = COMMAND_NONE;
+		_baseStatus.commands[7] = COMMAND_NONE;
+		_baseStatus.commands[8] = COMMAND_UNBURROW;
+	}
+	else
+	{
+		_baseStatus.commands[0] = COMMAND_MOVE;
+		_baseStatus.commands[1] = COMMAND_STOP;
+		_baseStatus.commands[2] = COMMAND_ATTACK;
+		_baseStatus.commands[3] = COMMAND_PATROL;
+		_baseStatus.commands[4] = COMMAND_HOLD;
+		_baseStatus.commands[5] = COMMAND_NONE;
+		_baseStatus.commands[6] = COMMAND_UNIT_LURKER;
+		_baseStatus.commands[7] = COMMAND_NONE;
+		_baseStatus.commands[8] = COMMAND_BURROW;
+	}
+}
+
 
 void zuHydralisk::procCommands(void)
 {
 	Unit::procCommands();
+
+	if (_battleStatus.curCommand == COMMAND_UNIT_LURKER)
+	{
+		tagProduction buildCost = _player->getZergProductionInfo()->getZUProductionInfo(UNITNUM_ZERG_LURKER);
+
+		//내가 차지하고 있는 인구수를 빼준다.
+		buildCost.control = buildCost.control - _baseStatus.unitControl;
+
+		if (_player->useResource(buildCost.costMinerals, buildCost.costGas, buildCost.control))
+		{
+			//성공
+			zuLurkerEgg* egg = new zuLurkerEgg(_playerNum);
+			egg->setLinkAdressZergUpgrade(_zergUpgrade);
+			egg->setLinkAdressAstar(_aStar);
+			egg->setLinkAdressPlayer(_player);
+			egg->init(_battleStatus.pt.toPoint());
+
+			_nextObject = egg;
+			_valid = false;
+
+			_player->addUnit(egg);
+		}
+
+		_battleStatus.curCommand = COMMAND_NONE;
+	}
 
 }

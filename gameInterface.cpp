@@ -211,8 +211,11 @@ void gameInterface::updateIconWeapon(void)
 			case UNITNUM_ZERG_LURKER:
 				_imgIconWeapon[0] = IMAGEMANAGER->findImage(L"iconWeapon-depGround");
 				_imgIconFrameX[0] = zUpgrade->getUpgrade()[UPGRADE_ZERG_CARAPACE].level;
-				_imgIconWeapon[1] = IMAGEMANAGER->findImage(L"iconWeapon-atkLurker");
-				_imgIconFrameX[1] = zUpgrade->getUpgrade()[UPGRADE_ZERG_MISSILEATTACKS].level;
+				if (selectInfo.object[0]->getBaseStatus().GWable)
+				{
+					_imgIconWeapon[1] = IMAGEMANAGER->findImage(L"iconWeapon-atkLurker");
+					_imgIconFrameX[1] = zUpgrade->getUpgrade()[UPGRADE_ZERG_MISSILEATTACKS].level;
+				}
 				_imgIconWeapon[2] = NULL;
 				_imgIconFrameX[2] = 0;
 			break;
@@ -404,6 +407,26 @@ void gameInterface::renderSelectInfo(void)
 			RENDERMANAGER->insertTextCenter(ZORDER_INTERFACE2, RectMake(295, 406, 50, 16), L"Detector", TEXTCOLOR_DETECTOR);
 		}
 
+		//Kills
+		switch (selectInfo.object[0]->getUnitnumZerg())
+		{
+			case UNITNUM_ZERG_DRONE:
+			case UNITNUM_ZERG_ZERGLING:
+			case UNITNUM_ZERG_HYDRALISK:
+			case UNITNUM_ZERG_LURKER:
+			case UNITNUM_ZERG_ULTRALISK:
+			case UNITNUM_ZERG_BROODLING:
+			case UNITNUM_ZERG_MUTALISK:
+			case UNITNUM_ZERG_QUEEN:
+			case UNITNUM_ZERG_GUADIAN:
+			case UNITNUM_ZERG_DEVOURER:
+			{
+				TCHAR strKill[100];
+				_stprintf(strKill, L"Kills: %d", selectInfo.object[0]->getBattleStatus().kills);
+				RENDERMANAGER->insertTextCenter(ZORDER_INTERFACE2, RectMake(274, 415, 80, 18), strKill, TEXTCOLOR_UNITNAME);
+			}
+			break;
+		}
 
 		//Stat1
 		RENDERMANAGER->insertImg(ZORDER_INTERFACE2, baseStatus.imgStat1, _rcStat1.left, _rcStat1.top);
@@ -455,6 +478,7 @@ void gameInterface::renderSelectInfo(void)
 			break;
 		}
 
+		//ÀÚ¿ø·®
 		if (selectInfo.object[0]->getIsNrMineral())
 		{
 			TCHAR strMineral[100];

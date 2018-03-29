@@ -158,6 +158,72 @@ void zuUltralisk::updateBattleStatus(void)
 void zuUltralisk::updateImageFrame(void)
 {
 	Unit::setImageFrameForAngle();
+
+	float tick = TIMEMANAGER->getElapsedTime();
+
+	if (_battleStatus.unitState == UNITSTATE_STOP)
+	{
+		//0
+		_battleStatus.bodyFrame.y = 0;
+		_battleStatus.bodyFrameTime = 0.0f;
+	}
+	else if (_battleStatus.unitState == UNITSTATE_MOVE)
+	{
+		//1, 2, 3, 4, 5
+		if (_battleStatus.bodyFrame.y >= 1 && _battleStatus.bodyFrame.y <= 5)
+		{
+			_battleStatus.bodyFrameTime += tick;
+			if (_battleStatus.bodyFrameTime >= UNIT_BODY_FPS_TIME)
+			{
+				_battleStatus.bodyFrameTime -= UNIT_BODY_FPS_TIME;
+
+				_battleStatus.bodyFrame.y++;
+				if (_battleStatus.bodyFrame.y > 5)
+				{
+					_battleStatus.bodyFrame.y = 1;
+				}
+			}
+		}
+		else
+		{
+			_battleStatus.bodyFrame.y = 1;
+			_battleStatus.bodyFrameTime = 0.0f;
+		}
+	}
+	else if (_battleStatus.unitState == UNITSTATE_ATTACK)
+	{
+		if (_battleStatus.targetObject == NULL)
+		{
+			_battleStatus.bodyFrame.y = 0;
+			_battleStatus.bodyFrameTime = 0.0f;
+			return;
+		}
+
+		float attackTime = (_battleStatus.targetObject->getBaseStatus().isAir) ? _baseStatus.AWcooldown : _baseStatus.GWcooldown;
+		attackTime = attackTime * UNIT_ATTACK_FPS_TIME / 6; //공격이 6프레임
+
+		//9, 10, 11, 12, 13, 14
+		if (_battleStatus.bodyFrame.y >= 9 && _battleStatus.bodyFrame.y <= 14)
+		{
+			_battleStatus.bodyFrameTime += tick;
+			if (_battleStatus.bodyFrameTime >= attackTime)
+			{
+				_battleStatus.bodyFrameTime -= attackTime;
+
+				_battleStatus.bodyFrame.y++;
+				if (_battleStatus.bodyFrame.y > 14)
+				{
+					_battleStatus.bodyFrame.y = 9;
+					_battleStatus.targetObject->hitDamage(this);
+				}
+			}
+		}
+		else
+		{
+			_battleStatus.bodyFrame.y = 9;
+			_battleStatus.bodyFrameTime = 0.0f;
+		}
+	}
 }
 
 void zuUltralisk::procCommands(void)

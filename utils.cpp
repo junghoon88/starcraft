@@ -13,6 +13,8 @@ namespace IOTA_UTIL
 		return sqrtf(x * x + y * y);
 	}
 
+
+
 	//각도 가져오는 함수
 	float getAngle(float x1, float y1, float x2, float y2)
 	{

@@ -145,7 +145,108 @@ void zuDefiler::updateBattleStatus(void)
 
 void zuDefiler::updateImageFrame(void)
 {
-	Unit::setImageFrameForAngle();
+	float tick = TIMEMANAGER->getElapsedTime();
+
+	if (_isBurrowing)
+	{
+		_battleStatus.unitState = UNITSTATE_STOP;
+
+		if (_battleStatus.bodyFrame.y != 8)
+		{
+			_battleStatus.bodyFrame.x = 0;
+			_battleStatus.bodyFrame.y = 8;
+			_battleStatus.bodyFrameTime = 0.0f;
+		}
+
+		_battleStatus.bodyFrameTime += tick;
+		if (_battleStatus.bodyFrameTime >= UNIT_BODY_FPS_TIME)
+		{
+			_battleStatus.bodyFrameTime -= UNIT_BODY_FPS_TIME;
+			_battleStatus.bodyFrame.x++;
+			if (_battleStatus.bodyFrame.x > 7)
+			{
+				_battleStatus.bodyFrame.x = 7;
+				_isBurrowing = false;
+				_battleStatus.isBurrow = true;
+				_battleStatus.angleDeg = 315.0f;
+			}
+		}
+	}
+	else if (_isUnburrowing)
+	{
+		_battleStatus.bodyFrameTime += tick;
+		if (_battleStatus.bodyFrameTime >= UNIT_BODY_FPS_TIME / 4)
+		{
+			_battleStatus.bodyFrameTime -= UNIT_BODY_FPS_TIME / 4;
+			_battleStatus.bodyFrame.x--;
+			if (_battleStatus.bodyFrame.x < 0)
+			{
+				_battleStatus.bodyFrame.x = 3;
+				_isUnburrowing = false;
+				_battleStatus.isBurrow = false;
+				_battleStatus.curCommand = COMMAND_STOP;
+				_battleStatus.oldCommand = COMMAND_STOP;
+
+				_battleStatus.bodyFrame.y = 0;
+			}
+		}
+	}
+	else
+	{
+		if (_battleStatus.isBurrow)
+			return;
+
+		Unit::setImageFrameForAngle();
+
+		if (_battleStatus.unitState == UNITSTATE_STOP)
+		{
+			//0
+			_battleStatus.bodyFrameTime = 0.0f;
+		}
+		else if (_battleStatus.unitState == UNITSTATE_MOVE)
+		{
+			_battleStatus.bodyFrameTime += tick;
+			if (_battleStatus.bodyFrameTime >= UNIT_BODY_FPS_TIME)
+			{
+				_battleStatus.bodyFrameTime -= UNIT_BODY_FPS_TIME;
+
+				_battleStatus.bodyFrame.y++;
+				if (_battleStatus.bodyFrame.y > 7)
+				{
+					_battleStatus.bodyFrame.y = 0;
+				}
+			}
+		}
+	}
+
+}
+
+void zuDefiler::updateCommandSet(void)
+{
+	if (_battleStatus.isBurrow)
+	{
+		_baseStatus.commands[0] = COMMAND_NONE;
+		_baseStatus.commands[1] = COMMAND_NONE;
+		_baseStatus.commands[2] = COMMAND_NONE;
+		_baseStatus.commands[3] = COMMAND_NONE;
+		_baseStatus.commands[4] = COMMAND_NONE;
+		_baseStatus.commands[5] = COMMAND_NONE;
+		_baseStatus.commands[6] = COMMAND_NONE;
+		_baseStatus.commands[7] = COMMAND_NONE;
+		_baseStatus.commands[8] = COMMAND_UNBURROW;
+	}
+	else
+	{
+		_baseStatus.commands[0] = COMMAND_MOVE;
+		_baseStatus.commands[1] = COMMAND_STOP;
+		_baseStatus.commands[2] = COMMAND_NONE;
+		_baseStatus.commands[3] = COMMAND_PATROL;
+		_baseStatus.commands[4] = COMMAND_HOLD;
+		_baseStatus.commands[5] = COMMAND_CONSUME;
+		_baseStatus.commands[6] = COMMAND_DARKSWARM;
+		_baseStatus.commands[7] = COMMAND_PLAGUE;
+		_baseStatus.commands[8] = COMMAND_BURROW;
+	}
 }
 
 void zuDefiler::procCommands(void)

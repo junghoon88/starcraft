@@ -225,9 +225,13 @@ void zergUpgrade::upgradeComplete(UPGRADE_ZERG num)
 	{
 		_upgrade[num].complete = true;
 	}
+
+	SOUNDMANAGER->play(L"zadupd02");
 }
 void zergUpgrade::evolutionComplete(EVOLUTION_ZERG num)
 {
 	_evolution[num].isProcessing = false;
 	_evolution[num].complete = true;
+
+	SOUNDMANAGER->play(L"zadupd02");
 }

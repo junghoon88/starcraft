@@ -22,6 +22,7 @@ public:
 	void updateBattleStatus(void);
 	void updatePosition(void);
 	void updateImageFrame(void);
+	void updateCommandSet(void);
 
 	void procCommands(void);
 

@@ -75,6 +75,7 @@ void Unit::render(void)
 	}
 
 	//debug
+#if 0
 	{
 		RECT temp = _battleStatus.rcBody;
 		temp.left -= MAINCAMERA->getCameraX();
@@ -83,6 +84,7 @@ void Unit::render(void)
 		temp.bottom -= MAINCAMERA->getCameraY();
 		RENDERMANAGER->insertLineRectangle(ZORDER_GAMEDEBUG1, temp, PENVERSION_BLUE1);
 	}
+#endif
 }
 
 void Unit::updateBattleStatus(void)
@@ -93,7 +95,11 @@ void Unit::updateBattleStatus(void)
 		//지상공격
 		if (_baseStatus.GWable)
 		{
-			if (_baseStatus.GWAttackType == ATTACKTYPE_ZERG_MELEE)
+			if (_baseStatus.GWAttackType == ATTACKTYPE_ZERG_FIXED)
+			{
+				_battleStatus.curGWdamage = _baseStatus.GWdamage;
+			}
+			else if (_baseStatus.GWAttackType == ATTACKTYPE_ZERG_MELEE)
 			{
 				_battleStatus.curGWdamage = _baseStatus.GWdamage + _baseStatus.GWdamagePlus * _zergUpgrade->getUpgrade()[UPGRADE_ZERG_MELEEATTACKS].level;
 			}
@@ -105,7 +111,11 @@ void Unit::updateBattleStatus(void)
 		//공중공격
 		if (_baseStatus.AWable)
 		{
-			if (_baseStatus.AWAttackType == ATTACKTYPE_ZERG_MELEE)
+			if (_baseStatus.AWAttackType == ATTACKTYPE_ZERG_FIXED)
+			{
+				_battleStatus.curAWdamage = _baseStatus.AWdamage;
+			}
+			else if (_baseStatus.AWAttackType == ATTACKTYPE_ZERG_MELEE)
 			{
 				_battleStatus.curAWdamage = _baseStatus.AWdamage + _baseStatus.AWdamagePlus * _zergUpgrade->getUpgrade()[UPGRADE_ZERG_MELEEATTACKS].level;
 			}
@@ -124,7 +134,11 @@ void Unit::updateBattleStatus(void)
 		//지상공격
 		if (_baseStatus.GWable)
 		{
-			if (_baseStatus.GWAttackType == ATTACKTYPE_ZERG_FLYING)
+			if (_baseStatus.GWAttackType == ATTACKTYPE_ZERG_FIXED)
+			{
+				_battleStatus.curGWdamage = _baseStatus.GWdamage;
+			}
+			else if (_baseStatus.GWAttackType == ATTACKTYPE_ZERG_FLYING)
 			{
 				_battleStatus.curGWdamage = _baseStatus.GWdamage + _baseStatus.GWdamagePlus * _zergUpgrade->getUpgrade()[UPGRADE_ZERG_FLYERATTACKS].level;
 			}
@@ -132,7 +146,11 @@ void Unit::updateBattleStatus(void)
 		//공중공격
 		if (_baseStatus.AWable)
 		{
-			if (_baseStatus.AWAttackType == ATTACKTYPE_ZERG_FLYING)
+			if (_baseStatus.AWAttackType == ATTACKTYPE_ZERG_FIXED)
+			{
+				_battleStatus.curAWdamage = _baseStatus.AWdamage;
+			}
+			else if (_baseStatus.AWAttackType == ATTACKTYPE_ZERG_FLYING)
 			{
 				_battleStatus.curAWdamage = _baseStatus.AWdamage + _baseStatus.AWdamagePlus * _zergUpgrade->getUpgrade()[UPGRADE_ZERG_FLYERATTACKS].level;
 			}
@@ -161,6 +179,7 @@ void Unit::checkDead(void)
 {
 	if (_battleStatus.isDead)
 	{
+		_nextObject = NULL;
 		_valid = false;
 	}
 }
@@ -200,6 +219,9 @@ void Unit::collisionMoveOffset(int x, int y)
 
 void Unit::stopUnitRegisterMap(void)
 {
+	if (_baseStatus.isAir == TRUE)
+		return;
+
 	float dist = getDistance(_battleStatus.pt.x, _battleStatus.pt.y, _battleStatus.ptold.x, _battleStatus.ptold.y);
 
 	//정지했는지?
@@ -244,7 +266,7 @@ void Unit::stopUnitRegisterMap(void)
 
 void Unit::collision(void)
 {
-	if (_unitNumZ == UNITNUM_ZERG_LARVA || _unitNumZ == UNITNUM_ZERG_ZERGEGG)
+	if (_unitNumZ == UNITNUM_ZERG_LARVA || _unitNumZ == UNITNUM_ZERG_ZERGEGG || _unitNumZ == UNITNUM_ZERG_LURKEREGG)
 		return;
 
 	if (_baseStatus.isAir)

@@ -160,4 +160,13 @@ void zbSporeColony::updateCommandSet(void)
 void zbSporeColony::procCommands(void)
 {
 	Building::procCommands();
+
+	if (_battleStatus.curCommand == COMMAND_ATTACK)
+	{
+
+	}
+	else
+	{
+		_battleStatus.curCommand = COMMAND_STOP;
+	}
 }

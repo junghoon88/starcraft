@@ -55,6 +55,14 @@ void aStar::initTiles(void)
 //타일 셋팅할 함수
 void aStar::setTiles(POINT startPt, POINT endPt)
 {
+	if ((startPt.x < 0 || startPt.x >= TILEX || startPt.y < 0 || startPt.y >= TILEY)
+		|| (endPt.x < 0 || endPt.x >= TILEX || endPt.y < 0 || endPt.y >= TILEY))
+	{
+		_valid = false;
+		return;
+	}
+
+
 	if (startPt.x == endPt.x && startPt.y == endPt.y)
 	{
 		_valid = false;
